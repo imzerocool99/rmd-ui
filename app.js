@@ -112,7 +112,8 @@ function renderResults(data) {
   renderHoldingsTable(portfolio, assets);
 
   // Selected assets table
-  renderSelectedTable(assets);
+  const executions = data.execution || [];
+  renderSelectedTable(assets, executions);
 
   // RMD coverage chart
   renderRMDChart(rmd, totalLiquidated);
@@ -312,20 +313,63 @@ function renderPerformanceChart(portfolio) {
   });
 }
 
-function renderSelectedTable(assets) {
+function renderSelectedTable(assets, executions) {
   const tbody = document.getElementById('selectedBody');
   tbody.innerHTML = '';
+
+  // Map execution results by symbol for status lookup
+  const execMap = {};
+  (executions || []).forEach(e => {
+    if (e && e.symbol) execMap[e.symbol] = e.status || 'simulated';
+  });
+
   assets.forEach(a => {
+    const execStatus = execMap[a.symbol] || 'selected';
+    const { badge, label, tooltip } = resolveStatus(execStatus);
+    const gain = a.gain !== undefined ? Number(a.gain) : null;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${a.symbol}</strong></td>
       <td>${a.qty} shares</td>
       <td>$${Number(a.price).toLocaleString()}</td>
-      <td>$${Number(a.value).toLocaleString()}</td>
-      <td><span class="badge done">✓ Executed</span></td>
+      <td><strong>$${Number(a.value).toLocaleString()}</strong></td>
+      <td>${gain !== null
+        ? `<span style="color:${gain >= 0 ? '#d29922' : '#3fb950'}">${gain >= 0 ? '+' : ''}$${gain.toFixed(2)}</span>`
+        : '—'}</td>
+      <td><span class="badge ${badge}" title="${tooltip}">${label}</span></td>
     `;
     tbody.appendChild(tr);
   });
+
+  // Summary row
+  const total = assets.reduce((s, a) => s + Number(a.value || 0), 0);
+  const totalGain = assets.reduce((s, a) => s + (a.gain !== undefined ? Number(a.gain) : 0), 0);
+  const tr = document.createElement('tr');
+  tr.style.borderTop = '2px solid #30363d';
+  tr.innerHTML = `
+    <td colspan="3" style="font-weight:700;color:#c9d1d9">Total</td>
+    <td style="font-weight:700;color:#58a6ff">$${total.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+    <td style="color:${totalGain >= 0 ? '#d29922' : '#3fb950'};font-weight:700">${totalGain >= 0 ? '+' : ''}$${totalGain.toFixed(2)}</td>
+    <td></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function resolveStatus(status) {
+  switch ((status || '').toLowerCase()) {
+    case 'filled':
+      return { badge: 'done',   label: '✅ Order Filled',    tooltip: 'Trade confirmed filled on the market' };
+    case 'new':
+    case 'pending_new':
+    case 'accepted':
+      return { badge: 'inkind', label: '🔄 Order Placed',    tooltip: 'Order submitted to Alpaca — awaiting fill' };
+    case 'simulated':
+      return { badge: 'sim',    label: '⚠️ POC Simulated',   tooltip: 'Paper trade simulated locally for demo — no real order placed' };
+    case 'selected':
+    default:
+      return { badge: 'hold',   label: '📋 Ready to Execute', tooltip: 'Agent selected this asset for liquidation — pending execution' };
+  }
 }
 
 function renderRMDChart(rmd, liquidated) {

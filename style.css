@@ -285,10 +285,11 @@ hr { border-color: #21262d; margin: 16px 0; }
   font-size: 11px;
   font-weight: 600;
 }
-.badge.sell { background: #3d2323; color: #f85149; }
+.badge.sell   { background: #3d2323; color: #f85149; }
 .badge.inkind { background: #1a3a2a; color: #3fb950; }
-.badge.done { background: #1a3a2a; color: #3fb950; }
-.badge.hold { background: #2d2a1a; color: #d29922; }
+.badge.done   { background: #1a3a2a; color: #3fb950; }
+.badge.hold   { background: #1a2a3a; color: #58a6ff; }
+.badge.sim    { background: #2d2a1a; color: #d29922; }
 
 /* JSON VIEW */
 .json-view {
