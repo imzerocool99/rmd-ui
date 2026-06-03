@@ -70,7 +70,6 @@
         <button class="tab" onclick="showTab('portfolio', this)">Portfolio</button>
         <button class="tab" onclick="showTab('results', this)">Agent Results</button>
         <button class="tab" onclick="showTab('reinvest', this)">💡 Reinvestment</button>
-        <button class="tab" onclick="showTab('chat', this)">AI Assistant</button>
         <button class="tab" onclick="showTab('value', this)">📊 Business Value</button>
         <button class="tab" onclick="showTab('logs', this)">Logs</button>
       </div>
@@ -385,30 +384,6 @@
 
       </div>
 
-      <!-- CHAT TAB -->
-      <div id="tab-chat" class="tab-content">
-        <div class="panel chat-panel">
-          <div class="panel-title">AI Assistant — Ask About Your RMD</div>
-          <div class="chat-messages" id="chatMessages">
-            <div class="chat-msg assistant">
-              Hello! I'm your RMD Intelligent Assistant. I can explain why specific assets were selected, help you understand your tax impact, compare cash vs in-kind distribution options, and answer any questions about your IRA Required Minimum Distribution. What would you like to know?
-            </div>
-          </div>
-          <div class="chat-input-row">
-            <input type="text" id="chatInput"
-              placeholder="Ask: Why was AAPL selected? What is my tax impact? Cash vs In-Kind?"
-              onkeydown="if(event.key==='Enter') sendChat()"/>
-            <button class="btn-primary" onclick="sendChat()">Send</button>
-          </div>
-          <div class="quick-questions">
-            <span class="qbtn" onclick="askQuick('Why were these specific assets selected for my RMD?')">Why these assets?</span>
-            <span class="qbtn" onclick="askQuick('What is the tax impact of my RMD distribution?')">Tax impact?</span>
-            <span class="qbtn" onclick="askQuick('Should I choose cash distribution or in-kind transfer?')">Cash vs In-Kind?</span>
-            <span class="qbtn" onclick="askQuick('How is my RMD amount calculated by the IRS?')">How is RMD calculated?</span>
-          </div>
-        </div>
-      </div>
-
       <!-- LOGS TAB -->
       <div id="tab-logs" class="tab-content">
         <div class="panel">
@@ -423,6 +398,46 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- FLOATING AI BOT -->
+  <div class="bot-bubble" id="botBubble" onclick="toggleBot()" title="AI Assistant">
+    <span class="bot-icon" id="botIcon">🤖</span>
+    <span class="bot-badge" id="botBadge"></span>
+  </div>
+
+  <div class="bot-panel" id="botPanel">
+    <div class="bot-header">
+      <div class="bot-header-left">
+        <span>🤖</span>
+        <div>
+          <div class="bot-name">RMD AI Assistant</div>
+          <div class="bot-context-label" id="botContextLabel">Awaiting agent run...</div>
+        </div>
+      </div>
+      <button class="bot-close" onclick="toggleBot()">✕</button>
+    </div>
+
+    <div class="bot-messages" id="botMessages">
+      <div class="chat-msg assistant">
+        Hi! I'm your RMD AI Assistant. I can see which tab you're on and answer questions in context.<br/><br/>
+        Run the agent first, then ask me anything about your portfolio, tax savings, reinvestment options, or RMD calculation.
+      </div>
+    </div>
+
+    <div class="bot-quick" id="botQuick">
+      <span class="qbtn" onclick="askBot('Why were these assets selected?')">Why these assets?</span>
+      <span class="qbtn" onclick="askBot('What is my tax impact?')">Tax impact?</span>
+      <span class="qbtn" onclick="askBot('Explain my reinvestment options')">Reinvestment?</span>
+      <span class="qbtn" onclick="askBot('How is my RMD calculated?')">RMD formula?</span>
+    </div>
+
+    <div class="bot-input-row">
+      <input type="text" id="botInput"
+        placeholder="Ask about this page..."
+        onkeydown="if(event.key==='Enter') askBot()"/>
+      <button class="btn-primary" onclick="askBot()" style="margin:0;width:auto;padding:8px 14px">↑</button>
+    </div>
   </div>
 
   <script src="app.js"></script>

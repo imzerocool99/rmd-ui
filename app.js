@@ -1,5 +1,7 @@
 const API = 'http://localhost:8085';
 let agentContext = '';
+let agentData = null;
+let currentTab = 'dashboard';
 let portfolioChart = null;
 let performanceChart = null;
 let rmdChart = null;
@@ -27,12 +29,14 @@ async function checkBackend() {
 }
 
 // ── Tabs ──────────────────────────────────────────────────────────────
-function showTab(name) {
+function showTab(name, el) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(`tab-${name}`).classList.add('active');
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
+  currentTab = name;
   if (name === 'logs') loadLogs();
+  updateBotContext();
 }
 
 // ── Presets ───────────────────────────────────────────────────────────
@@ -61,8 +65,10 @@ async function runAgent() {
       body: JSON.stringify(body)
     });
     const data = await res.json();
+    agentData = data;
     renderResults(data);
     agentContext = buildContext(data, body);
+    updateBotContext();
   } catch (e) {
     alert('Agent run failed. Is the backend running on port 8085?');
   } finally {
@@ -450,37 +456,140 @@ function renderTaxAnalysis(tax) {
   });
 }
 
-// ── Chat ──────────────────────────────────────────────────────────────
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
+// ── Floating Bot ──────────────────────────────────────────────────────
+function toggleBot() {
+  const panel = document.getElementById('botPanel');
+  const badge = document.getElementById('botBadge');
+  panel.classList.toggle('open');
+  badge.classList.remove('active');
+}
+
+function updateBotContext() {
+  const label = document.getElementById('botContextLabel');
+  if (!agentData) { label.textContent = 'Awaiting agent run...'; return; }
+
+  const tabLabels = {
+    dashboard:  'Context: Dashboard — RMD & Portfolio Overview',
+    portfolio:  'Context: Portfolio — Holdings & Performance',
+    results:    'Context: Agent Results — Liquidation & Tax Savings',
+    reinvest:   'Context: Reinvestment — Product Suggestions',
+    value:      'Context: Business Value — POC Showcase',
+    logs:       'Context: Agent Logs'
+  };
+  label.textContent = tabLabels[currentTab] || 'Context: RMD Agent';
+
+  // Update quick questions per tab
+  const quick = document.getElementById('botQuick');
+  const tabQuestions = {
+    dashboard: [
+      ['Why these assets?',       'Why were these specific assets selected for my RMD?'],
+      ['Cash vs In-Kind?',        'Should I choose cash distribution or in-kind transfer?'],
+      ['How is RMD calculated?',  'How is my RMD amount calculated?'],
+      ['What is my strategy?',    'Explain the strategy the agent chose for me']
+    ],
+    portfolio: [
+      ['Best asset to sell?',     'Which asset in my portfolio is the best candidate for liquidation?'],
+      ['Why keep AAPL?',          'Why is AAPL being held and not selected for liquidation?'],
+      ['Portfolio risk?',         'What is the overall risk profile of my portfolio?'],
+      ['What are my losses?',     'Which assets have unrealized losses in my portfolio?']
+    ],
+    results: [
+      ['How much tax saved?',     'How much tax did the agent save compared to a random selection?'],
+      ['Why these quantities?',   'Why were these specific share quantities chosen?'],
+      ['What is naive approach?', 'What would have happened without the agent optimizing the selection?'],
+      ['What is my tax bill?',    'What is my estimated tax bill on this RMD distribution?']
+    ],
+    reinvest: [
+      ['Best product for me?',    'Which reinvestment product is best for my age and situation?'],
+      ['What is a CD?',           'Explain the Certificate of Deposit option and its benefits'],
+      ['Why municipal bonds?',    'Why are municipal bonds recommended and what is the tax benefit?'],
+      ['Total income estimate?',  'What is my total projected annual income from reinvestment?']
+    ],
+    value: [
+      ['How does agent save tax?','How exactly does the agent save taxes compared to manual processing?'],
+      ['ROI of this solution?',   'What is the return on investment of deploying this RMD agent?'],
+      ['Who benefits most?',      'Which type of client benefits the most from this agent?'],
+      ['Scale to many clients?',  'How does this agent scale to thousands of IRA accounts?']
+    ],
+    logs: [
+      ['What did agent do?',      'Summarize what the agent did in its last run'],
+      ['Any errors?',             'Were there any errors or alerts in the agent execution?'],
+      ['How long did it run?',    'How long did the agent take to complete?'],
+      ['What is next step?',      'What will the agent do next?']
+    ]
+  };
+
+  const questions = tabQuestions[currentTab] || tabQuestions.dashboard;
+  quick.innerHTML = questions
+    .map(([label, q]) => `<span class="qbtn" onclick="askBot('${q}')">${label}</span>`)
+    .join('');
+}
+
+function buildTabContext() {
+  if (!agentData) return 'No agent run yet.';
+  const d = agentData;
+
+  const base = `Client: age ${document.getElementById('age').value}, balance $${document.getElementById('balance').value}. ` +
+    `RMD: $${Number(d.rmdAmount).toFixed(2)}. Strategy: ${d.strategy}. `;
+
+  const contexts = {
+    dashboard: base +
+      `Explanation: ${d.explanation}. Reasoning: ${d.reasoning}.`,
+
+    portfolio: base +
+      `Portfolio holdings: ${(d.portfolio||[]).map(p => `${p.symbol}(${p.assetClass}, qty:${p.qty}, price:$${p.price}, gain:$${p.gain})`).join(', ')}.`,
+
+    results: base +
+      `Selected assets for liquidation: ${(d.selectedAssets||[]).map(a => `${a.symbol} qty:${a.qty} value:$${a.value}`).join(', ')}. ` +
+      `Tax analysis: naive gain $${d.taxAnalysis?.naiveGain}, smart gain $${d.taxAnalysis?.smartGain}, tax saved $${d.taxAnalysis?.taxSaved} at ${d.taxAnalysis?.taxRatePct}% rate.`,
+
+    reinvest: base +
+      `Reinvestment: total $${d.reinvestment?.totalAmount?.toFixed(2)}, projected annual income $${d.reinvestment?.totalAnnualIncome}. ` +
+      `Products: ${(d.reinvestment?.suggestions||[]).map(s => `${s.name}(${s.allocationPct}%, yield ${s.yieldPct}%, $${s.allocationAmount})`).join(', ')}.`,
+
+    value: base +
+      `This is the Business Value tab showing POC benefits: regulatory compliance, tax efficiency, client retention, operational savings, revenue protection, and strategic differentiation.`,
+
+    logs: base + `User is viewing the agent execution logs tab.`
+  };
+
+  return contexts[currentTab] || base;
+}
+
+async function askBot(question) {
+  const input = document.getElementById('botInput');
+  const msg = question || input.value.trim();
   if (!msg) return;
   input.value = '';
-  appendChat('user', msg);
-  const loading = appendChat('loading', '⏳ Thinking...');
+
+  // Open bot if closed
+  document.getElementById('botPanel').classList.add('open');
+
+  appendBot('user', msg);
+  const loading = appendBot('loading', '⏳ Thinking...');
 
   try {
     const res = await fetch(`${API}/agent/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, context: agentContext })
+      body: JSON.stringify({ message: msg, context: buildTabContext() })
     });
     const data = await res.json();
     loading.remove();
-    appendChat('assistant', data.reply);
+    appendBot('assistant', data.reply);
+
+    // Show badge if panel is closed
+    if (!document.getElementById('botPanel').classList.contains('open')) {
+      document.getElementById('botBadge').classList.add('active');
+    }
   } catch (e) {
     loading.remove();
-    appendChat('assistant', 'Could not reach the AI assistant. Make sure the backend is running on port 8085.');
+    appendBot('assistant', 'Could not reach the AI assistant. Make sure the backend is running on port 8085.');
   }
 }
 
-function askQuick(q) {
-  document.getElementById('chatInput').value = q;
-  sendChat();
-}
-
-function appendChat(role, text) {
-  const box = document.getElementById('chatMessages');
+function appendBot(role, text) {
+  const box = document.getElementById('botMessages');
   const div = document.createElement('div');
   div.className = `chat-msg ${role}`;
   div.textContent = text;
