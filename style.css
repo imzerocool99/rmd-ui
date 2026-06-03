@@ -21,34 +21,21 @@ header {
   flex-shrink: 0;
 }
 .coin-logo {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #f0c040 0%, #d4a017 40%, #f5d060 60%, #b8860b 100%);
-  box-shadow:
-    0 0 0 3px #b8860b,
-    0 0 0 5px #f0c040,
-    inset 0 2px 4px rgba(255,255,255,0.4),
-    inset 0 -2px 4px rgba(0,0,0,0.3),
-    0 4px 12px rgba(184,134,11,0.6);
+  background: #F5A623;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  animation: coinShine 3s ease-in-out infinite;
   margin-right: 12px;
 }
 .coin-inner {
   font-size: 22px;
   font-weight: 900;
-  color: #7a4f00;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.5), 0 -1px 1px rgba(0,0,0,0.3);
-  font-family: 'Georgia', serif;
-  letter-spacing: -1px;
-}
-@keyframes coinShine {
-  0%, 100% { box-shadow: 0 0 0 3px #b8860b, 0 0 0 5px #f0c040, inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 12px rgba(184,134,11,0.6); }
-  50%       { box-shadow: 0 0 0 3px #b8860b, 0 0 0 5px #f0c040, inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.3), 0 4px 20px rgba(240,192,64,0.9); }
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
 }
 .logo {
   font-size: 18px;
