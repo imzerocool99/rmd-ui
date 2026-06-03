@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<p style="color:#555;font-size:12px">Architecture, Technology Stack &amp; Full Solution Design &nbsp;|&nbsp; Last Updated: June 2026 &nbsp;|&nbsp; Branch: <strong>feature/local-poc-ui</strong></p>
+<p style="color:#555;font-size:12px">Architecture, Technology Stack &amp; Full Solution Design &nbsp;|&nbsp; Last Updated: June 3, 2026 &nbsp;|&nbsp; Branch: <strong>feature/local-poc-ui</strong></p>
 
 <div class="toc">
   <strong>Table of Contents</strong>
@@ -79,7 +79,7 @@
     <li><strong>Cash Distribution:</strong> Sells selected assets, transfers cash to the client's bank account. Agent then suggests reinvestment products for that cash.</li>
     <li><strong>In-Kind Transfer:</strong> Moves shares from IRA to taxable brokerage. Client retains market exposure while satisfying the RMD.</li>
   </ul>
-  <strong>Agent Response Time: &lt; 0.1 seconds</strong> — all processing is local, no external API blocking.
+  <strong>Agent Response Time: ~4 seconds</strong> — rule-based logic is instant; Ollama/phi3 generates reinvestment advice asynchronously (4s budget, falls back to rule-based if exceeded).
 </div>
 </div>
 
@@ -175,8 +175,14 @@ Example: $500,000 balance, age 75 → RMD = <strong>$20,325.20</strong></div>
 <p>After RMD cash hits the bank account, the agent generates 7 reinvestment product suggestions. Allocation percentages are adjusted based on client age and risk profile.</p>
 
 <h3>5.5 AI Layer — <code>AzureLLM.java</code> (Ollama/Phi-3)</h3>
-<p><strong>Strategy decisions</strong> (cash vs in-kind, asset scoring) use fast rule-based logic — no Ollama call, instant response.<br/>
-<strong>Chat assistant</strong> uses Ollama/Phi-3 on demand with a 2-second timeout and smart fallback. Context injected per active tab.</p>
+<p>Three levels of AI usage, each with a smart fallback:</p>
+<table>
+  <tr><th>Feature</th><th>Uses Ollama?</th><th>Timeout</th><th>Why</th></tr>
+  <tr><td>Strategy decision (cash vs in-kind)</td><td>❌ Rule-based</td><td>Instant</td><td>Simple decision — market prediction context is enough</td></tr>
+  <tr><td>Reinvestment advice</td><td>✅ Ollama async</td><td>4 seconds</td><td>Rich personalized advice across 7 products — worth the wait</td></tr>
+  <tr><td>Chat assistant (/agent/chat)</td><td>✅ Ollama</td><td>4 seconds</td><td>User explicitly asking — expects a thoughtful response</td></tr>
+</table>
+<p>Both Ollama calls use a <strong>4-second timeout</strong> with smart rule-based fallback. Reinvestment advice fires in a <strong>CompletableFuture async thread</strong> so it runs in parallel with tax analysis — reducing total wait time.</p>
 
 <h3>5.6 Trade Execution — <code>AlpacaMCP.java</code></h3>
 <p>POC mode: simulates trade execution locally — no external HTTP call, instant response. Production upgrade path: remove simulation flag → real Alpaca paper/live orders fire.</p>
@@ -289,7 +295,12 @@ Example: $500,000 balance, age 75 → RMD = <strong>$20,325.20</strong></div>
 <div class="flow-step"><div class="step-num">3</div><div class="step-text"><strong>PLAN</strong><span>Asset selector allocates exact quantities to match RMD amount. Rule-based logic decides cash vs in-kind. Tax analysis runs naive vs optimized comparison to quantify savings. Reinvestment engine generates 7 product suggestions.</span></div></div>
 <div class="flow-step"><div class="step-num">4</div><div class="step-text"><strong>ACT</strong><span>Simulates trade execution via AlpacaMCP (POC mode — instant, no HTTP call). In production: real Alpaca paper/live orders. Updates positions and NAV.</span></div></div>
 <div class="flow-step"><div class="step-num">5</div><div class="step-text"><strong>REPORT</strong><span>Returns full response: selected assets, tax savings, reinvestment suggestions, AI explanation. Saves decision to MemoryService. Logs all actions to MonitorService. Context injected into floating chatbot.</span></div></div>
-<div class="highlight-box"><strong>Total runtime: ~0.06 seconds</strong> — all computation is local, no blocking external calls during agent run.</div>
+<div class="highlight-box">
+  <strong>Total runtime: ~4 seconds</strong><br/>
+  Rule-based logic (RMD calc, asset selection, tax analysis, trade simulation): &lt; 0.1s<br/>
+  Ollama reinvestment advice (async, phi3 on CPU): ~4s with 4s timeout<br/>
+  Fallback if Ollama exceeds timeout: instant smart rule-based advice
+</div>
 </div>
 
 <hr/>
@@ -430,7 +441,7 @@ mvn clean package -DskipTests</div>
 
 <table style="margin-top:20px">
   <tr><th>KPI</th><th>Current POC Value</th></tr>
-  <tr><td>Agent response time</td><td>&lt; 0.1 seconds</td></tr>
+  <tr><td>Agent response time</td><td>~4 seconds (Ollama async) / &lt;0.1s fallback</td></tr>
   <tr><td>Assets analyzed per run</td><td>13 across 10 asset classes</td></tr>
   <tr><td>Reinvestment products suggested</td><td>7</td></tr>
   <tr><td>Tax saved (age 75, $500K, 24% rate)</td><td>~$1,212</td></tr>
