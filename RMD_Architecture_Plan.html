@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>RMD Intelligent Agent — Architecture Plan</title>
+<style>
+  body { font-family: 'Calibri', sans-serif; max-width: 900px; margin: 40px auto; padding: 0 40px; color: #1a1a1a; line-height: 1.7; }
+  h1.doc-title { font-size: 28px; color: #1e3a5f; border-bottom: 3px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 4px; }
+  .subtitle { font-size: 14px; color: #555; margin-bottom: 40px; }
+  h2 { font-size: 20px; color: #1e3a5f; margin-top: 36px; margin-bottom: 8px; border-left: 5px solid #1e3a5f; padding-left: 12px; }
+  h3 { font-size: 15px; color: #2c5f8a; margin-top: 20px; margin-bottom: 6px; }
+  p { margin-bottom: 10px; font-size: 13.5px; }
+  ul { margin: 8px 0 14px 24px; }
+  li { font-size: 13.5px; margin-bottom: 5px; }
+  .section { margin-bottom: 32px; }
+  .highlight-box { background: #eef5ff; border: 1px solid #b3d0f5; border-radius: 6px; padding: 16px 20px; margin: 16px 0; }
+  .arch-box { background: #f5f5f5; border: 1px solid #ccc; border-radius: 6px; padding: 16px; font-family: 'Courier New', monospace; font-size: 12px; white-space: pre; margin: 16px 0; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: #1e3a5f; color: white; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #ddd; }
+  tr:nth-child(even) td { background: #f9f9f9; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+  .free { background: #d4edda; color: #155724; }
+  .paid { background: #f8d7da; color: #721c24; }
+  .toc { background: #f0f4ff; border: 1px solid #c8d8f8; border-radius: 6px; padding: 16px 20px 16px 30px; margin-bottom: 36px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: #1e3a5f; text-decoration: none; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 32px 0; }
+  .flow-step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+  .step-num { background: #1e3a5f; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; flex-shrink: 0; }
+  .step-text strong { display: block; font-size: 13.5px; }
+  .step-text span { font-size: 12.5px; color: #555; }
+</style>
+</head>
+<body>
+
+<h1 class="doc-title">Intelligent RMD Liquidation Agent</h1>
+<div class="subtitle">Architecture, Technology Stack &amp; Full Solution Design — POC Document &nbsp;|&nbsp; June 2026</div>
+
+<div class="toc">
+  <strong>Table of Contents</strong>
+  <ol>
+    <li><a href="#s1">Executive Summary</a></li>
+    <li><a href="#s2">Business Problem</a></li>
+    <li><a href="#s3">Solution Overview</a></li>
+    <li><a href="#s4">High-Level Architecture</a></li>
+    <li><a href="#s5">Core Components</a></li>
+    <li><a href="#s6">Technology Stack (100% Free)</a></li>
+    <li><a href="#s7">Backend API Endpoints</a></li>
+    <li><a href="#s8">Agent Execution Flow</a></li>
+    <li><a href="#s9">Customer AI Experience</a></li>
+    <li><a href="#s10">GitHub Repository Structure</a></li>
+    <li><a href="#s11">Local Deployment Guide</a></li>
+    <li><a href="#s12">KPIs &amp; Success Metrics</a></li>
+  </ol>
+</div>
+
+<!-- 1. Executive Summary -->
+<div class="section" id="s1">
+<h2>1. Executive Summary</h2>
+<p>The <strong>Intelligent RMD Liquidation Agent</strong> is an AI-powered platform that automates IRA Required Minimum Distribution (RMD) processing for wealth management firms. It combines IRS regulatory logic, tax-efficient portfolio analysis, autonomous trade execution, and a natural language AI assistant to transform a complex manual process into a fully automated, explainable, and client-centric workflow.</p>
+<div class="highlight-box">
+  <strong>Two Execution Modes:</strong>
+  <ul>
+    <li><strong>Option 1 — Cash Distribution:</strong> Sells selected assets, transfers cash to the client's bank account.</li>
+    <li><strong>Option 2 — In-Kind Transfer:</strong> Moves shares from IRA to taxable brokerage. Client retains market exposure while satisfying the RMD requirement.</li>
+  </ul>
+</div>
+<p>The solution is built entirely with <strong>free, open-source tools</strong> and runs 100% locally on a developer's PC — no cloud subscription required.</p>
+</div>
+
+<hr/>
+
+<!-- 2. Business Problem -->
+<div class="section" id="s2">
+<h2>2. Business Problem</h2>
+<p>Traditional IRA RMD processing is manual, slow, and carries significant compliance and financial risk:</p>
+<ul>
+  <li>The IRS mandates annual RMDs after age 73. Failure triggers a <strong>25% excise tax</strong> on the undistributed amount.</li>
+  <li>Poor asset selection generates unnecessary capital gains and tax drag, reducing after-tax returns for clients.</li>
+  <li>Operations teams spend hours per account on manual calculations, trade tickets, and compliance documentation.</li>
+  <li>Clients lack transparency — they don't know <em>why</em> specific assets were chosen for distribution.</li>
+  <li>The process does not scale: as the number of aging IRA accounts grows, operational burden grows proportionally.</li>
+</ul>
+</div>
+
+<hr/>
+
+<!-- 3. Solution Overview -->
+<div class="section" id="s3">
+<h2>3. Solution Overview</h2>
+<p>The agent automatically executes the full RMD workflow end-to-end:</p>
+<ol>
+  <li>Determines RMD eligibility and calculates the required distribution amount using the IRS formula.</li>
+  <li>Analyzes the portfolio — scores each asset for tax efficiency, performance, and concentration risk.</li>
+  <li>Uses an AI model (Ollama/Phi-3, running locally) to choose the optimal distribution strategy.</li>
+  <li>Executes sell orders or in-kind transfers via the Alpaca paper trading API.</li>
+  <li>Generates a plain-English explanation of every decision for the client and advisor.</li>
+  <li>Logs a full audit trail for compliance and regulatory review.</li>
+</ol>
+</div>
+
+<hr/>
+
+<!-- 4. Architecture -->
+<div class="section" id="s4">
+<h2>4. High-Level Architecture</h2>
+<div class="arch-box">┌──────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                             │
+│   Web Dashboard (port 4500)  |  Advisor Portal  |  API Clients  │
+└─────────────────────┬────────────────────────────────────────────┘
+                      │  HTTP (REST + JSON)
+┌─────────────────────▼────────────────────────────────────────────┐
+│                  CONVERSATIONAL AI LAYER                          │
+│        Ollama (local) + Phi-3 — Customer-Facing AI Agent         │
+│   Natural Language → Intent → Personalized RMD Explanation       │
+└─────────────────────┬────────────────────────────────────────────┘
+                      │
+┌─────────────────────▼────────────────────────────────────────────┐
+│                 ORCHESTRATION LAYER (port 8085)                   │
+│              Spring Boot Master Agent — rmd-agent                │
+│  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌───────────────────┐  │
+│  │   RMD    │ │   Asset   │ │   Tax    │ │    Execution      │  │
+│  │  Engine  │ │  Ranker   │ │Optimizer │ │   Orchestrator    │  │
+│  └──────────┘ └───────────┘ └──────────┘ └───────────────────┘  │
+│  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌───────────────────┐  │
+│  │  Memory  │ │  Monitor  │ │   Bond   │ │    Prediction     │  │
+│  │ Service  │ │  Service  │ │Allocation│ │     Service       │  │
+│  └──────────┘ └───────────┘ └──────────┘ └───────────────────┘  │
+└─────────────────────┬────────────────────────────────────────────┘
+                      │
+┌─────────────────────▼────────────────────────────────────────────┐
+│                   INTEGRATION LAYER                               │
+│  Alpaca Paper Trading API  |  IRS Rules Tables  |  Market Data   │
+└──────────────────────────────────────────────────────────────────┘</div>
+</div>
+
+<hr/>
+
+<!-- 5. Components -->
+<div class="section" id="s5">
+<h2>5. Core Components</h2>
+
+<h3>5.1 RMD Calculation Engine (RMDService.java)</h3>
+<p>Calculates the Required Minimum Distribution using the IRS Uniform Lifetime Table formula:</p>
+<div class="highlight-box"><strong>RMD = Prior Year-End IRA Balance ÷ IRS Life Expectancy Factor</strong><br/>
+Example: $500,000 balance, age 75, factor = 24.6 → RMD = <strong>$20,325.20</strong></div>
+<p>Validates account type (Traditional IRA, Inherited IRA), age eligibility, and IRS rule compliance.</p>
+
+<h3>5.2 Asset Ranking &amp; Selection (AssetRankingService, AssetSelectionService)</h3>
+<p>Scores each portfolio holding for tax efficiency. Scoring preference order:</p>
+<ul>
+  <li>Assets with unrealized losses (best — generates tax loss harvesting benefit).</li>
+  <li>Underperforming assets (second — reduces portfolio drag).</li>
+  <li>Over-concentrated positions (third — natural rebalancing opportunity).</li>
+  <li>High-gain, long-term holds (last — avoid disturbing best performers).</li>
+</ul>
+<p>Allocates exact share quantities to match the RMD amount, minimizing remainder.</p>
+
+<h3>5.3 Tax Optimization Engine (TaxService)</h3>
+<p>Evaluates tax impact of each candidate asset: capital gains vs losses, cost basis, ordinary income treatment of IRA withdrawals, wash-sale risk, and portfolio rebalancing impact. Outputs a ranked liquidation strategy with estimated net tax impact.</p>
+
+<h3>5.4 Trade Execution via Alpaca (AlpacaMCP, AlpacaClient)</h3>
+<p>Executes all trades via the Alpaca paper trading REST API. Supports market orders, position updates, NAV recalculation, and trade confirmation. In-kind transfers are simulated (Alpaca does not support IRA-to-brokerage transfers in paper mode).</p>
+
+<h3>5.5 AI Layer — Ollama + Phi-3 (AzureLLM.java → now Ollama)</h3>
+<p>The LLM layer has two capabilities:</p>
+<ul>
+  <li><strong>Strategy Decision:</strong> Chooses between cash sale and in-kind transfer based on market prediction context. Falls back to rule-based logic if Ollama is offline.</li>
+  <li><strong>AI Chat Assistant:</strong> Answers client questions in plain English using the actual agent context (RMD amount, selected assets, strategy). Runs locally via Ollama on port 11434.</li>
+</ul>
+
+<h3>5.6 Memory &amp; Audit (MemoryService, MonitorService)</h3>
+<p>MemoryService stores per-client history of past RMD decisions and execution results. MonitorService logs every agent action with timestamps and exposes them via the /agent/logs REST endpoint.</p>
+
+<h3>5.7 Frontend Dashboard (rmd-ui)</h3>
+<p>A single-page HTML5/JS application with five sections: Dashboard (KPI cards + portfolio chart), Portfolio (holdings table + performance chart), Agent Results (selected assets + RMD coverage chart), AI Assistant (chat interface with quick-question buttons), and Logs (real-time agent log viewer). Served on port 4500.</p>
+</div>
+
+<hr/>
+
+<!-- 6. Tech Stack -->
+<div class="section" id="s6">
+<h2>6. Technology Stack — 100% Free &amp; Open Source</h2>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Purpose</th><th>Cost</th></tr>
+  <tr><td>Backend Runtime</td><td>Java 17 (Microsoft OpenJDK)</td><td>JVM runtime</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Backend Framework</td><td>Spring Boot 3.2.5</td><td>REST APIs, DI, scheduling</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Build Tool</td><td>Apache Maven 3.9.6</td><td>Compile, package, dependency management</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>AI / LLM Runtime</td><td>Ollama (local)</td><td>Runs LLM on your PC — no API key needed</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>AI Model</td><td>Phi-3 (Microsoft, 3.8B)</td><td>Strategy decisions + customer chat</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Trading API</td><td>Alpaca Paper Trading</td><td>Simulated trade execution</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Frontend Framework</td><td>HTML5 / CSS3 / Vanilla JS</td><td>Dashboard UI — no build step</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Charts</td><td>Chart.js 4.5</td><td>Portfolio, performance, RMD charts</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Static File Server</td><td>http-server (npx)</td><td>Serves frontend on port 4500</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Source Control</td><td>Git + GitHub</td><td>Version control, collaboration</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>CI/CD</td><td>GitHub Actions</td><td>Automated build and test</td><td><span class="badge free">FREE (2000 min/mo)</span></td></tr>
+  <tr><td>Package Manager (Windows)</td><td>winget</td><td>Install Java, Ollama</td><td><span class="badge free">FREE</span></td></tr>
+</table>
+
+<div class="highlight-box">
+  <strong>Cost Comparison</strong><br/>
+  Original stack with Azure OpenAI + cloud hosting: ~$185/month<br/>
+  This free stack (Ollama local + localhost deployment): <strong>$0/month</strong>
+</div>
+</div>
+
+<hr/>
+
+<!-- 7. API Endpoints -->
+<div class="section" id="s7">
+<h2>7. Backend API Endpoints (Base URL: http://localhost:8085)</h2>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Request Body</th></tr>
+  <tr><td>POST</td><td>/agent/run</td><td>Run the full agent pipeline</td><td>{ age, balance, clientId, preference }</td></tr>
+  <tr><td>GET</td><td>/agent/portfolio</td><td>Get Alpaca paper portfolio</td><td>—</td></tr>
+  <tr><td>GET</td><td>/agent/positions</td><td>Get current positions</td><td>—</td></tr>
+  <tr><td>GET</td><td>/agent/logs</td><td>Get agent execution logs</td><td>—</td></tr>
+  <tr><td>POST</td><td>/agent/chat</td><td>AI chat assistant (Ollama)</td><td>{ message, context }</td></tr>
+  <tr><td>POST</td><td>/api/analyze</td><td>Custom portfolio analysis</td><td>{ portfolio, preference }</td></tr>
+  <tr><td>POST</td><td>/agent/config/limit</td><td>Update trade quantity limit</td><td>{ maxQty }</td></tr>
+</table>
+</div>
+
+<hr/>
+
+<!-- 8. Agent Flow -->
+<div class="section" id="s8">
+<h2>8. Agent Execution Flow (SENSE → THINK → PLAN → ACT → REPORT)</h2>
+
+<div class="flow-step">
+  <div class="step-num">1</div>
+  <div class="step-text"><strong>SENSE</strong><span>Reads client age, IRA balance, portfolio holdings, market prediction from request context.</span></div>
+</div>
+<div class="flow-step">
+  <div class="step-num">2</div>
+  <div class="step-text"><strong>THINK</strong><span>Calculates RMD amount using IRS formula. Scores and ranks all portfolio assets for tax efficiency.</span></div>
+</div>
+<div class="flow-step">
+  <div class="step-num">3</div>
+  <div class="step-text"><strong>PLAN</strong><span>Tax optimizer selects exact assets and quantities. Ollama LLM decides cash vs in-kind strategy.</span></div>
+</div>
+<div class="flow-step">
+  <div class="step-num">4</div>
+  <div class="step-text"><strong>ACT</strong><span>Executes sell orders or in-kind transfer records via Alpaca API. Updates portfolio state.</span></div>
+</div>
+<div class="flow-step">
+  <div class="step-num">5</div>
+  <div class="step-text"><strong>REPORT</strong><span>Generates plain-English explanation of decisions. Saves to MemoryService. Logs all actions with timestamps.</span></div>
+</div>
+</div>
+
+<hr/>
+
+<!-- 9. Customer AI -->
+<div class="section" id="s9">
+<h2>9. Customer-Facing AI Experience</h2>
+<p>The AI Assistant tab lets clients interact with the agent in natural language. The AI uses the actual run context (RMD amount, selected assets, strategy) to give personalized answers:</p>
+<table>
+  <tr><th>Client Question</th><th>AI Response Type</th></tr>
+  <tr><td>"Why were AAPL and BND selected?"</td><td>Explains tax-efficiency scoring and portfolio concentration</td></tr>
+  <tr><td>"What is my tax impact?"</td><td>Explains ordinary income treatment and estimated tax on withdrawal</td></tr>
+  <tr><td>"Should I choose cash or in-kind?"</td><td>Compares both options based on client's financial situation</td></tr>
+  <tr><td>"How is my RMD amount calculated?"</td><td>Explains IRS formula with the client's actual numbers</td></tr>
+</table>
+</div>
+
+<hr/>
+
+<!-- 10. Repos -->
+<div class="section" id="s10">
+<h2>10. GitHub Repository Structure</h2>
+<table>
+  <tr><th>Repo</th><th>Branch</th><th>Contents</th></tr>
+  <tr><td>imzerocool99/rmd-agent</td><td>feature/local-poc-ui</td><td>Spring Boot backend — all agent logic, APIs, Ollama integration</td></tr>
+  <tr><td>imzerocool99/rmd-ui</td><td>feature/local-poc-ui</td><td>HTML/CSS/JS dashboard — full frontend UI, charts, AI chat</td></tr>
+</table>
+</div>
+
+<hr/>
+
+<!-- 11. Deployment -->
+<div class="section" id="s11">
+<h2>11. Local Deployment Guide</h2>
+
+<h3>Step 1 — Install Java 17</h3>
+<div class="arch-box">winget install Microsoft.OpenJDK.17 --accept-package-agreements --accept-source-agreements</div>
+
+<h3>Step 2 — Install Ollama (Local AI Engine)</h3>
+<p>Ollama runs AI models entirely on your local PC — no API key, no cloud, no cost.</p>
+<div class="arch-box"># Install via winget
+winget install Ollama.Ollama --accept-package-agreements --accept-source-agreements
+
+# Pull the Phi-3 model (3.8B — fast on CPU, no GPU required)
+ollama pull phi3
+
+# Verify
+ollama list</div>
+<p>Ollama runs as a Windows background service on port <strong>11434</strong>. Verify at <code>http://localhost:11434</code>.</p>
+<p><strong>Alternative free models:</strong></p>
+<ul>
+  <li><code>ollama pull phi3</code> — Microsoft Phi-3, 3.8B (recommended for this POC)</li>
+  <li><code>ollama pull llama3.2</code> — Meta LLaMA 3.2, 3B, excellent reasoning</li>
+  <li><code>ollama pull mistral</code> — Mistral 7B, strong for structured tasks</li>
+</ul>
+
+<h3>Step 3 — Install Maven &amp; Node.js</h3>
+<div class="arch-box"># Maven: download and extract
+Invoke-WebRequest -Uri "https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.zip" -OutFile "$env:USERPROFILE\maven.zip" -UseBasicParsing
+Expand-Archive "$env:USERPROFILE\maven.zip" -DestinationPath "$env:USERPROFILE\maven"
+$env:PATH = "$env:USERPROFILE\maven\apache-maven-3.9.6\bin;$env:PATH"
+
+# Node.js
+winget install OpenJS.NodeJS --accept-package-agreements --accept-source-agreements</div>
+
+<h3>Step 4 — Clone, Checkout Branch, Build</h3>
+<div class="arch-box">git clone https://github.com/imzerocool99/rmd-agent
+git clone https://github.com/imzerocool99/rmd-ui
+cd rmd-agent; git checkout feature/local-poc-ui
+cd ..\rmd-ui; git checkout feature/local-poc-ui
+
+# Build backend JAR
+cd ..\rmd-agent
+$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.0.19.10-hotspot"
+$env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
+mvn clean package -DskipTests</div>
+
+<h3>Step 5 — Run All Three Services</h3>
+<table>
+  <tr><th>Terminal</th><th>Command</th><th>Port</th></tr>
+  <tr><td>Ollama AI (auto-starts)</td><td>ollama serve</td><td>11434</td></tr>
+  <tr><td>Backend</td><td>java -jar rmd-agent\target\rmd-agent-1.0.0.jar</td><td>8085</td></tr>
+  <tr><td>Frontend</td><td>npx http-server rmd-ui -p 4500 --cors</td><td>4500</td></tr>
+</table>
+
+<h3>Step 6 — Open the App</h3>
+<div class="highlight-box">
+  <strong>Open your browser and navigate to:</strong><br/><br/>
+  &nbsp;&nbsp;Frontend Dashboard: <code>http://localhost:4500</code><br/>
+  &nbsp;&nbsp;Backend API: <code>http://localhost:8085</code><br/>
+  &nbsp;&nbsp;Ollama AI: <code>http://localhost:11434</code>
+</div>
+<div class="highlight-box"><strong>Total Cost: $0</strong> — All components are free and open source. No cloud account, no API keys, no subscriptions required.</div>
+</div>
+
+<hr/>
+
+<!-- 12. KPIs -->
+<div class="section" id="s12">
+<h2>12. KPIs &amp; Success Metrics</h2>
+<ul>
+  <li>% of RMDs completed automatically without human intervention.</li>
+  <li>Reduction in estimated tax impact vs naive (random) asset selection.</li>
+  <li>Client adoption rate — % who interact with the AI assistant.</li>
+  <li>Zero IRS penalty incidents across all managed accounts.</li>
+  <li>Processing time saved vs manual RMD workflow per account.</li>
+  <li>AI explanation satisfaction score (advisor and client feedback surveys).</li>
+</ul>
+</div>
+
+</body>
+</html>
