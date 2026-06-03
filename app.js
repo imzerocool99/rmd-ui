@@ -115,7 +115,8 @@ function renderResults(data) {
   document.getElementById('executionJson').textContent = JSON.stringify(data, null, 2);
 
   // Reinvestment tab
-  if (data.reinvestment) renderReinvestment(data.reinvestment, body.age);
+  const clientAge = parseInt(document.getElementById('age').value) || 75;
+  if (data.reinvestment) renderReinvestment(data.reinvestment, clientAge);
 
   // Tax analysis
   if (data.taxAnalysis) renderTaxAnalysis(data.taxAnalysis);
