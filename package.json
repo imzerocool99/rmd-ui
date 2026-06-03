@@ -1,0 +1,9 @@
+{
+  "name": "rmd-frontend",
+  "scripts": {
+    "start": "npx http-server ./"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1"
+  }
+}
