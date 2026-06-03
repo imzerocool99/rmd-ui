@@ -69,7 +69,9 @@
         <button class="tab active" onclick="showTab('dashboard', this)">Dashboard</button>
         <button class="tab" onclick="showTab('portfolio', this)">Portfolio</button>
         <button class="tab" onclick="showTab('results', this)">Agent Results</button>
+        <button class="tab" onclick="showTab('reinvest', this)">💡 Reinvestment</button>
         <button class="tab" onclick="showTab('chat', this)">AI Assistant</button>
+        <button class="tab" onclick="showTab('value', this)">📊 Business Value</button>
         <button class="tab" onclick="showTab('logs', this)">Logs</button>
       </div>
 
@@ -165,10 +167,222 @@
           <canvas id="rmdChart" height="160"></canvas>
         </div>
 
+        <!-- TAX EFFICIENCY PANEL -->
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">💰 Tax Efficiency — Agent vs Naive Approach</div>
+          <div class="tax-compare" id="taxCompare" style="display:none">
+            <div class="tax-col bad">
+              <div class="tax-col-title">❌ Without Agent (Naive — Highest Gain First)</div>
+              <table class="data-table" id="naiveAssetsTable">
+                <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
+                <tbody id="naiveAssetsBody"></tbody>
+              </table>
+              <div class="tax-total bad-total">Total Gain: <span id="naiveGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="naiveTax">—</span></div>
+            </div>
+            <div class="tax-saved-badge" id="taxSavedBadge">💰<br/>Saved<br/><span id="taxSavedAmt">—</span></div>
+            <div class="tax-col good">
+              <div class="tax-col-title">✅ With Agent (Optimized — Loss-First Selection)</div>
+              <table class="data-table" id="smartAssetsTable">
+                <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
+                <tbody id="smartAssetsBody"></tbody>
+              </table>
+              <div class="tax-total good-total">Total Gain: <span id="smartGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="smartTax">—</span></div>
+            </div>
+          </div>
+          <div class="tax-explanation" id="taxExplanation">Run the agent to see tax savings analysis.</div>
+          <canvas id="taxChart" height="120" style="margin-top:16px;display:none"></canvas>
+        </div>
+
         <div class="panel" style="margin-top:20px">
           <div class="panel-title">Full Agent Response</div>
           <pre class="json-view" id="executionJson">Run the agent to see the full execution response...</pre>
         </div>
+      </div>
+
+      <!-- REINVESTMENT TAB -->
+      <div id="tab-reinvest" class="tab-content">
+
+        <!-- Flow diagram -->
+        <div class="reinvest-flow">
+          <div class="flow-box ira">🏦 IRA Account<br/><span id="flow-rmd-amt">—</span></div>
+          <div class="flow-arrow">→<br/><small>RMD Withdrawal</small></div>
+          <div class="flow-box bank">🏛 Same Bank Account<br/><span id="flow-bank-amt">—</span></div>
+          <div class="flow-arrow">→<br/><small>Agent Suggests</small></div>
+          <div class="flow-box invest">📈 Reinvested Products<br/><span id="flow-income-amt">— / yr income</span></div>
+        </div>
+
+        <!-- AI Agent Advice -->
+        <div class="panel" style="margin-bottom:20px">
+          <div class="panel-title">🤖 Agentic AI Reinvestment Recommendation</div>
+          <div class="agent-advice-box" id="agentAdviceBox">
+            Run the agent to see the AI-generated reinvestment recommendation for this client.
+          </div>
+          <div class="advice-meta" id="adviceMeta"></div>
+        </div>
+
+        <div class="two-col">
+          <!-- Suggestions table -->
+          <div class="panel">
+            <div class="panel-title">Suggested Products</div>
+            <table class="data-table" id="reinvestTable">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Type</th>
+                  <th>Allocation</th>
+                  <th>Amount</th>
+                  <th>Yield</th>
+                  <th>Annual Income</th>
+                  <th>Risk</th>
+                  <th>Account</th>
+                </tr>
+              </thead>
+              <tbody id="reinvestBody">
+                <tr><td colspan="8" class="empty">Run the agent to see suggestions</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Allocation chart -->
+          <div class="panel">
+            <div class="panel-title">Allocation by Product</div>
+            <canvas id="reinvestChart" height="280"></canvas>
+          </div>
+        </div>
+
+        <!-- Product detail cards -->
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">Product Details</div>
+          <div class="product-cards" id="productCards">
+            <div class="empty" style="padding:20px">Run the agent to see product details</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BUSINESS VALUE TAB -->
+      <div id="tab-value" class="tab-content">
+
+        <div class="bv-hero">
+          <div class="bv-hero-title">How Agentic AI Transforms RMD Processing</div>
+          <div class="bv-hero-sub">From manual, error-prone operations to autonomous, tax-efficient, client-centric execution</div>
+        </div>
+
+        <!-- Before vs After -->
+        <div class="two-col" style="margin-bottom:20px">
+          <div class="panel">
+            <div class="panel-title" style="color:#f85149">❌ Without the Agent (Manual Process)</div>
+            <ul class="bv-list bad">
+              <li>Advisor manually calculates RMD amount each year</li>
+              <li>Random or gut-feel asset selection for liquidation</li>
+              <li>No tax optimization — often triggers unnecessary gains</li>
+              <li>Manual trade tickets — slow, error-prone</li>
+              <li>No explanation given to client on asset selection</li>
+              <li>Risk of missing IRS deadline → 25% excise tax penalty</li>
+              <li>Cannot scale without hiring more operations staff</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <div class="panel-title" style="color:#3fb950">✅ With the Intelligent RMD Agent</div>
+            <ul class="bv-list good">
+              <li>Agent auto-identifies eligible accounts and calculates RMD</li>
+              <li>AI scores 31 assets across 10 classes for tax efficiency</li>
+              <li>Liquidates losers first — minimizes tax drag automatically</li>
+              <li>Executes trades via Alpaca API — no manual ticket</li>
+              <li>AI generates plain-English explanation for every decision</li>
+              <li>Zero missed deadlines — scheduled agent runs year-round</li>
+              <li>Scales to thousands of accounts with no added staff</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 6 Business Values from PDF -->
+        <div class="bv-grid">
+
+          <div class="bv-card">
+            <div class="bv-icon">⚖️</div>
+            <div class="bv-title">Regulatory Compliance &amp; Risk Reduction</div>
+            <div class="bv-desc">Ensures 100% on-time and accurate RMD execution, eliminating IRS penalty risk. Full audit trail and explainability support regulatory reviews and internal controls.</div>
+            <div class="bv-value">Lower compliance risk · Stronger regulatory posture</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">😊</div>
+            <div class="bv-title">Improved Client Experience &amp; Retention</div>
+            <div class="bv-desc">Removes complexity from clients. Offers cash vs in-kind flexibility. AI explains every decision in plain English — building trust and advisor-client relationships.</div>
+            <div class="bv-value">Higher satisfaction · Increased AUM retention</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">💰</div>
+            <div class="bv-title">Tax-Efficient Outcomes</div>
+            <div class="bv-desc">Optimizes asset selection based on gains/losses, cost basis, and portfolio impact. Minimizes unnecessary tax drag by liquidating underperformers and loss positions first.</div>
+            <div class="bv-value">Better after-tax returns · Trusted fiduciary positioning</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">⚡</div>
+            <div class="bv-title">Operational Efficiency &amp; Cost Savings</div>
+            <div class="bv-desc">Automates a multi-step process spanning operations, tax, and advisory teams. Reduces processing time, errors, and exception handling dramatically.</div>
+            <div class="bv-value">Lower operating costs · Staff redeployed to high-value work</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">📈</div>
+            <div class="bv-title">Revenue Protection &amp; Growth</div>
+            <div class="bv-desc">Protects existing AUM by preventing forced outflows from poor RMD handling. Reinvestment suggestions keep assets within the firm's managed products.</div>
+            <div class="bv-value">Stable AUM · Stronger long-term revenue streams</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">🚀</div>
+            <div class="bv-title">Strategic Platform Differentiation</div>
+            <div class="bv-desc">Positions the firm as an innovator in AI-driven retirement automation. Reusable framework extends to Inherited IRAs, Roth conversions, and retirement income planning.</div>
+            <div class="bv-value">Competitive differentiation · Foundation for future AI capabilities</div>
+          </div>
+
+        </div>
+
+        <!-- How the AI Agent Helps -->
+        <div class="panel" style="margin-top:24px">
+          <div class="panel-title">🤖 How Agentic AI Powers This Solution</div>
+          <div class="agent-loop">
+            <div class="loop-step">
+              <div class="loop-num">1</div>
+              <div class="loop-body"><strong>SENSE</strong><span>Reads client age, IRA balance, 31-asset portfolio, market signals, and client preference from the request context.</span></div>
+            </div>
+            <div class="loop-step">
+              <div class="loop-num">2</div>
+              <div class="loop-body"><strong>THINK</strong><span>Calculates RMD using IRS Uniform Lifetime Table. Scores every asset for tax efficiency, performance, and concentration risk.</span></div>
+            </div>
+            <div class="loop-step">
+              <div class="loop-num">3</div>
+              <div class="loop-body"><strong>PLAN</strong><span>Tax optimizer selects exact share quantities across asset classes. Ollama/Phi-3 decides cash vs in-kind strategy. Reinvestment engine allocates proceeds across 7 product types.</span></div>
+            </div>
+            <div class="loop-step">
+              <div class="loop-num">4</div>
+              <div class="loop-body"><strong>ACT</strong><span>Executes sell orders or in-kind transfer via Alpaca paper trading API. Updates portfolio positions, NAV, and tax records.</span></div>
+            </div>
+            <div class="loop-step">
+              <div class="loop-num">5</div>
+              <div class="loop-body"><strong>REPORT</strong><span>Generates plain-English explanation for client and advisor. Saves decision history to memory. Logs all actions for compliance audit trail.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">📊 KPIs &amp; Success Metrics</div>
+          <div class="kpi-grid">
+            <div class="kpi-card"><div class="kpi-val">100%</div><div class="kpi-label">RMDs Completed On Time</div></div>
+            <div class="kpi-card"><div class="kpi-val">0</div><div class="kpi-label">IRS Penalty Incidents</div></div>
+            <div class="kpi-card"><div class="kpi-val">31</div><div class="kpi-label">Assets Analysed Per Run</div></div>
+            <div class="kpi-card"><div class="kpi-val">10</div><div class="kpi-label">Asset Classes Covered</div></div>
+            <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Reinvestment Products</div></div>
+            <div class="kpi-card"><div class="kpi-val">&lt;5s</div><div class="kpi-label">End-to-End Agent Runtime</div></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- CHAT TAB -->

@@ -403,6 +403,193 @@ hr { border-color: #21262d; margin: 16px 0; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* TAX EFFICIENCY */
+.tax-compare {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.tax-col { flex: 1; }
+.tax-col-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+.tax-total { font-size: 12px; font-weight: 600; padding: 8px; border-radius: 4px; margin-top: 8px; }
+.bad-total  { background: #3d2323; color: #f85149; }
+.good-total { background: #1a3a2a; color: #3fb950; }
+.tax-saved-badge {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #1a3a2a, #0d2a1a);
+  border: 2px solid #3fb950;
+  border-radius: 50%;
+  width: 90px; height: 90px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  font-size: 11px; color: #3fb950; font-weight: 700;
+  margin-top: 30px;
+  line-height: 1.4;
+}
+.tax-saved-badge span { font-size: 16px; font-weight: 800; }
+.tax-explanation {
+  font-size: 13px;
+  color: #8b949e;
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* BUSINESS VALUE */
+.bv-hero {
+  background: linear-gradient(135deg, #0d1f3a 0%, #0d1117 100%);
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.bv-hero-title { font-size: 20px; font-weight: 700; color: #58a6ff; margin-bottom: 8px; }
+.bv-hero-sub { font-size: 13px; color: #8b949e; }
+
+.bv-list { list-style: none; padding: 0; margin: 0; }
+.bv-list li { font-size: 13px; padding: 7px 0; border-bottom: 1px solid #21262d; color: #c9d1d9; }
+.bv-list li:last-child { border: none; }
+.bv-list.bad li::before  { content: '✗ '; color: #f85149; font-weight: 700; }
+.bv-list.good li::before { content: '✓ '; color: #3fb950; font-weight: 700; }
+
+.bv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.bv-card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+  padding: 18px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.bv-card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+.bv-icon { font-size: 28px; margin-bottom: 10px; }
+.bv-title { font-size: 13px; font-weight: 700; color: #c9d1d9; margin-bottom: 8px; }
+.bv-desc { font-size: 12px; color: #8b949e; line-height: 1.6; margin-bottom: 10px; }
+.bv-value { font-size: 11px; color: #3fb950; font-weight: 600; border-top: 1px solid #21262d; padding-top: 8px; }
+
+/* AGENT LOOP */
+.agent-loop { display: flex; flex-direction: column; gap: 12px; }
+.loop-step { display: flex; align-items: flex-start; gap: 14px; }
+.loop-num {
+  background: #1f4a8a;
+  color: #58a6ff;
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+  flex-shrink: 0;
+}
+.loop-body strong { display: block; color: #c9d1d9; font-size: 13px; margin-bottom: 2px; }
+.loop-body span { font-size: 12px; color: #8b949e; line-height: 1.5; }
+
+/* KPI GRID */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+.kpi-card {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 16px 12px;
+  text-align: center;
+}
+.kpi-val { font-size: 28px; font-weight: 700; color: #58a6ff; margin-bottom: 4px; }
+.kpi-label { font-size: 11px; color: #8b949e; line-height: 1.4; }
+
+/* REINVESTMENT FLOW */
+.reinvest-flow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 10px;
+}
+.flow-box {
+  flex: 1;
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.8;
+}
+.flow-box span { font-size: 18px; font-weight: 700; display: block; margin-top: 4px; }
+.flow-box.ira    { background: #1a2a3a; border: 1px solid #58a6ff; color: #58a6ff; }
+.flow-box.ira span { color: #58a6ff; }
+.flow-box.bank   { background: #1a2a1a; border: 1px solid #3fb950; color: #3fb950; }
+.flow-box.bank span { color: #3fb950; }
+.flow-box.invest { background: #2a2a1a; border: 1px solid #d29922; color: #d29922; }
+.flow-box.invest span { color: #d29922; }
+.flow-arrow {
+  color: #8b949e;
+  font-size: 22px;
+  text-align: center;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.flow-arrow small { display: block; font-size: 10px; color: #484f58; }
+
+/* AI ADVICE BOX */
+.agent-advice-box {
+  background: linear-gradient(135deg, #0d1f0d 0%, #0d1117 100%);
+  border: 1px solid #3fb950;
+  border-left: 4px solid #3fb950;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-size: 13.5px;
+  color: #c9d1d9;
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+.advice-meta {
+  font-size: 11px;
+  color: #484f58;
+  padding: 0 4px;
+}
+
+/* PRODUCT CARDS */
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.product-card {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 14px;
+  transition: border-color 0.2s;
+}
+.product-card:hover { border-color: #58a6ff; }
+.product-card-name { font-size: 13px; font-weight: 600; color: #c9d1d9; margin-bottom: 6px; }
+.product-card-type { font-size: 11px; color: #8b949e; margin-bottom: 10px; }
+.product-card-yield { font-size: 22px; font-weight: 700; color: #3fb950; margin-bottom: 2px; }
+.product-card-amount { font-size: 12px; color: #58a6ff; margin-bottom: 8px; }
+.product-card-desc { font-size: 11px; color: #484f58; line-height: 1.5; margin-bottom: 8px; }
+.product-card-footer { display: flex; gap: 6px; flex-wrap: wrap; }
+.risk-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.risk-very-low  { background: #1a3a2a; color: #3fb950; }
+.risk-low       { background: #1a3a2a; color: #3fb950; }
+.risk-low-medium{ background: #2d2f1a; color: #d29922; }
+.risk-medium    { background: #2d2f1a; color: #d29922; }
+.risk-high      { background: #3d2323; color: #f85149; }
+.acct-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #1a2a3a; color: #58a6ff; font-weight: 600; }
+
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0d1117; }
