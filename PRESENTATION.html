@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RMD Intelligent Agent — Presentation</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #F5A623;
+  --blue: #1e3a5f;
+  --green: #2ea043;
+  --red: #da3633;
+  --dark: #0d1117;
+  --card: #161b22;
+  --border: #21262d;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--text); }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,17,23,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 40px;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-coin {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--gold); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900; color: #fff; flex-shrink: 0;
+}
+.nav-title { font-size: 15px; font-weight: 700; color: var(--gold); }
+.nav-links { display: flex; gap: 24px; }
+.nav-links a {
+  font-size: 12px; color: var(--muted); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+/* ── SLIDES ── */
+.slide {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 100px 60px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.slide-number {
+  position: absolute; top: 80px; right: 50px;
+  font-size: 11px; color: var(--border); font-weight: 700; letter-spacing: 2px;
+}
+
+/* ── SLIDE 1 — TITLE ── */
+#s1 {
+  background: radial-gradient(ellipse at center, #1a2a3a 0%, var(--dark) 70%);
+  text-align: center;
+}
+.title-coin {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: var(--gold); display: flex; align-items: center; justify-content: center;
+  font-size: 52px; font-weight: 900; color: #fff;
+  margin: 0 auto 32px;
+  box-shadow: 0 0 60px rgba(245,166,35,0.4);
+  animation: pulse 3s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 40px rgba(245,166,35,0.3); }
+  50%      { box-shadow: 0 0 80px rgba(245,166,35,0.6); }
+}
+.title-main { font-size: 52px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 16px; }
+.title-main span { color: var(--gold); }
+.title-sub { font-size: 20px; color: var(--muted); margin-bottom: 40px; }
+.title-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.badge-pill {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 8px 20px; font-size: 13px; color: var(--text);
+}
+.badge-pill span { color: var(--gold); font-weight: 700; }
+
+/* ── SLIDE 2 — CLIENT ── */
+#s2 { background: var(--dark); }
+.slide-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 700; margin-bottom: 12px; text-align: center; }
+.slide-title { font-size: 42px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 48px; }
+.client-card {
+  display: flex; gap: 48px; align-items: center;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px 48px; max-width: 900px; width: 100%;
+}
+.client-avatar {
+  width: 140px; height: 140px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), #2c5f8a);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px; flex-shrink: 0;
+  border: 3px solid var(--gold);
+}
+.client-info h2 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.client-info p  { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+.client-stats { display: flex; gap: 24px; }
+.cstat { }
+.cstat-val   { font-size: 24px; font-weight: 800; color: var(--gold); }
+.cstat-label { font-size: 11px; color: var(--muted); }
+.client-quote {
+  margin-top: 20px; padding: 14px 16px;
+  background: var(--dark); border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  font-size: 14px; font-style: italic; color: var(--text); line-height: 1.6;
+}
+
+/* ── SLIDE 3 — PROBLEM ── */
+#s3 { background: linear-gradient(180deg, #1a0d0d 0%, var(--dark) 100%); }
+.problems-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; width: 100%; }
+.problem-card {
+  background: var(--card); border: 1px solid #3d2323;
+  border-radius: 12px; padding: 24px;
+}
+.problem-icon { font-size: 36px; margin-bottom: 12px; }
+.problem-title { font-size: 15px; font-weight: 700; color: #f85149; margin-bottom: 8px; }
+.problem-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.problem-impact {
+  margin-top: 10px; font-size: 12px; font-weight: 700;
+  color: #f85149; background: #3d2323; padding: 4px 10px;
+  border-radius: 10px; display: inline-block;
+}
+
+/* ── SLIDE 4 — SOLUTION ── */
+#s4 { background: linear-gradient(180deg, #0d1a0d 0%, var(--dark) 100%); }
+.solution-flow {
+  display: flex; align-items: center; gap: 0; max-width: 1000px; width: 100%;
+  margin-bottom: 40px;
+}
+.flow-node {
+  flex: 1; text-align: center; padding: 20px 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+}
+.flow-node-icon { font-size: 32px; margin-bottom: 10px; }
+.flow-node-title { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.flow-node-sub   { font-size: 11px; color: var(--muted); }
+.flow-arrow { font-size: 24px; color: var(--gold); padding: 0 8px; flex-shrink: 0; }
+.solution-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1000px; width: 100%; }
+.sol-card {
+  background: var(--card); border: 1px solid #1a3a2a;
+  border-radius: 12px; padding: 20px;
+}
+.sol-card-icon  { font-size: 28px; margin-bottom: 10px; }
+.sol-card-title { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.sol-card-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ── SLIDE 5 — HOW IT WORKS ── */
+#s5 { background: var(--dark); }
+.steps-row { display: flex; gap: 12px; max-width: 1000px; width: 100%; margin-bottom: 32px; }
+.step-box {
+  flex: 1; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 16px; text-align: center; position: relative;
+}
+.step-box::after {
+  content: '→'; position: absolute; right: -14px; top: 50%;
+  transform: translateY(-50%); color: var(--gold); font-size: 18px; font-weight: 700;
+  z-index: 1;
+}
+.step-box:last-child::after { display: none; }
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold); color: var(--dark);
+  font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 10px;
+}
+.step-icon  { font-size: 28px; margin-bottom: 8px; }
+.step-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.step-desc  { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.ai-highlight {
+  background: linear-gradient(135deg, #0d2a1a, var(--card));
+  border: 1px solid var(--green); border-radius: 12px;
+  padding: 20px 28px; max-width: 1000px; width: 100%;
+  display: flex; gap: 20px; align-items: center;
+}
+.ai-highlight-icon { font-size: 48px; }
+.ai-highlight-text h3 { font-size: 16px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.ai-highlight-text p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── SLIDE 6 — ASSET SELECTION ── */
+#s6 { background: var(--dark); }
+.asset-compare { display: flex; gap: 32px; max-width: 1000px; width: 100%; align-items: flex-start; }
+.asset-col { flex: 1; }
+.asset-col-title {
+  font-size: 13px; font-weight: 700; text-align: center;
+  padding: 10px; border-radius: 8px 8px 0 0; margin-bottom: 0;
+}
+.asset-col-title.bad  { background: #3d2323; color: #f85149; }
+.asset-col-title.good { background: #1a3a2a; color: var(--green); }
+.asset-list { background: var(--card); border: 1px solid var(--border); border-radius: 0 0 8px 8px; }
+.asset-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.asset-row:last-child { border-bottom: none; }
+.asset-sym { font-weight: 700; color: #fff; }
+.asset-gain.pos { color: #f85149; }
+.asset-gain.neg { color: var(--green); }
+.asset-reason   { font-size: 11px; color: var(--muted); }
+.vs-badge {
+  font-size: 28px; font-weight: 800; color: var(--gold);
+  align-self: center; text-align: center; flex-shrink: 0;
+}
+.tax-result-box {
+  max-width: 1000px; width: 100%; margin-top: 24px;
+  background: linear-gradient(135deg, #0d2a1a, var(--card));
+  border: 2px solid var(--green); border-radius: 12px;
+  padding: 20px 28px; display: flex; gap: 40px; align-items: center; justify-content: center;
+}
+.tax-number { text-align: center; }
+.tax-number-val   { font-size: 40px; font-weight: 800; color: var(--gold); }
+.tax-number-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ── SLIDE 7 — REINVESTMENT ── */
+#s7 { background: var(--dark); }
+.reinvest-flow-big {
+  display: flex; gap: 0; align-items: center; max-width: 900px; width: 100%; margin-bottom: 32px;
+}
+.rfb {
+  flex: 1; text-align: center; padding: 24px;
+  border-radius: 12px; font-size: 13px; font-weight: 600;
+}
+.rfb.ira     { background: #1a2a3a; border: 2px solid #58a6ff; color: #58a6ff; }
+.rfb.bank    { background: #1a3a2a; border: 2px solid var(--green); color: var(--green); }
+.rfb.invest  { background: #2a2a1a; border: 2px solid var(--gold); color: var(--gold); }
+.rfb-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+.rfb-val  { font-size: 22px; font-weight: 800; display: block; margin-top: 8px; }
+.rfb-arrow { font-size: 28px; color: var(--muted); padding: 0 12px; flex-shrink: 0; }
+.products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1000px; width: 100%; }
+.prod-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; text-align: center;
+}
+.prod-name  { font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.prod-yield { font-size: 22px; font-weight: 800; color: var(--green); }
+.prod-risk  { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+/* ── SLIDE 8 — BUSINESS VALUE ── */
+#s8 { background: linear-gradient(180deg, #0d1a0d 0%, var(--dark) 100%); }
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1000px; width: 100%; }
+.value-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px;
+  transition: border-color 0.3s;
+}
+.value-card:hover { border-color: var(--gold); }
+.value-icon  { font-size: 32px; margin-bottom: 10px; }
+.value-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.value-desc  { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.value-tag   { font-size: 11px; color: var(--gold); font-weight: 600; }
+
+/* ── SLIDE 9 — TECH STACK ── */
+#s9 { background: var(--dark); }
+.tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 1000px; width: 100%; }
+.tech-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+.tech-icon  { font-size: 32px; margin-bottom: 8px; }
+.tech-name  { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.tech-role  { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.tech-free  { background: #1a3a2a; color: var(--green); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+
+/* ── SLIDE 10 — CTA ── */
+#s10 {
+  background: radial-gradient(ellipse at center, #1a2a1a 0%, var(--dark) 70%);
+  text-align: center;
+}
+.cta-big { font-size: 56px; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 20px; }
+.cta-big span { color: var(--gold); }
+.cta-sub { font-size: 18px; color: var(--muted); margin-bottom: 48px; max-width: 600px; }
+.kpi-row { display: flex; gap: 32px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+.kpi-box { text-align: center; }
+.kpi-box-val   { font-size: 42px; font-weight: 800; color: var(--gold); }
+.kpi-box-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.cta-link {
+  display: inline-block; background: var(--gold); color: var(--dark);
+  font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 8px;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.cta-link:hover { opacity: 0.85; }
+.cta-note { font-size: 12px; color: var(--muted); margin-top: 16px; }
+
+/* ── DIVIDER ── */
+.slide-divider {
+  width: 60px; height: 4px; background: var(--gold);
+  border-radius: 2px; margin: 0 auto 32px;
+}
+
+/* ── SCROLL INDICATOR ── */
+.scroll-hint {
+  position: absolute; bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px; color: var(--muted); text-align: center;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-coin">$</div>
+    <div class="nav-title">RMD Intelligent Agent</div>
+  </div>
+  <div class="nav-links">
+    <a href="#s1">Intro</a>
+    <a href="#s2">Client</a>
+    <a href="#s3">Problem</a>
+    <a href="#s4">Solution</a>
+    <a href="#s5">How It Works</a>
+    <a href="#s6">Tax Savings</a>
+    <a href="#s7">Reinvestment</a>
+    <a href="#s8">Value</a>
+    <a href="#s9">Tech</a>
+    <a href="#s10">Summary</a>
+  </div>
+</nav>
+
+<!-- SLIDE 1 — TITLE -->
+<section class="slide" id="s1">
+  <div class="slide-number">01 / 10</div>
+  <div class="title-coin">$</div>
+  <div class="title-main">Intelligent <span>RMD</span><br/>Liquidation Agent</div>
+  <div class="title-sub">Autonomous IRA Required Minimum Distribution Platform</div>
+  <div class="title-badges">
+    <div class="badge-pill">🤖 Agentic AI</div>
+    <div class="badge-pill">⚡ <span>4s</span> response time</div>
+    <div class="badge-pill">💰 Tax-efficient liquidation</div>
+    <div class="badge-pill">📈 Reinvestment engine</div>
+    <div class="badge-pill">🆓 <span>$0</span> infrastructure cost</div>
+  </div>
+  <div class="scroll-hint">↓ Scroll to explore</div>
+</section>
+
+<!-- SLIDE 2 — CLIENT STORY -->
+<section class="slide" id="s2">
+  <div class="slide-number">02 / 10</div>
+  <div class="slide-label">Client Use Case</div>
+  <div class="slide-title">Meet Robert & Margaret Chen</div>
+  <div class="slide-divider"></div>
+  <div class="client-card">
+    <div class="client-avatar">👴</div>
+    <div class="client-info">
+      <h2>Robert & Margaret Chen</h2>
+      <p>Retired couple · Traditional IRA · New York</p>
+      <div class="client-stats">
+        <div class="cstat"><div class="cstat-val">75</div><div class="cstat-label">Robert's Age</div></div>
+        <div class="cstat"><div class="cstat-val">$500K</div><div class="cstat-label">IRA Balance</div></div>
+        <div class="cstat"><div class="cstat-val">13</div><div class="cstat-label">Holdings</div></div>
+        <div class="cstat"><div class="cstat-val">10</div><div class="cstat-label">Asset Classes</div></div>
+      </div>
+      <div class="client-quote">
+        "Every year I get stressed about which stocks to sell for my RMD. Last year my advisor sold the wrong ones and I ended up with a huge tax bill I wasn't expecting."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3 — PROBLEM -->
+<section class="slide" id="s3">
+  <div class="slide-number">03 / 10</div>
+  <div class="slide-label">The Problem</div>
+  <div class="slide-title">RMD Processing is Broken</div>
+  <div class="slide-divider"></div>
+  <div class="problems-grid">
+    <div class="problem-card">
+      <div class="problem-icon">⏳</div>
+      <div class="problem-title">Manual & Slow</div>
+      <div class="problem-desc">Advisors spend 2-3 hours per client manually calculating RMD amounts and selecting assets — a process that should take seconds.</div>
+      <div class="problem-impact">3 hours → 4 seconds with agent</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">💸</div>
+      <div class="problem-title">Costly Tax Mistakes</div>
+      <div class="problem-desc">Random or gut-feel asset selection sells winners first, triggering unnecessary capital gains. Robert's last RMD cost him $1,211 extra in taxes.</div>
+      <div class="problem-impact">$1,211 in avoidable taxes</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">⚖️</div>
+      <div class="problem-title">Compliance Risk</div>
+      <div class="problem-desc">IRS mandates RMDs after age 73. Missing or under-distributing triggers a 25% excise tax penalty — entirely avoidable with automation.</div>
+      <div class="problem-impact">25% IRS penalty if missed</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-icon">😤</div>
+      <div class="problem-title">No Client Transparency</div>
+      <div class="problem-desc">Clients like Robert have no idea why specific assets were sold. No explanation. No confidence. No trust in the process.</div>
+      <div class="problem-impact">Erodes advisor-client trust</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4 — SOLUTION -->
+<section class="slide" id="s4">
+  <div class="slide-number">04 / 10</div>
+  <div class="slide-label">The Solution</div>
+  <div class="slide-title">One Agent. Full Automation.</div>
+  <div class="slide-divider"></div>
+  <div class="solution-flow">
+    <div class="flow-node"><div class="flow-node-icon">🧮</div><div class="flow-node-title">Calculate RMD</div><div class="flow-node-sub">IRS formula</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="flow-node-icon">📊</div><div class="flow-node-title">Analyse Portfolio</div><div class="flow-node-sub">13 assets, 10 classes</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="flow-node-icon">💰</div><div class="flow-node-title">Optimise Tax</div><div class="flow-node-sub">Losses first</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="flow-node-icon">⚡</div><div class="flow-node-title">Execute Trades</div><div class="flow-node-sub">Via Alpaca API</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="flow-node-icon">📈</div><div class="flow-node-title">Reinvest Cash</div><div class="flow-node-sub">7 products</div></div>
+  </div>
+  <div class="solution-cards">
+    <div class="sol-card"><div class="sol-card-icon">💵</div><div class="sol-card-title">Cash Distribution</div><div class="sol-card-desc">Sells selected assets, transfers cash to client's bank account. Agent suggests where to reinvest immediately.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">🔄</div><div class="sol-card-title">In-Kind Transfer</div><div class="sol-card-desc">Moves shares from IRA to taxable brokerage. Client retains market exposure while satisfying the RMD requirement.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">🤖</div><div class="sol-card-title">AI Explanation</div><div class="sol-card-desc">Every decision explained in plain English. Client understands exactly why each asset was selected or protected.</div></div>
+  </div>
+</section>
+
+<!-- SLIDE 5 — HOW IT WORKS -->
+<section class="slide" id="s5">
+  <div class="slide-number">05 / 10</div>
+  <div class="slide-label">Agentic AI</div>
+  <div class="slide-title">SENSE → THINK → PLAN → ACT → REPORT</div>
+  <div class="slide-divider"></div>
+  <div class="steps-row">
+    <div class="step-box">
+      <div class="step-num">1</div>
+      <div class="step-icon">👁️</div>
+      <div class="step-title">SENSE</div>
+      <div class="step-desc">Reads age, IRA balance, 13 holdings, market signals, client preference</div>
+    </div>
+    <div class="step-box">
+      <div class="step-num">2</div>
+      <div class="step-icon">🧠</div>
+      <div class="step-title">THINK</div>
+      <div class="step-desc">Calculates RMD via IRS table. Scores every asset: Score = -(Gain/Loss)</div>
+    </div>
+    <div class="step-box">
+      <div class="step-num">3</div>
+      <div class="step-icon">📋</div>
+      <div class="step-title">PLAN</div>
+      <div class="step-desc">Selects exact quantities. Runs naive vs smart tax comparison</div>
+    </div>
+    <div class="step-box">
+      <div class="step-num">4</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-title">ACT</div>
+      <div class="step-desc">Executes trades via Alpaca API. Generates reinvestment plan</div>
+    </div>
+    <div class="step-box">
+      <div class="step-num">5</div>
+      <div class="step-icon">📢</div>
+      <div class="step-title">REPORT</div>
+      <div class="step-desc">Plain-English explanation. Full audit trail. Client chat assistant</div>
+    </div>
+  </div>
+  <div class="ai-highlight">
+    <div class="ai-highlight-icon">🤖</div>
+    <div class="ai-highlight-text">
+      <h3>Powered by Ollama / Phi-3 — Runs 100% Locally</h3>
+      <p>The AI language model runs on the server itself — no data sent to the cloud, no API key required. Generates personalized reinvestment advice and answers client questions in plain English via a context-aware floating chat assistant.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6 — TAX SAVINGS -->
+<section class="slide" id="s6">
+  <div class="slide-number">06 / 10</div>
+  <div class="slide-label">Tax Efficiency</div>
+  <div class="slide-title">The Agent Saves Robert $1,211 in Taxes</div>
+  <div class="slide-divider"></div>
+  <div class="asset-compare">
+    <div class="asset-col">
+      <div class="asset-col-title bad">❌ Without Agent — Sells Highest Gainers</div>
+      <div class="asset-list">
+        <div class="asset-row"><span class="asset-sym">VTI</span><span class="asset-reason">Broad Market ETF</span><span class="asset-gain pos">+$2,800 gain</span></div>
+        <div class="asset-row"><span class="asset-sym">GLD</span><span class="asset-reason">Commodity</span><span class="asset-gain pos">+$1,850 gain</span></div>
+        <div class="asset-row"><span class="asset-sym">XLV</span><span class="asset-reason">Healthcare ETF</span><span class="asset-gain pos">+$620 gain</span></div>
+      </div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="asset-col">
+      <div class="asset-col-title good">✅ With Agent — Sells Losses First</div>
+      <div class="asset-list">
+        <div class="asset-row"><span class="asset-sym">TSLA</span><span class="asset-reason">US Equity</span><span class="asset-gain neg">-$1,800 loss</span></div>
+        <div class="asset-row"><span class="asset-sym">EEM</span><span class="asset-reason">Intl Equity</span><span class="asset-gain neg">-$680 loss</span></div>
+        <div class="asset-row"><span class="asset-sym">HYG</span><span class="asset-reason">High Yield Bond</span><span class="asset-gain neg">-$510 loss</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="tax-result-box">
+    <div class="tax-number"><div class="tax-number-val">$1,211</div><div class="tax-number-label">Tax Saved by Agent</div></div>
+    <div class="tax-number"><div class="tax-number-val">$0</div><div class="tax-number-label">Agent Tax Bill</div></div>
+    <div class="tax-number"><div class="tax-number-val">24%</div><div class="tax-number-label">Tax Rate Applied</div></div>
+    <div class="tax-number"><div class="tax-number-val">$1.2M</div><div class="tax-number-label">Savings at 1,000 Clients/yr</div></div>
+  </div>
+</section>
+
+<!-- SLIDE 7 — REINVESTMENT -->
+<section class="slide" id="s7">
+  <div class="slide-number">07 / 10</div>
+  <div class="slide-label">Reinvestment Engine</div>
+  <div class="slide-title">Keep the Money Working</div>
+  <div class="slide-divider"></div>
+  <div class="reinvest-flow-big">
+    <div class="rfb ira"><span class="rfb-icon">🏦</span>IRA Account<span class="rfb-val">$500,000</span></div>
+    <div class="rfb-arrow">→</div>
+    <div class="rfb bank"><span class="rfb-icon">🏛️</span>Same Bank Account<span class="rfb-val">$20,325</span></div>
+    <div class="rfb-arrow">→</div>
+    <div class="rfb invest"><span class="rfb-icon">📈</span>Reinvested Products<span class="rfb-val">$862/yr income</span></div>
+  </div>
+  <div class="products-grid">
+    <div class="prod-card"><div class="prod-name">High-Yield Savings</div><div class="prod-yield">4.5%</div><div class="prod-risk">Low Risk · Same Bank</div></div>
+    <div class="prod-card"><div class="prod-name">Certificate of Deposit</div><div class="prod-yield">4.85%</div><div class="prod-risk">Low Risk · 12-month</div></div>
+    <div class="prod-card"><div class="prod-name">US Treasury Bills</div><div class="prod-yield">4.2%</div><div class="prod-risk">Very Low · Govt backed</div></div>
+    <div class="prod-card"><div class="prod-name">Municipal Bond Fund</div><div class="prod-yield">3.8%</div><div class="prod-risk">Low · Tax-free interest</div></div>
+    <div class="prod-card"><div class="prod-name">Dividend ETF (SCHD)</div><div class="prod-yield">3.5%</div><div class="prod-risk">Medium · Growth + income</div></div>
+    <div class="prod-card"><div class="prod-name">Fixed Annuity</div><div class="prod-yield">5.2%</div><div class="prod-risk">Very Low · Guaranteed</div></div>
+    <div class="prod-card"><div class="prod-name">Money Market Fund</div><div class="prod-yield">4.1%</div><div class="prod-risk">Very Low · Liquid</div></div>
+    <div class="prod-card" style="border-color:var(--gold);background:linear-gradient(135deg,#2a2a1a,var(--card))">
+      <div class="prod-name" style="color:var(--gold)">Total Annual Income</div>
+      <div class="prod-yield" style="color:var(--gold)">$862</div>
+      <div class="prod-risk">RMD working for Robert</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8 — BUSINESS VALUE -->
+<section class="slide" id="s8">
+  <div class="slide-number">08 / 10</div>
+  <div class="slide-label">Business Value</div>
+  <div class="slide-title">Six Reasons to Build This</div>
+  <div class="slide-divider"></div>
+  <div class="value-grid">
+    <div class="value-card"><div class="value-icon">⚖️</div><div class="value-title">Regulatory Compliance</div><div class="value-desc">100% on-time RMD execution, IRS penalty eliminated, full audit trail for every decision.</div><div class="value-tag">Zero penalty incidents</div></div>
+    <div class="value-card"><div class="value-icon">😊</div><div class="value-title">Client Experience</div><div class="value-desc">Plain-English AI explanations, cash or in-kind flexibility, 24/7 chat assistant for any question.</div><div class="value-tag">Higher retention & trust</div></div>
+    <div class="value-card"><div class="value-icon">💰</div><div class="value-title">Tax Efficiency</div><div class="value-desc">Loss-first liquidation saves Robert $1,211/yr. At 1,000 clients → $1.2M in client tax savings annually.</div><div class="value-tag">$1,211 saved per client/yr</div></div>
+    <div class="value-card"><div class="value-icon">⚡</div><div class="value-title">Operational Savings</div><div class="value-desc">3 hours of manual work per client reduced to 4 seconds. Staff redeployed to high-value activities.</div><div class="value-tag">3 hrs → 4 seconds</div></div>
+    <div class="value-card"><div class="value-icon">📈</div><div class="value-title">Revenue Protection</div><div class="value-desc">Reinvestment engine keeps distributed cash in firm-managed products. AUM stays within the firm.</div><div class="value-tag">Protects AUM outflow</div></div>
+    <div class="value-card"><div class="value-icon">🚀</div><div class="value-title">Strategic Platform</div><div class="value-desc">Reusable AI framework extends to Inherited IRAs, Roth conversions, systematic withdrawals.</div><div class="value-tag">Foundation for future AI</div></div>
+  </div>
+</section>
+
+<!-- SLIDE 9 — TECH STACK -->
+<section class="slide" id="s9">
+  <div class="slide-number">09 / 10</div>
+  <div class="slide-label">Technology</div>
+  <div class="slide-title">100% Free & Open Source Stack</div>
+  <div class="slide-divider"></div>
+  <div class="tech-grid">
+    <div class="tech-card"><div class="tech-icon">☕</div><div class="tech-name">Java 17</div><div class="tech-role">Runtime</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">🍃</div><div class="tech-name">Spring Boot 3.2</div><div class="tech-role">Backend Framework</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">🤖</div><div class="tech-name">Ollama + Phi-3</div><div class="tech-role">Local AI Engine</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">📈</div><div class="tech-name">Alpaca API</div><div class="tech-role">Paper Trading</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">🌐</div><div class="tech-name">HTML5 / JS</div><div class="tech-role">Frontend Dashboard</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">📊</div><div class="tech-name">Chart.js</div><div class="tech-role">Data Visualisation</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card"><div class="tech-icon">🐙</div><div class="tech-name">GitHub</div><div class="tech-role">Source Control</div><div class="tech-free">FREE</div></div>
+    <div class="tech-card" style="border-color:var(--gold)">
+      <div class="tech-icon">💰</div>
+      <div class="tech-name">Total Cost</div>
+      <div class="tech-role">All components</div>
+      <div style="font-size:22px;font-weight:800;color:var(--gold);margin-top:4px">$0 / month</div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 10 — CTA -->
+<section class="slide" id="s10">
+  <div class="slide-number">10 / 10</div>
+  <div class="cta-big">Ready to <span>Automate</span><br/>Every RMD?</div>
+  <div class="cta-sub">The agent is built, tested, and running. Zero cloud cost. One click to deploy on any Windows machine.</div>
+  <div class="kpi-row">
+    <div class="kpi-box"><div class="kpi-box-val">$20,325</div><div class="kpi-box-label">RMD Calculated</div></div>
+    <div class="kpi-box"><div class="kpi-box-val">$1,211</div><div class="kpi-box-label">Tax Saved</div></div>
+    <div class="kpi-box"><div class="kpi-box-val">4s</div><div class="kpi-box-label">Agent Runtime</div></div>
+    <div class="kpi-box"><div class="kpi-box-val">$862</div><div class="kpi-box-label">Annual Reinvestment Income</div></div>
+    <div class="kpi-box"><div class="kpi-box-val">$0</div><div class="kpi-box-label">Infrastructure Cost</div></div>
+  </div>
+  <a class="cta-link" href="http://localhost:4500" target="_blank">▶ Open Live Demo</a>
+  <div class="cta-note">github.com/imzerocool99/rmd-agent &nbsp;·&nbsp; github.com/imzerocool99/rmd-ui</div>
+</section>
+
+</body>
+</html>
