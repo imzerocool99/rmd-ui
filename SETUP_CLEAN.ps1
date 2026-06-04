@@ -1,7 +1,7 @@
 # ============================================================
-#  RMD Intelligent Agent — One-Click Setup
+#  RMD Intelligent Agent - One-Click Setup
 #  Run this ONCE on a new machine to install and launch the app
-#  Right-click → Run with PowerShell
+#  Right-click Run with PowerShell
 # ============================================================
 
 $ErrorActionPreference = "Stop"
@@ -13,7 +13,7 @@ function Write-WARN($msg) { Write-Host "    !!  $msg" -ForegroundColor Yellow }
 
 Clear-Host
 Write-Host "============================================" -ForegroundColor Yellow
-Write-Host "   RMD Intelligent Agent — Setup Wizard    " -ForegroundColor Yellow
+Write-Host "   RMD Intelligent Agent - Setup Wizard    " -ForegroundColor Yellow
 Write-Host "============================================" -ForegroundColor Yellow
 Write-Host ""
 
@@ -38,7 +38,7 @@ if (-not (Test-Path "$javaHome\bin\java.exe")) {
 $env:JAVA_HOME = $javaHome
 $env:PATH = "$javaHome\bin;$env:PATH"
 
-# 3. Install Git────
+# 3. Install Git
 Write-Step "Checking Git..."
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     Write-Host "    Installing Git..." -ForegroundColor Yellow
@@ -57,7 +57,7 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     $env:PATH = "C:\Program Files\nodejs;$env:PATH"
     Write-OK "Node.js installed"
 } else {
-    Write-OK "Node.js already installed — $(node -v)"
+    Write-OK "Node.js already installed - $(node -v)"
 }
 
 # 5. Install Ollama
@@ -76,14 +76,14 @@ $env:PATH = "$env:LOCALAPPDATA\Programs\Ollama;$env:PATH"
 Write-Step "Checking Phi-3 AI model (3.8GB download if not present)..."
 $models = & ollama list 2>&1
 if ($models -notmatch "phi3") {
-    Write-Host "    Downloading Phi-3 model (~3.8GB, please wait)..." -ForegroundColor Yellow
+    Write-Host "    Downloading Phi-3 model (3.8GB, please wait)..." -ForegroundColor Yellow
     ollama pull phi3
     Write-OK "Phi-3 model ready"
 } else {
     Write-OK "Phi-3 model already downloaded"
 }
 
-# 7. Install Maven────
+# 7. Install Maven
 Write-Step "Checking Maven..."
 $mvnPath = "$env:USERPROFILE\maven\apache-maven-3.9.6\bin\mvn.cmd"
 if (-not (Test-Path $mvnPath)) {
@@ -98,7 +98,7 @@ if (-not (Test-Path $mvnPath)) {
 }
 $env:PATH = "$env:USERPROFILE\maven\apache-maven-3.9.6\bin;$env:PATH"
 
-# 8. Clone repos────
+# 8. Clone repos
 Write-Step "Setting up project files..."
 $projectDir = "$env:USERPROFILE\rmd-project"
 if (-not (Test-Path $projectDir)) { New-Item -ItemType Directory -Path $projectDir | Out-Null }
@@ -130,8 +130,8 @@ if (-not (Test-Path "$projectDir\rmd-ui")) {
     Write-OK "Frontend updated"
 }
 
-# 9. Build backend────
-Write-Step "Building backend (first build downloads dependencies ~100MB)..."
+# 9. Build backend
+Write-Step "Building backend (first build downloads dependencies 100MB)..."
 Set-Location "$projectDir\rmd-agent"
 mvn clean package -DskipTests -q
 if ($LASTEXITCODE -ne 0) {
@@ -169,7 +169,7 @@ Start-Process -FilePath "cmd.exe" `
 Start-Sleep -Seconds 4
 Write-OK "Frontend running on port 4500"
 
-# 12. Open browser────
+# 12. Open browser
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
 Write-Host "   Setup Complete! Opening the app...      " -ForegroundColor Green
