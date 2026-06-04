@@ -316,19 +316,37 @@ function renderPerformanceChart(portfolio) {
     type: 'bar',
     data: {
       labels: portfolio.map(p => p.symbol),
-      datasets: [{
-        label: 'Gain / Loss ($)',
-        data: portfolio.map(p => Number(p.gain)),
-        backgroundColor: portfolio.map(p => Number(p.gain) >= 0 ? '#238636' : '#da3633'),
-        borderRadius: 6
-      }]
+      datasets: [
+        {
+          label: 'Unrealized Gain ($)',
+          data: portfolio.map(p => Number(p.gain) >= 0 ? Number(p.gain) : 0),
+          backgroundColor: '#238636',
+          borderRadius: 4
+        },
+        {
+          label: 'Unrealized Loss ($)',
+          data: portfolio.map(p => Number(p.gain) < 0 ? Number(p.gain) : 0),
+          backgroundColor: '#da3633',
+          borderRadius: 4
+        }
+      ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12, padding: 10 }
+        }
+      },
       scales: {
-        x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },
-        y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } }
+        x: { ticks: { color: '#8b949e', font: { size: 10 } }, grid: { color: '#21262d' } },
+        y: {
+          ticks: { color: '#8b949e', callback: v => '$' + v.toLocaleString() },
+          grid: { color: '#21262d' }
+        }
       }
     }
   });
@@ -397,29 +415,58 @@ function renderRMDChart(rmd, liquidated) {
   const ctx = document.getElementById('rmdChart').getContext('2d');
   if (rmdChart) rmdChart.destroy();
 
-  const coverage = Math.min(liquidated, rmd);
+  const coverage  = Math.min(liquidated, rmd);
   const shortfall = Math.max(0, rmd - liquidated);
+  const surplus   = Math.max(0, liquidated - rmd);
 
   rmdChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['RMD Requirement', 'Assets Liquidated', 'Coverage', 'Shortfall'],
-      datasets: [{
-        data: [rmd, liquidated, coverage, shortfall],
-        backgroundColor: ['#58a6ff', '#3fb950', '#3fb950', '#f85149'],
-        borderRadius: 6
-      }]
+      labels: ['RMD Required', 'Liquidated', 'Covered', 'Surplus / Shortfall'],
+      datasets: [
+        {
+          label: 'IRS Required Amount',
+          data: [rmd, null, null, null],
+          backgroundColor: '#58a6ff',
+          borderRadius: 4
+        },
+        {
+          label: 'Total Assets Liquidated',
+          data: [null, liquidated, null, null],
+          backgroundColor: '#3fb950',
+          borderRadius: 4
+        },
+        {
+          label: 'RMD Covered',
+          data: [null, null, coverage, null],
+          backgroundColor: '#238636',
+          borderRadius: 4
+        },
+        {
+          label: shortfall > 0 ? 'Shortfall' : 'Surplus',
+          data: [null, null, null, shortfall > 0 ? shortfall : surplus],
+          backgroundColor: shortfall > 0 ? '#f85149' : '#d29922',
+          borderRadius: 4
+        }
+      ]
     },
     options: {
       indexAxis: 'y',
       responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: {
-          ticks: { color: '#8b949e', callback: v => '$' + v.toLocaleString() },
-          grid: { color: '#21262d' }
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12, padding: 10 }
         },
-        y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } }
+        tooltip: {
+          callbacks: { label: c => ` ${c.dataset.label}: $${Number(c.parsed.x).toLocaleString('en-US', {minimumFractionDigits:2})}` }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8b949e', callback: v => '$' + v.toLocaleString() }, grid: { color: '#21262d' } },
+        y: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: '#21262d' } }
       }
     }
   });
@@ -461,7 +508,7 @@ let taxChart = null;
 
 function renderTaxAnalysis(tax) {
   document.getElementById('taxCompare').style.display = 'flex';
-  document.getElementById('taxChart').style.display = 'block';
+  document.getElementById('taxChartWrap').style.display = 'block';
 
   const fmt = v => '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2 });
 
@@ -500,22 +547,29 @@ function renderTaxAnalysis(tax) {
   taxChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Naive Tax Bill', 'Agent Tax Bill', 'Tax Saved'],
-      datasets: [{
-        data: [tax.naiveTaxBill, tax.smartTaxBill, tax.taxSaved],
-        backgroundColor: ['#da3633', '#238636', '#58a6ff'],
-        borderRadius: 6
-      }]
+      labels: ['Without Agent', 'With Agent', 'Tax Saved'],
+      datasets: [
+        { label: 'Naive Tax Bill (no AI)',  data: [tax.naiveTaxBill, null, null], backgroundColor: '#da3633', borderRadius: 4 },
+        { label: 'Agent Tax Bill (AI)',      data: [null, tax.smartTaxBill, null], backgroundColor: '#238636', borderRadius: 4 },
+        { label: 'Total Tax Saved by Agent', data: [null, null, tax.taxSaved],    backgroundColor: '#58a6ff', borderRadius: 4 }
+      ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' } },
-        y: {
-          ticks: { color: '#8b949e', callback: v => '$' + v.toLocaleString() },
-          grid: { color: '#21262d' }
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12, padding: 10 }
+        },
+        tooltip: {
+          callbacks: { label: c => ` ${c.dataset.label}: $${Number(c.parsed.y).toLocaleString('en-US', {minimumFractionDigits:2})}` }
         }
+      },
+      scales: {
+        x: { ticks: { color: '#8b949e', font: { size: 11 } }, grid: { color: '#21262d' } },
+        y: { ticks: { color: '#8b949e', callback: v => '$' + v.toLocaleString() }, grid: { color: '#21262d' } }
       }
     }
   });
