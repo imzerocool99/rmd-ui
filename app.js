@@ -7,8 +7,71 @@ let performanceChart = null;
 let rmdChart = null;
 let reinvestChart = null;
 
+// ── Client Registry ───────────────────────────────────────────────────
+const CLIENTS = [
+  { id: 'client_001', name: 'Robert & Margaret Chen',   age: 75, balance: 500000,  preference: 'sell',    initials: 'RC', location: 'New York, NY' },
+  { id: 'client_002', name: 'William & Dorothy Davis',  age: 78, balance: 750000,  preference: 'sell',    initials: 'WD', location: 'Boston, MA'  },
+  { id: 'client_003', name: 'James Harrison',           age: 73, balance: 250000,  preference: 'in_kind', initials: 'JH', location: 'Chicago, IL' },
+  { id: 'client_004', name: 'Patricia & John Kim',      age: 80, balance: 1200000, preference: 'sell',    initials: 'PK', location: 'San Jose, CA'},
+  { id: 'client_005', name: 'Barbara & Thomas Wilson',  age: 74, balance: 425000,  preference: 'sell',    initials: 'BW', location: 'Austin, TX'  },
+];
+
+function selectClient(idOrObj) {
+  const c = typeof idOrObj === 'string' ? CLIENTS.find(x => x.id === idOrObj) : idOrObj;
+  if (!c) return;
+  document.getElementById('clientId').value = c.id;
+  document.getElementById('clientSearch').value = c.name;
+  document.getElementById('age').value = c.age;
+  document.getElementById('balance').value = c.balance;
+  document.getElementById('preference').value = c.preference;
+  const badge = document.getElementById('selectedClientBadge');
+  badge.innerHTML = `
+    <div class="scb-avatar">${c.initials}</div>
+    <div class="scb-info">
+      <div class="scb-name">${c.name}</div>
+      <div class="scb-meta">${c.id} &nbsp;·&nbsp; ${c.location}</div>
+    </div>`;
+  badge.style.display = 'flex';
+  closeDropdown();
+}
+
+function filterClients(q) {
+  const dd = document.getElementById('clientDropdown');
+  const lower = q.toLowerCase().trim();
+  const matches = lower
+    ? CLIENTS.filter(c => c.name.toLowerCase().includes(lower) || c.id.includes(lower))
+    : CLIENTS;
+  renderDropdown(matches);
+  dd.style.display = 'block';
+}
+
+function renderDropdown(list) {
+  const dd = document.getElementById('clientDropdown');
+  if (!list.length) {
+    dd.innerHTML = '<div class="dd-empty">No clients found</div>';
+    return;
+  }
+  dd.innerHTML = list.map(c => `
+    <div class="dd-item" onmousedown="selectClient('${c.id}')">
+      <div class="dd-avatar">${c.initials}</div>
+      <div class="dd-info">
+        <div class="dd-name">${c.name}</div>
+        <div class="dd-meta">${c.id} &nbsp;·&nbsp; Age ${c.age} &nbsp;·&nbsp; $${(c.balance/1000).toFixed(0)}K IRA &nbsp;·&nbsp; ${c.location}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openDropdown() {
+  filterClients(document.getElementById('clientSearch').value);
+}
+
+function closeDropdown() {
+  document.getElementById('clientDropdown').style.display = 'none';
+}
+
 // ── Boot ──────────────────────────────────────────────────────────────
 window.onload = () => {
+  selectClient('client_001');
   checkBackend();
   setInterval(checkBackend, 10000);
 };

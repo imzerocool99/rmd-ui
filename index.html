@@ -32,10 +32,21 @@
     <aside class="sidebar">
       <h3>Client Profile</h3>
 
-      <div class="form-group">
-        <label>Client ID</label>
-        <input type="text" id="clientId" value="client_001"/>
+      <div class="form-group client-search-wrap">
+        <label>Search Client</label>
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="clientSearch" placeholder="Type name or ID..."
+                 autocomplete="off"
+                 oninput="filterClients(this.value)"
+                 onfocus="openDropdown()"
+                 onblur="setTimeout(closeDropdown,150)"/>
+          <div class="client-dropdown" id="clientDropdown"></div>
+        </div>
       </div>
+      <div class="selected-client-badge" id="selectedClientBadge"></div>
+      <input type="hidden" id="clientId" value="client_001"/>
+
       <div class="form-group">
         <label>Client Age</label>
         <input type="number" id="age" value="75" min="70" max="100"/>
@@ -58,11 +69,12 @@
 
       <hr/>
 
-      <h3>Quick Presets</h3>
+      <h3>Quick Select</h3>
       <div class="quick-actions">
-        <button class="tag-btn" onclick="setPreset(72, 300000)">Age 72 · $300K IRA</button>
-        <button class="tag-btn" onclick="setPreset(75, 500000)">Age 75 · $500K IRA</button>
-        <button class="tag-btn" onclick="setPreset(80, 1000000)">Age 80 · $1M IRA</button>
+        <button class="tag-btn" onclick="selectClient('client_001')">R. Chen · 75 · $500K</button>
+        <button class="tag-btn" onclick="selectClient('client_002')">W. Davis · 78 · $750K</button>
+        <button class="tag-btn" onclick="selectClient('client_003')">J. Harrison · 73 · $250K</button>
+        <button class="tag-btn" onclick="selectClient('client_004')">P. Kim · 80 · $1.2M</button>
       </div>
     </aside>
 

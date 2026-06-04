@@ -1,5 +1,56 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── CLIENT TYPEAHEAD ── */
+.client-search-wrap { position: relative; }
+.search-input-wrap  { position: relative; }
+.search-icon {
+  position: absolute; left: 9px; top: 50%;
+  transform: translateY(-50%); font-size: 13px; pointer-events: none;
+}
+.search-input-wrap input {
+  padding-left: 28px !important;
+}
+.client-dropdown {
+  display: none;
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: #1c2128; border: 1px solid #30363d;
+  border-radius: 8px; z-index: 200;
+  max-height: 220px; overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.dd-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; cursor: pointer;
+  border-bottom: 1px solid #21262d;
+  transition: background 0.15s;
+}
+.dd-item:last-child { border-bottom: none; }
+.dd-item:hover { background: #21262d; }
+.dd-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #1e3a5f; border: 1px solid #F5A623;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: #F5A623; flex-shrink: 0;
+}
+.dd-name { font-size: 13px; font-weight: 600; color: #e6edf3; }
+.dd-meta { font-size: 10px; color: #8b949e; margin-top: 1px; }
+.dd-empty { padding: 12px; font-size: 12px; color: #8b949e; text-align: center; }
+
+/* ── SELECTED CLIENT BADGE ── */
+.selected-client-badge {
+  display: none; align-items: center; gap: 10px;
+  background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;
+}
+.scb-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #F5A623; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 800;
+  color: #0d1117; flex-shrink: 0;
+}
+.scb-name { font-size: 13px; font-weight: 700; color: #e6edf3; }
+.scb-meta { font-size: 10px; color: #8b949e; margin-top: 2px; }
+
 body {
   font-family: 'Segoe UI', sans-serif;
   background: #0d1117;
