@@ -200,6 +200,56 @@ header {
 .form-group select:focus {
   border-color: #58a6ff;
 }
+/* ── EXPLANATION SOURCES ── */
+.sources-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #21262d;
+}
+.sources-header {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: #484f58; margin-bottom: 8px;
+}
+.sources-icon { font-size: 11px; }
+.sources-count {
+  background: #21262d; color: #8b949e;
+  font-size: 9px; padding: 1px 6px; border-radius: 8px;
+  font-weight: 600; text-transform: none; letter-spacing: 0;
+}
+.sources-chips { display: flex; flex-direction: column; gap: 5px; }
+.source-chip {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 10px; border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid #21262d;
+  transition: border-color 0.15s, background 0.15s;
+}
+.source-chip:hover { background: #1c2128; border-color: #30363d; }
+.source-chip.source-gov {
+  background: #0d1117;
+  border-left: 2px solid #58a6ff;
+}
+.source-chip.source-pro {
+  background: #0d1117;
+  border-left: 2px solid #F5A623;
+}
+.source-chip-icon  { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.source-chip-body  { flex: 1; min-width: 0; }
+.source-chip-label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: #c9d1d9; margin-bottom: 1px;
+}
+.source-chip-reason {
+  display: block; font-size: 10px; color: #484f58; line-height: 1.4;
+}
+.source-chip-arrow {
+  font-size: 11px; color: #484f58; flex-shrink: 0;
+  align-self: center;
+}
+.source-chip.source-gov:hover .source-chip-label { color: #58a6ff; }
+.source-chip.source-pro:hover .source-chip-label { color: #F5A623; }
+
 /* ── ADVISORY INTELLIGENCE STRIP ── */
 .intel-strip {
   margin-top: 20px;

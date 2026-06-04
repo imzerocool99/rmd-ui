@@ -359,7 +359,7 @@ function renderResults(data) {
         return `<div class="exp-item">${line.trim()}</div>`;
       return line ? `<div>${line}</div>` : '<br/>';
     })
-    .join('');
+    .join('') + renderExplanationSources(data);
   document.getElementById('reasoningBox').textContent = '🤖 AI Reasoning: ' + (data.reasoning || '');
 
   // Portfolio chart
@@ -387,6 +387,92 @@ function renderResults(data) {
 
   // Intelligence strip
   renderIntelStrip(portfolio, assets);
+}
+
+// ── Explanation Sources ───────────────────────────────────────────────
+const SOURCE_LIBRARY = [
+  {
+    id: 'rmd-rules',
+    label: 'IRS — Required Minimum Distributions',
+    type: 'gov',
+    url: 'https://www.irs.gov/retirement-plans/retirement-topics-required-minimum-distributions-rmds',
+    reason: 'Basis for RMD calculation rules and deadlines',
+    keywords: ['rmd', 'required minimum', 'withdrawal', 'irs', 'age 73']
+  },
+  {
+    id: 'pub590b',
+    label: 'IRS Publication 590-B — IRA Distributions',
+    type: 'gov',
+    url: 'https://www.irs.gov/publications/p590b',
+    reason: 'Uniform Lifetime Table used for RMD divisor at each age',
+    keywords: ['uniform lifetime', 'factor', 'ira distribution', 'in-kind', 'in_kind', 'divisor']
+  },
+  {
+    id: 'topic409',
+    label: 'IRS Topic 409 — Capital Gains and Losses',
+    type: 'gov',
+    url: 'https://www.irs.gov/taxtopics/tc409',
+    reason: 'Defines how realized gains and losses are taxed on asset sales',
+    keywords: ['gain', 'loss', 'capital', 'tax', 'liquidat', 'sell', 'realized']
+  },
+  {
+    id: 'tax-brackets',
+    label: 'IRS — Tax Rate Schedules',
+    type: 'gov',
+    url: 'https://www.irs.gov/newsroom/irs-provides-tax-inflation-adjustments-for-tax-year-2024',
+    reason: '24% marginal rate applied to calculate tax impact of each distribution',
+    keywords: ['24%', 'tax rate', 'marginal', 'tax bill', 'bracket']
+  },
+  {
+    id: 'tax-loss-harvesting',
+    label: 'Investopedia — Tax-Loss Harvesting Explained',
+    type: 'pro',
+    url: 'https://www.investopedia.com/terms/t/taxgainlossharvesting.asp',
+    reason: 'Professional explanation of loss-first liquidation strategy used by the agent',
+    keywords: ['loss', 'harvest', 'tax-loss', 'tax loss', 'scoring', 'minimize tax']
+  },
+  {
+    id: 'inkind-transfer',
+    label: 'Fidelity — In-Kind IRA Distributions',
+    type: 'pro',
+    url: 'https://www.fidelity.com/retirement-ira/required-minimum-distribution-ira',
+    reason: 'How in-kind transfers from IRA to taxable brokerage satisfy RMD requirements',
+    keywords: ['in-kind', 'in_kind', 'transfer', 'brokerage', 'shares moved']
+  },
+  {
+    id: 'rmd-penalty',
+    label: 'IRS — Excess Accumulation Penalty (25%)',
+    type: 'gov',
+    url: 'https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-exceptions-to-tax-on-early-distributions',
+    reason: 'IRS imposes a 25% excise tax on RMD shortfalls — automation eliminates this risk',
+    keywords: ['penalty', '25%', 'excise', 'missed', 'deadline']
+  },
+];
+
+function renderExplanationSources(data) {
+  const text = ((data.explanation || '') + ' ' + (data.reasoning || '') + ' ' + (data.strategy || '')).toLowerCase();
+  const matched = SOURCE_LIBRARY.filter(s => s.keywords.some(kw => text.includes(kw)));
+  if (!matched.length) return '';
+
+  const chips = matched.map(s => `
+    <a class="source-chip source-${s.type}" href="${s.url}" target="_blank" rel="noopener">
+      <span class="source-chip-icon">${s.type === 'gov' ? '🏛' : '📘'}</span>
+      <span class="source-chip-body">
+        <span class="source-chip-label">${s.label}</span>
+        <span class="source-chip-reason">${s.reason}</span>
+      </span>
+      <span class="source-chip-arrow">↗</span>
+    </a>`).join('');
+
+  return `
+    <div class="sources-section">
+      <div class="sources-header">
+        <span class="sources-icon">📎</span>
+        Regulatory &amp; Professional Sources
+        <span class="sources-count">${matched.length} reference${matched.length > 1 ? 's' : ''}</span>
+      </div>
+      <div class="sources-chips">${chips}</div>
+    </div>`;
 }
 
 // ── Advisory Intelligence Strip ───────────────────────────────────────
