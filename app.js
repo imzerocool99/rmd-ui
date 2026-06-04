@@ -327,9 +327,17 @@ function renderResults(data) {
 
   // Cards
   document.getElementById('rmdValue').textContent = '$' + rmd.toLocaleString('en-US', { minimumFractionDigits: 2 });
-  const sv = document.getElementById('strategyValue');
-  sv.textContent = strategy === 'sell' ? 'CASH SALE' : 'IN-KIND TRANSFER';
-  sv.className = 'card-value ' + (strategy === 'sell' ? 'orange' : 'green');
+  const sv  = document.getElementById('strategyValue');
+  const ssl = document.getElementById('strategySubLabel');
+  if (strategy === 'sell') {
+    sv.textContent  = 'CASH SALE';
+    sv.className    = 'card-value orange';
+    ssl.textContent = 'Assets sold — cash distributed to client';
+  } else {
+    sv.textContent  = 'IN-KIND TRANSFER';
+    sv.className    = 'card-value green';
+    ssl.textContent = 'Shares moved to taxable account — client stays invested';
+  }
   document.getElementById('totalValue').textContent = '$' + totalLiquidated.toLocaleString('en-US', { minimumFractionDigits: 2 });
   document.getElementById('assetsCount').textContent = assets.length;
 
