@@ -101,8 +101,25 @@ function renderResults(data) {
   document.getElementById('totalValue').textContent = '$' + totalLiquidated.toLocaleString('en-US', { minimumFractionDigits: 2 });
   document.getElementById('assetsCount').textContent = assets.length;
 
-  // Explanation
-  document.getElementById('explanationBox').textContent = data.explanation || 'No explanation returned.';
+  // Explanation — render with line breaks and section highlighting
+  const expBox = document.getElementById('explanationBox');
+  const expText = data.explanation || 'No explanation returned.';
+  expBox.innerHTML = expText
+    .split('\n')
+    .map(line => {
+      if (line.startsWith('SELECTION CRITERIA:'))
+        return `<div class="exp-section criteria">${line}</div>`;
+      if (line.startsWith('SELECTED FOR LIQUIDATION:'))
+        return `<div class="exp-header sell">📋 ${line}</div>`;
+      if (line.startsWith('PROTECTED'))
+        return `<div class="exp-header protect">🛡 ${line}</div>`;
+      if (line.startsWith('RESULT:'))
+        return `<div class="exp-result">${line}</div>`;
+      if (line.trim().startsWith('•'))
+        return `<div class="exp-item">${line.trim()}</div>`;
+      return line ? `<div>${line}</div>` : '<br/>';
+    })
+    .join('');
   document.getElementById('reasoningBox').textContent = '🤖 AI Reasoning: ' + (data.reasoning || '');
 
   // Portfolio chart
@@ -233,12 +250,16 @@ function renderPortfolioChart(portfolio) {
     type: 'doughnut',
     data: {
       labels,
-      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderColor: '#0d1117', borderWidth: 3 }]
+      datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderColor: '#0d1117', borderWidth: 2 }]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { color: '#8b949e', font: { size: 11 }, boxWidth: 12 } },
+        legend: {
+          position: 'right',
+          labels: { color: '#8b949e', font: { size: 10 }, boxWidth: 10, padding: 8 }
+        },
         tooltip: {
           callbacks: {
             label: c => ` ${c.label}: $${Number(c.parsed).toLocaleString()}`

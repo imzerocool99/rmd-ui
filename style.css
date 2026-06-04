@@ -257,13 +257,21 @@ hr { border-color: #21262d; margin: 16px 0; }
   background: #0d1117;
   border: 1px solid #30363d;
   border-radius: 8px;
-  padding: 14px;
-  font-size: 13px;
+  padding: 14px 16px;
+  font-size: 12.5px;
   color: #c9d1d9;
-  line-height: 1.6;
+  line-height: 1.7;
   min-height: 80px;
   margin-bottom: 10px;
+  max-height: 340px;
+  overflow-y: auto;
 }
+.exp-section  { color: #8b949e; font-style: italic; margin-bottom: 8px; border-left: 3px solid #30363d; padding-left: 8px; }
+.exp-header   { font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin: 10px 0 4px; }
+.exp-header.sell    { color: #f85149; }
+.exp-header.protect { color: #3fb950; }
+.exp-item     { padding: 3px 0 3px 12px; border-left: 2px solid #21262d; margin: 2px 0; color: #c9d1d9; }
+.exp-result   { margin-top: 10px; background: #1a2a1a; border: 1px solid #3fb950; border-radius: 4px; padding: 8px 12px; color: #3fb950; font-weight: 600; font-size: 12px; }
 .reasoning-box {
   font-size: 12px;
   color: #8b949e;
