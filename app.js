@@ -8,40 +8,127 @@ let rmdChart = null;
 let reinvestChart = null;
 
 // ── Client Registry ───────────────────────────────────────────────────
+// accounts[] — each client can have 1 or more IRA accounts
 const CLIENTS = [
-  { id: 'client_001', name: 'Robert & Margaret Chen',   age: 75, balance: 500000,  preference: 'sell',    initials: 'RC', location: 'New York, NY' },
-  { id: 'client_002', name: 'William & Dorothy Davis',  age: 78, balance: 750000,  preference: 'sell',    initials: 'WD', location: 'Boston, MA'  },
-  { id: 'client_003', name: 'James Harrison',           age: 73, balance: 250000,  preference: 'in_kind', initials: 'JH', location: 'Chicago, IL' },
-  { id: 'client_004', name: 'Patricia & John Kim',      age: 80, balance: 1200000, preference: 'sell',    initials: 'PK', location: 'San Jose, CA'},
-  { id: 'client_005', name: 'Barbara & Thomas Wilson',  age: 74, balance: 425000,  preference: 'sell',    initials: 'BW', location: 'Austin, TX'  },
+  {
+    id: 'client_001', name: 'Robert & Margaret Chen', initials: 'RC', location: 'New York, NY',
+    accounts: [
+      { accountId: 'IRA-001-A', label: 'Traditional IRA',  type: 'Traditional IRA', age: 75, balance: 500000,  preference: 'sell'    },
+      { accountId: 'IRA-001-B', label: 'Rollover IRA',     type: 'Rollover IRA',    age: 75, balance: 320000,  preference: 'in_kind' },
+    ]
+  },
+  {
+    id: 'client_002', name: 'William & Dorothy Davis', initials: 'WD', location: 'Boston, MA',
+    accounts: [
+      { accountId: 'IRA-002-A', label: 'Traditional IRA',  type: 'Traditional IRA', age: 78, balance: 750000,  preference: 'sell'    },
+    ]
+  },
+  {
+    id: 'client_003', name: 'James Harrison', initials: 'JH', location: 'Chicago, IL',
+    accounts: [
+      { accountId: 'IRA-003-A', label: 'Traditional IRA',  type: 'Traditional IRA', age: 73, balance: 250000,  preference: 'in_kind' },
+    ]
+  },
+  {
+    id: 'client_004', name: 'Patricia & John Kim', initials: 'PK', location: 'San Jose, CA',
+    accounts: [
+      { accountId: 'IRA-004-A', label: 'Traditional IRA',  type: 'Traditional IRA', age: 80, balance: 1200000, preference: 'sell'    },
+    ]
+  },
+  {
+    id: 'client_005', name: 'Barbara & Thomas Wilson', initials: 'BW', location: 'Austin, TX',
+    accounts: [
+      { accountId: 'IRA-005-A', label: 'Traditional IRA',  type: 'Traditional IRA', age: 74, balance: 425000,  preference: 'sell'    },
+    ]
+  },
 ];
+
+let activeClient  = null;
+let activeAccount = null;
 
 function selectClient(idOrObj) {
   const c = typeof idOrObj === 'string' ? CLIENTS.find(x => x.id === idOrObj) : idOrObj;
   if (!c) return;
-  document.getElementById('clientId').value = c.id;
+  activeClient = c;
   document.getElementById('clientSearch').value = c.name;
-  document.getElementById('age').value = c.age;
-  document.getElementById('balance').value = c.balance;
-  document.getElementById('preference').value = c.preference;
+  closeDropdown();
+
+  // Show client badge
   const badge = document.getElementById('selectedClientBadge');
+  const acctCount = c.accounts.length;
   badge.innerHTML = `
     <div class="scb-avatar">${c.initials}</div>
     <div class="scb-info">
       <div class="scb-name">${c.name}</div>
-      <div class="scb-meta">${c.id} &nbsp;·&nbsp; ${c.location}</div>
+      <div class="scb-meta">${c.id} &nbsp;·&nbsp; ${c.location} &nbsp;·&nbsp;
+        <span class="scb-acct-count">${acctCount} IRA account${acctCount > 1 ? 's' : ''}</span>
+      </div>
     </div>`;
   badge.style.display = 'flex';
-  closeDropdown();
+
+  // Render account picker
+  renderAccountPicker(c);
+
+  // Auto-select single account; for multi-account show picker only (no auto-load)
+  if (acctCount === 1) {
+    selectAccount(c.accounts[0], true);
+  } else {
+    // Clear fields until user picks an account
+    document.getElementById('clientId').value = c.id;
+    document.getElementById('age').value = '';
+    document.getElementById('balance').value = '';
+  }
+}
+
+function renderAccountPicker(c) {
+  const wrap = document.getElementById('accountPickerWrap');
+  if (c.accounts.length === 1) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div class="acct-picker-label">Select Account</div>
+    <div class="acct-cards" id="acctCards">
+      ${c.accounts.map((a, i) => `
+        <div class="acct-card" id="acct-card-${i}" onmousedown="selectAccount(getActiveAccount(${i}), false, ${i})">
+          <div class="acct-card-type">${a.type}</div>
+          <div class="acct-card-id">${a.accountId}</div>
+          <div class="acct-card-bal">$${(a.balance/1000).toFixed(0)}K &nbsp;·&nbsp; ${a.preference === 'sell' ? 'Cash' : 'In-Kind'}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function getActiveAccount(idx) {
+  return activeClient ? activeClient.accounts[idx] : null;
+}
+
+function selectAccount(acct, silent, idx) {
+  if (!acct) return;
+  activeAccount = acct;
+  document.getElementById('clientId').value = activeClient.id + '/' + acct.accountId;
+  document.getElementById('age').value     = acct.age;
+  document.getElementById('balance').value = acct.balance;
+  document.getElementById('preference').value = acct.preference;
+
+  // Highlight selected account card
+  document.querySelectorAll('.acct-card').forEach((el, i) => {
+    el.classList.toggle('acct-card-active', i === idx);
+  });
 }
 
 function filterClients(q) {
-  const dd = document.getElementById('clientDropdown');
   const lower = q.toLowerCase().trim();
   const matches = lower
     ? CLIENTS.filter(c => c.name.toLowerCase().includes(lower) || c.id.includes(lower))
     : CLIENTS;
   renderDropdown(matches);
+  positionAndShowDropdown();
+}
+
+function positionAndShowDropdown() {
+  const input = document.getElementById('clientSearch');
+  const dd    = document.getElementById('clientDropdown');
+  const rect  = input.getBoundingClientRect();
+  dd.style.top   = (rect.bottom + 2) + 'px';
+  dd.style.left  = rect.left + 'px';
+  dd.style.width = rect.width + 'px';
   dd.style.display = 'block';
 }
 
@@ -51,14 +138,20 @@ function renderDropdown(list) {
     dd.innerHTML = '<div class="dd-empty">No clients found</div>';
     return;
   }
-  dd.innerHTML = list.map(c => `
+  dd.innerHTML = list.map(c => {
+    const acctCount = c.accounts.length;
+    const totalBal  = c.accounts.reduce((s, a) => s + a.balance, 0);
+    return `
     <div class="dd-item" onmousedown="selectClient('${c.id}')">
       <div class="dd-avatar">${c.initials}</div>
       <div class="dd-info">
-        <div class="dd-name">${c.name}</div>
-        <div class="dd-meta">${c.id} &nbsp;·&nbsp; Age ${c.age} &nbsp;·&nbsp; $${(c.balance/1000).toFixed(0)}K IRA &nbsp;·&nbsp; ${c.location}</div>
+        <div class="dd-name">${c.name}
+          ${acctCount > 1 ? `<span class="dd-multi-badge">${acctCount} accounts</span>` : ''}
+        </div>
+        <div class="dd-meta">${c.id} &nbsp;·&nbsp; $${(totalBal/1000).toFixed(0)}K total IRA &nbsp;·&nbsp; ${c.location}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function openDropdown() {
@@ -350,13 +443,15 @@ function renderHoldingsTable(portfolio, selectedAssets) {
 
     if (cls !== lastClass) {
       const sep = document.createElement('tr');
-      sep.innerHTML = `<td colspan="7" style="background:#1c2128;color:#58a6ff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 12px;">${cls}</td>`;
+      sep.innerHTML = `<td colspan="8" style="background:#1c2128;color:#58a6ff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:6px 12px;">${cls}</td>`;
       tbody.appendChild(sep);
       lastClass = cls;
     }
 
+    const acct = p.account || '—';
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <td><span class="acct-pill">${acct}</span></td>
       <td><strong>${p.symbol}</strong></td>
       <td style="color:#8b949e;font-size:11px">${cls}</td>
       <td>${p.qty}</td>
@@ -430,8 +525,10 @@ function renderSelectedTable(assets, executions) {
     const { badge, label, tooltip } = resolveStatus(execStatus);
     const gain = a.gain !== undefined ? Number(a.gain) : null;
 
+    const acct = a.account || activeAccount?.label || '—';
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <td><span class="acct-pill">${acct}</span></td>
       <td><strong>${a.symbol}</strong></td>
       <td>${a.qty} shares</td>
       <td>$${Number(a.price).toLocaleString()}</td>
@@ -450,7 +547,7 @@ function renderSelectedTable(assets, executions) {
   const tr = document.createElement('tr');
   tr.style.borderTop = '2px solid #30363d';
   tr.innerHTML = `
-    <td colspan="3" style="font-weight:700;color:#c9d1d9">Total</td>
+    <td colspan="4" style="font-weight:700;color:#c9d1d9">Total</td>
     <td style="font-weight:700;color:#58a6ff">$${total.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
     <td style="color:${totalGain >= 0 ? '#d29922' : '#3fb950'};font-weight:700">${totalGain >= 0 ? '+' : ''}$${totalGain.toFixed(2)}</td>
     <td></td>

@@ -12,10 +12,10 @@
 }
 .client-dropdown {
   display: none;
-  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  position: fixed;
   background: #1c2128; border: 1px solid #30363d;
-  border-radius: 8px; z-index: 200;
-  max-height: 220px; overflow-y: auto;
+  border-radius: 8px; z-index: 9999;
+  max-height: 260px; overflow-y: auto;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 .dd-item {
@@ -50,6 +50,44 @@
 }
 .scb-name { font-size: 13px; font-weight: 700; color: #e6edf3; }
 .scb-meta { font-size: 10px; color: #8b949e; margin-top: 2px; }
+.scb-acct-count { color: #F5A623; font-weight: 700; }
+
+/* ── ACCOUNT PICKER ── */
+.acct-picker-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+  color: #8b949e; font-weight: 700; margin-bottom: 6px; margin-top: 2px;
+}
+.acct-cards { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.acct-card {
+  background: #161b22; border: 1px solid #30363d;
+  border-radius: 8px; padding: 10px 12px; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.acct-card:hover { border-color: #58a6ff; background: #1c2128; }
+.acct-card-active { border-color: #F5A623 !important; background: #1c1a12 !important; }
+.acct-card-type { font-size: 12px; font-weight: 700; color: #e6edf3; }
+.acct-card-id   { font-size: 10px; color: #8b949e; margin-top: 1px; }
+.acct-card-bal  { font-size: 11px; color: #F5A623; font-weight: 600; margin-top: 4px; }
+
+/* multi-account badge in dropdown and quick-select */
+.dd-multi-badge {
+  background: #1e3a5f; color: #58a6ff;
+  font-size: 9px; font-weight: 700; padding: 1px 6px;
+  border-radius: 8px; margin-left: 6px; vertical-align: middle;
+}
+.multi-badge {
+  background: #1e3a5f; color: #58a6ff;
+  font-size: 9px; font-weight: 700; padding: 1px 5px;
+  border-radius: 8px; margin-left: 4px;
+}
+
+/* ── ACCOUNT PILL (tables) ── */
+.acct-pill {
+  background: #1e3a5f; color: #58a6ff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+  white-space: nowrap; display: inline-block;
+}
 
 body {
   font-family: 'Segoe UI', sans-serif;

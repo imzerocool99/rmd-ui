@@ -45,6 +45,7 @@
         </div>
       </div>
       <div class="selected-client-badge" id="selectedClientBadge"></div>
+      <div id="accountPickerWrap"></div>
       <input type="hidden" id="clientId" value="client_001"/>
 
       <div class="form-group">
@@ -71,10 +72,10 @@
 
       <h3>Quick Select</h3>
       <div class="quick-actions">
-        <button class="tag-btn" onclick="selectClient('client_001')">R. Chen · 75 · $500K</button>
-        <button class="tag-btn" onclick="selectClient('client_002')">W. Davis · 78 · $750K</button>
-        <button class="tag-btn" onclick="selectClient('client_003')">J. Harrison · 73 · $250K</button>
-        <button class="tag-btn" onclick="selectClient('client_004')">P. Kim · 80 · $1.2M</button>
+        <button class="tag-btn" onclick="selectClient('client_001')">R. Chen <span class="multi-badge">2 accts</span></button>
+        <button class="tag-btn" onclick="selectClient('client_002')">W. Davis · $750K</button>
+        <button class="tag-btn" onclick="selectClient('client_003')">J. Harrison · $250K</button>
+        <button class="tag-btn" onclick="selectClient('client_004')">P. Kim · $1.2M</button>
       </div>
     </aside>
 
@@ -141,6 +142,7 @@
           <table class="data-table">
             <thead>
               <tr>
+                <th>Account</th>
                 <th>Symbol</th>
                 <th>Asset Class</th>
                 <th>Quantity</th>
@@ -170,6 +172,7 @@
           <table class="data-table">
             <thead>
               <tr>
+                <th>Account</th>
                 <th>Symbol</th>
                 <th>Qty to Sell</th>
                 <th>Price</th>
