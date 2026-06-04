@@ -535,7 +535,7 @@ function renderHoldingsTable(portfolio, selectedAssets) {
       <td>$${Number(p.price).toLocaleString()}</td>
       <td>$${value.toLocaleString()}</td>
       <td style="color:${gain >= 0 ? '#3fb950' : '#f85149'}">${gain >= 0 ? '+' : ''}$${gain.toLocaleString()}</td>
-      <td>${isSelected ? '<span class="badge sell">Liquidating</span>' : '<span class="badge hold">Hold</span>'}</td>
+      <td>${isSelected ? '<span class="badge sell">Recommend Sell</span>' : '<span class="badge hold">Hold</span>'}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -635,16 +635,16 @@ function renderSelectedTable(assets, executions) {
 function resolveStatus(status) {
   switch ((status || '').toLowerCase()) {
     case 'filled':
-      return { badge: 'done',   label: '✅ Order Filled',    tooltip: 'Trade confirmed filled on the market' };
+      return { badge: 'done',   label: '✅ Advisor Approved',   tooltip: 'Approved and executed by advisor' };
     case 'new':
     case 'pending_new':
     case 'accepted':
-      return { badge: 'inkind', label: '🔄 Order Placed',    tooltip: 'Order submitted to Alpaca — awaiting fill' };
+      return { badge: 'inkind', label: '🔄 Pending Approval',   tooltip: 'Awaiting advisor review and approval' };
     case 'simulated':
-      return { badge: 'sim',    label: '⚠️ POC Simulated',   tooltip: 'Paper trade simulated locally for demo — no real order placed' };
+      return { badge: 'sim',    label: '👁 Pending Review',     tooltip: 'Recommended by agent — awaiting advisor approval before execution' };
     case 'selected':
     default:
-      return { badge: 'hold',   label: '📋 Ready to Execute', tooltip: 'Agent selected this asset for liquidation — pending execution' };
+      return { badge: 'hold',   label: '👁 Pending Review',     tooltip: 'Recommended by agent — awaiting advisor approval before execution' };
   }
 }
 
