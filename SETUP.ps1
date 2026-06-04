@@ -38,7 +38,18 @@ if (-not (Test-Path "$javaHome\bin\java.exe")) {
 $env:JAVA_HOME = $javaHome
 $env:PATH = "$javaHome\bin;$env:PATH"
 
-# ── 3. Install Node.js ───────────────────────────────────────
+# ── 3. Install Git ───────────────────────────────────────────
+Write-Step "Checking Git..."
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Host "    Installing Git..." -ForegroundColor Yellow
+    winget install Git.Git --accept-package-agreements --accept-source-agreements --silent
+    $env:PATH = "C:\Program Files\Git\cmd;$env:PATH"
+    Write-OK "Git installed"
+} else {
+    Write-OK "Git already installed"
+}
+
+# ── 4. Install Node.js ───────────────────────────────────────
 Write-Step "Checking Node.js..."
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     Write-Host "    Installing Node.js..." -ForegroundColor Yellow
