@@ -77,6 +77,7 @@
         <button class="tab" onclick="showTab('reinvest', this)">💡 Reinvestment</button>
         <button class="tab" onclick="showTab('value', this)">📊 Business Value</button>
         <button class="tab" onclick="showTab('logs', this)">Logs</button>
+        <button class="tab demo-tab" onclick="showTab('demo', this)">🎯 Demo Guide</button>
       </div>
 
       <!-- DASHBOARD TAB -->
@@ -387,6 +388,215 @@
             <div class="kpi-card"><div class="kpi-val">10</div><div class="kpi-label">Asset Classes Covered</div></div>
             <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Reinvestment Products</div></div>
             <div class="kpi-card"><div class="kpi-val">&lt;5s</div><div class="kpi-label">End-to-End Agent Runtime</div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DEMO GUIDE TAB -->
+      <div id="tab-demo" class="tab-content">
+
+        <!-- Client Use Case Header -->
+        <div class="demo-hero">
+          <div class="demo-hero-left">
+            <div class="demo-client-badge">Client Use Case</div>
+            <div class="demo-client-name">Robert & Margaret Chen</div>
+            <div class="demo-client-sub">Retired couple · Ages 75 &amp; 73 · Traditional IRA · $500,000 balance</div>
+          </div>
+          <div class="demo-hero-right">
+            <div class="demo-stat"><span>$20,325</span>Annual RMD Required</div>
+            <div class="demo-stat"><span>$1,211</span>Tax Saved by Agent</div>
+            <div class="demo-stat"><span>4s</span>Agent Response Time</div>
+          </div>
+        </div>
+
+        <!-- Problem Statement -->
+        <div class="demo-problem">
+          <div class="demo-problem-title">❌ The Problem Without This Agent</div>
+          <div class="demo-problem-grid">
+            <div class="demo-problem-item">Robert's advisor manually calculates RMD each year — takes 2-3 hours per client</div>
+            <div class="demo-problem-item">Random asset selection triggered a $5,000+ capital gains tax last year</div>
+            <div class="demo-problem-item">Distributed cash sat idle in checking account earning 0.01% APY</div>
+            <div class="demo-problem-item">No explanation given to Robert on why specific stocks were sold</div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Presentation Flow -->
+        <div class="panel" style="margin-bottom:20px">
+          <div class="panel-title">🎯 Presentation Flow — Step by Step</div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">1</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Set the Scene — Enter Client Profile <span class="demo-where">← Left Sidebar</span></div>
+              <div class="demo-step-desc">Enter Robert's details: Age 75, IRA Balance $500,000, Preference: Cash. Say: <em>"Robert is 75 years old with a $500K IRA. The IRS requires him to withdraw a minimum amount every year — let's see what our AI agent recommends."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>IRS mandates RMDs after age 73 — failure = 25% excise tax penalty</li>
+                  <li>The challenge is not just HOW MUCH to withdraw, but WHICH assets to sell</li>
+                  <li>Wrong asset selection can cost thousands in unnecessary taxes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">2</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Run the Agent <span class="demo-where">← Click ▶ Run Agent</span></div>
+              <div class="demo-step-desc">Click the green Run Agent button. In ~4 seconds, the entire pipeline completes. Say: <em>"In 4 seconds, the agent has analyzed Robert's full portfolio, calculated his RMD, selected the optimal assets, and generated a reinvestment plan."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>This would take an advisor 2-3 hours manually</li>
+                  <li>Agent runs on a schedule — Robert never misses his deadline</li>
+                  <li>No human error, no missed steps</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">3</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Show the Dashboard — RMD Summary <span class="demo-where">← Dashboard Tab</span></div>
+              <div class="demo-step-desc">Point to the 4 cards at the top. Say: <em>"Robert's required withdrawal is $20,325. The agent chose a Cash distribution strategy. It selected assets worth $20,562 — just enough to cover the RMD."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>RMD calculated using IRS Uniform Lifetime Table (age 75 → factor 24.6)</li>
+                  <li>Portfolio doughnut shows allocation by asset class — not just stocks</li>
+                  <li>Scroll down to show the AI Explanation — it tells Robert exactly WHY each asset was picked</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">4</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Show the Portfolio — All Holdings <span class="demo-where">← Portfolio Tab</span></div>
+              <div class="demo-step-desc">Show the full holdings table grouped by asset class. Say: <em>"Robert holds 13 assets across 10 asset classes — equities, bonds, REITs, commodities, ETFs, and money market. The agent analyzed every single one."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>Green = being held (protected from liquidation)</li>
+                  <li>Red "Liquidating" = selected for sale by the agent</li>
+                  <li>Point to VTI (+$2,800 gain) — agent protected this to avoid a large tax bill</li>
+                  <li>Point to TSLA (-$1,800 loss) — agent sold this first to harvest the tax loss</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">5</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Show Tax Savings — The Core Value <span class="demo-where">← Agent Results Tab</span></div>
+              <div class="demo-step-desc">Scroll to the Tax Efficiency panel. Say: <em>"This is the most important part. Without the agent, a random system would have sold VTI and GLD — triggering a $1,211 tax bill. Our agent sold TSLA and EEM instead, which had losses. Robert's tax bill: $0."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>Left side (red) = what a naive/manual system would have done</li>
+                  <li>Right side (green) = what the AI agent did</li>
+                  <li>$1,211 saved in taxes — every year, for every client</li>
+                  <li>At 1,000 clients → $1.2M in client tax savings annually</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">6</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Show Reinvestment — Keep Money Working <span class="demo-where">← Reinvestment Tab</span></div>
+              <div class="demo-step-desc">Show the money flow diagram and product table. Say: <em>"Robert's $20,325 doesn't just sit in a checking account. The agent immediately recommends where to reinvest it — generating $862 in annual income from products like T-Bills, CDs, and dividend ETFs."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>Money stays within the firm's managed products — protects AUM</li>
+                  <li>7 products across different risk levels — client chooses what fits</li>
+                  <li>High-Yield Savings stays at the same bank — same relationship</li>
+                  <li>$862/year in projected income from the reinvestment alone</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">7</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Show AI Assistant — Client Experience <span class="demo-where">← 🤖 Bot Bubble (bottom-right)</span></div>
+              <div class="demo-step-desc">Click the green bot bubble. Ask: <em>"Why were these assets selected?"</em> Show the AI response. Say: <em>"Robert can ask questions in plain English, any time, about his RMD. No jargon. No waiting for a call back."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>Bot knows which tab you're on — context-aware answers</li>
+                  <li>Powered by local AI (Ollama/Phi-3) — no data leaves the machine</li>
+                  <li>Builds client trust through transparency and explainability</li>
+                  <li>Reduces advisor call volume for routine RMD questions</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">8</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Close with Business Value <span class="demo-where">← Business Value Tab</span></div>
+              <div class="demo-step-desc">Show the Before/After panel and KPI grid. Say: <em>"This is not just a compliance tool. It's a client retention tool, a tax optimization tool, and a revenue protection tool — all in one automated agent."</em></div>
+              <div class="demo-step-talk">
+                <strong>Talking Points:</strong>
+                <ul>
+                  <li>Scales to thousands of accounts with zero additional staff</li>
+                  <li>Same framework extends to Inherited IRAs, Roth conversions</li>
+                  <li>Positions the firm as an AI-driven wealth management leader</li>
+                  <li>Total build cost for POC: $0 — all open source, runs locally</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick Cheat Sheet -->
+        <div class="panel">
+          <div class="panel-title">📋 Quick Cheat Sheet — Key Numbers to Quote</div>
+          <div class="cheat-grid">
+            <div class="cheat-card"><div class="cheat-val">$20,325</div><div class="cheat-label">Robert's Annual RMD (age 75, $500K IRA)</div></div>
+            <div class="cheat-card"><div class="cheat-val">$1,211</div><div class="cheat-label">Tax saved vs naive asset selection</div></div>
+            <div class="cheat-card"><div class="cheat-val">$862</div><div class="cheat-label">Annual income from reinvestment plan</div></div>
+            <div class="cheat-card"><div class="cheat-val">4 sec</div><div class="cheat-label">Full agent pipeline (vs 3 hrs manual)</div></div>
+            <div class="cheat-card"><div class="cheat-val">13</div><div class="cheat-label">Assets analyzed across 10 classes</div></div>
+            <div class="cheat-card"><div class="cheat-val">$0</div><div class="cheat-label">Total POC cost — 100% open source</div></div>
+          </div>
+        </div>
+
+        <!-- Anticipated Questions -->
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">❓ Anticipated Questions & Answers</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Is this using real money / real trades?</div>
+              <div class="qa-a">This POC uses Alpaca Paper Trading — a simulated environment. No real orders are placed. Production upgrade is straightforward: replace the paper trading API key with a live one.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Where does the AI run — is client data going to the cloud?</div>
+              <div class="qa-a">The AI (Ollama/Phi-3) runs 100% locally on the machine. No client data leaves the server. The language model is downloaded once and runs offline.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Can it handle multiple clients at once?</div>
+              <div class="qa-a">Yes — the agent is stateless per request. It can process multiple clients in parallel. The scheduler runs automatically for all eligible accounts.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What about regulatory compliance and audit trail?</div>
+              <div class="qa-a">Every agent decision is logged with timestamps in the Logs tab. The explanation of why each asset was selected is stored per client. Full audit trail is available for regulatory review.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">How accurate is the tax savings calculation?</div>
+              <div class="qa-a">The POC uses a 24% marginal tax rate as a baseline. In production, the actual client tax bracket and state taxes would be integrated from the firm's tax engine for precise calculations.</div>
+            </div>
           </div>
         </div>
 
