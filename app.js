@@ -203,9 +203,15 @@ function setPreset(age, balance) {
 
 // ── Run Agent ─────────────────────────────────────────────────────────
 async function runAgent() {
-  const btn = document.getElementById('runBtn');
+  const btn    = document.getElementById('runBtn');
+  const icon   = document.getElementById('runBtnIcon');
+  const spin   = document.getElementById('runBtnSpinner');
+  const label  = document.getElementById('runBtnLabel');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Running Agent...';
+  btn.classList.add('btn-circle-running');
+  icon.style.display = 'none';
+  spin.style.display = 'block';
+  label.textContent  = 'Running...';
 
   const body = {
     age: parseInt(document.getElementById('age').value),
@@ -229,7 +235,10 @@ async function runAgent() {
     alert('Agent run failed. Is the backend running on port 8085?');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '▶ Run Agent';
+    btn.classList.remove('btn-circle-running');
+    icon.style.display  = 'block';
+    spin.style.display  = 'none';
+    label.textContent   = 'Optimize & Execute';
   }
 }
 

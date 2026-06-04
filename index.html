@@ -64,7 +64,13 @@
         </select>
       </div>
 
-      <button class="btn-primary" id="runBtn" onclick="runAgent()">▶ Run Agent</button>
+      <div class="run-btn-wrap">
+        <button class="btn-circle" id="runBtn" onclick="runAgent()">
+          <span class="btn-circle-icon" id="runBtnIcon">⚡</span>
+          <span class="btn-circle-spinner" id="runBtnSpinner" style="display:none"></span>
+        </button>
+        <div class="btn-circle-label" id="runBtnLabel">Optimize &amp; Execute</div>
+      </div>
       <button class="btn-secondary" onclick="loadPortfolio()">↻ Refresh Portfolio</button>
       <button class="btn-secondary" onclick="loadLogs()">📋 View Logs</button>
 
