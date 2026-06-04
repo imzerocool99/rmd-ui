@@ -384,6 +384,91 @@ function renderResults(data) {
 
   // Tax analysis
   if (data.taxAnalysis) renderTaxAnalysis(data.taxAnalysis);
+
+  // Intelligence strip
+  renderIntelStrip(portfolio, assets);
+}
+
+// ── Advisory Intelligence Strip ───────────────────────────────────────
+const MARKET_CATALYSTS = [
+  { sym:'TSLA', tone:'neg', headline:'Tesla misses delivery estimates — analyst downgrades to Neutral', source:'Morgan Stanley Research', age:'2h ago' },
+  { sym:'TLT',  tone:'pos', headline:'Fed signals pause — long-duration Treasuries rally on rate outlook', source:'Bloomberg Intelligence', age:'3h ago' },
+  { sym:'GLD',  tone:'pos', headline:'Gold hits 6-month high as inflation expectations tick up', source:'Goldman Sachs Commodities', age:'4h ago' },
+  { sym:'EEM',  tone:'neg', headline:'EM equities under pressure — dollar strength weighs on returns', source:'JPMorgan EM Strategy', age:'5h ago' },
+  { sym:'VTI',  tone:'pos', headline:'Broad market resilience — S&P 500 holds key support level', source:'BlackRock Investment Institute', age:'1h ago' },
+  { sym:'HYG',  tone:'neg', headline:'High-yield spreads widen on recession concerns — credit caution advised', source:'Fidelity Fixed Income', age:'6h ago' },
+  { sym:'VNQ',  tone:'neu', headline:'REITs stabilise after rate-driven selloff — selective opportunities emerging', source:'CBRE Research', age:'7h ago' },
+  { sym:'SPY',  tone:'pos', headline:'S&P 500 earnings season beats consensus — 72% of reporters above estimates', source:'FactSet Earnings Insight', age:'2h ago' },
+  { sym:'BND',  tone:'pos', headline:'Total bond market fund inflows at 12-month high amid flight to quality', source:'Vanguard Research', age:'3h ago' },
+  { sym:'AGG',  tone:'neu', headline:'Core bonds hold steady as mixed economic data keeps market range-bound', source:'PIMCO Strategy', age:'5h ago' },
+  { sym:'PFE',  tone:'neg', headline:'Pfizer guidance cut — pipeline delays weigh on healthcare sector outlook', source:'Wells Fargo Healthcare', age:'4h ago' },
+  { sym:'XOM',  tone:'pos', headline:'Energy sector outperforms — oil above $85 supports integrated majors', source:'Barclays Commodities', age:'1h ago' },
+];
+
+const AGENT_SIGNALS = [
+  { sym:'TSLA',  badge:'caution', text:'Continued downside momentum. Loss position may deepen — monitor closely.' },
+  { sym:'VTI',   badge:'hold',    text:'Core holding. Strong long-term fundamentals — protect from liquidation.' },
+  { sym:'GLD',   badge:'hold',    text:'Inflation hedge performing. Maintain exposure in volatile environments.' },
+  { sym:'EEM',   badge:'review',  text:'Underperforming vs benchmark. Consider reducing on next rebalance.' },
+  { sym:'TLT',   badge:'watch',   text:'Rate sensitivity high. Positive catalyst if Fed holds — watch closely.' },
+  { sym:'HYG',   badge:'caution', text:'Credit risk elevated. Spread widening signals stress — reduce weight.' },
+  { sym:'SPY',   badge:'hold',    text:'Broad index anchor. No action recommended — core portfolio position.' },
+  { sym:'BND',   badge:'watch',   text:'Duration risk moderate. Benefiting from rate pause narrative.' },
+  { sym:'PFE',   badge:'caution', text:'Guidance cut adds uncertainty — review allocation ahead of earnings.' },
+  { sym:'XOM',   badge:'hold',    text:'Energy exposure providing portfolio diversification — maintain.' },
+  { sym:'AGG',   badge:'watch',   text:'Stable income generator. Rate environment improving for bond holders.' },
+  { sym:'SCHD',  badge:'hold',    text:'Dividend yield supportive. Quality factor providing downside buffer.' },
+];
+
+const FIRM_PRODUCTS = [
+  { name:'Capital Preservation Fund', yield:'4.85%', desc:'AAA-rated short-duration bond fund. Designed for capital protection with consistent income generation.', tags:['Low Risk','Liquid','AAA Rated'] },
+  { name:'Managed Income Portfolio', yield:'5.20%', desc:'Actively managed blend of investment-grade corporates and government bonds. Institutional-grade execution.', tags:['Medium Risk','Income Focus','Quarterly Distribution'] },
+  { name:'Strategic Tax-Exempt Fund', yield:'3.95%', desc:'Municipal bond fund — interest income exempt from federal tax. Ideal for clients in higher tax brackets post-RMD.', tags:['Low Risk','Tax-Exempt','State Bonds'] },
+  { name:'Diversified Real Assets', yield:'6.10%', desc:'Inflation-linked portfolio spanning infrastructure, TIPS, and commodity futures. Protects purchasing power.', tags:['Medium Risk','Inflation Hedge','Quarterly'] },
+  { name:'Short Duration Treasury', yield:'4.40%', desc:'1–3 year US Treasury ladder. Government-backed, zero credit risk, rolling maturities for liquidity management.', tags:['Very Low Risk','Govt Backed','Liquid'] },
+];
+
+function renderIntelStrip(portfolio, selectedAssets) {
+  const heldSymbols = portfolio.map(p => p.symbol);
+  const now = new Date();
+  document.getElementById('intelTimestamp').textContent =
+    now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) + ' · ' +
+    now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+
+  // Catalysts — only show items relevant to held symbols, max 3
+  const relevantCatalysts = MARKET_CATALYSTS.filter(c => heldSymbols.includes(c.sym)).slice(0, 3);
+  document.getElementById('catalystCards').innerHTML = relevantCatalysts.map(c => `
+    <div class="catalyst-card">
+      <div class="catalyst-ticker ${c.tone}">${c.sym}</div>
+      <div class="catalyst-body">
+        <div class="catalyst-headline">${c.headline}</div>
+        <div class="catalyst-meta">${c.source} &nbsp;·&nbsp; ${c.age}</div>
+      </div>
+    </div>`).join('');
+
+  // Signals — only for held symbols, max 3
+  const relevantSignals = AGENT_SIGNALS.filter(s => heldSymbols.includes(s.sym)).slice(0, 3);
+  document.getElementById('signalCards').innerHTML = relevantSignals.map(s => `
+    <div class="signal-card">
+      <span class="signal-badge ${s.badge}">${s.badge.toUpperCase()}</span>
+      <span class="signal-sym">${s.sym}</span>
+      <span class="signal-text">${s.text}</span>
+    </div>`).join('');
+
+  // Products — pick 3 matched to client age
+  const age = parseInt(document.getElementById('age').value) || 75;
+  const products = age >= 78 ? FIRM_PRODUCTS.slice(0, 3) : FIRM_PRODUCTS.slice(1, 4);
+  document.getElementById('productCards2').innerHTML = products.map(p => `
+    <div class="product-card2">
+      <div class="product-card2-top">
+        <div class="product-card2-name">${p.name}</div>
+        <div class="product-card2-yield">${p.yield}</div>
+      </div>
+      <div class="product-card2-desc">${p.desc}</div>
+      <div class="product-card2-tags">${p.tags.map(t => `<span class="product-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+
+  document.getElementById('intelStrip').style.display = 'block';
 }
 
 function renderReinvestment(r, age) {
