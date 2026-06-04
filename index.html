@@ -73,6 +73,7 @@
       <div class="tabs">
         <button class="tab active" onclick="showTab('dashboard', this)">Dashboard</button>
         <button class="tab" onclick="showTab('portfolio', this)">Portfolio</button>
+        <button class="tab" onclick="showTab('catalyst', this)">Catalyst</button>
         <button class="tab" onclick="showTab('results', this)">Agent Results</button>
         <button class="tab" onclick="showTab('reinvest', this)">💡 Reinvestment</button>
         <button class="tab" onclick="showTab('value', this)">📊 Business Value</button>
@@ -120,6 +121,17 @@
             <div class="reasoning-box" id="reasoningBox"></div>
           </div>
         </div>
+
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">📣 Latest News for Your Holdings</div>
+          <div class="news-header">
+            <span>Stay informed with the latest headlines for the positions in your current portfolio.</span>
+            <button class="btn-secondary btn-xs" onclick="refreshNews()">Refresh News</button>
+          </div>
+          <div class="news-grid" id="newsList">
+            <div class="news-card empty">Run the agent to load current holdings and display the latest news for those stocks.</div>
+          </div>
+        </div>
       </div>
 
       <!-- PORTFOLIO TAB -->
@@ -147,6 +159,43 @@
           <div class="panel-title">Performance by Asset</div>
           <div style="position:relative;height:160px">
             <canvas id="performanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CATALYST TAB -->
+      <div id="tab-catalyst" class="tab-content">
+        <div class="cards-row">
+          <div class="card">
+            <div class="card-label">Catalyst Events</div>
+            <div class="card-value" id="catalystCount">—</div>
+            <div class="card-sub">Recent trigger items</div>
+          </div>
+          <div class="card">
+            <div class="card-label">High Impact</div>
+            <div class="card-value" id="catalystHigh">—</div>
+            <div class="card-sub">Potential portfolio movers</div>
+          </div>
+          <div class="card">
+            <div class="card-label">News Signals</div>
+            <div class="card-value" id="catalystNewsCount">—</div>
+            <div class="card-sub">Headlines powering catalyst insight</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Catalyst Insights</div>
+          <div class="panel-text" id="catalystInsights">Run the agent or refresh to view the latest catalyst signals for your current holdings.</div>
+        </div>
+
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-title">Catalyst Signals</div>
+          <div class="news-header">
+            <span>Market events and headlines that may move your holdings.</span>
+            <button class="btn-secondary btn-xs" onclick="loadCatalyst()">Refresh Catalysts</button>
+          </div>
+          <div class="news-grid" id="catalystList">
+            <div class="news-card empty">Run the agent to load holdings and display catalyst events.</div>
           </div>
         </div>
       </div>
