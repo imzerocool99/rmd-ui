@@ -169,7 +169,6 @@ function closeDropdown() {
 
 // ── Boot ──────────────────────────────────────────────────────────────
 window.onload = () => {
-  selectClient('client_001');
   checkBackend();
   setInterval(checkBackend, 10000);
 };
