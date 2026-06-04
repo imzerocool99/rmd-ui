@@ -102,6 +102,11 @@ function getActiveAccount(idx) {
 function selectAccount(acct, silent, idx) {
   if (!acct) return;
   activeAccount = acct;
+  document.getElementById('err-account').textContent = '';
+  document.getElementById('accountPickerWrap').classList.remove('field-invalid');
+  clearFieldError('field-age');
+  clearFieldError('field-balance');
+  clearFieldError('field-preference');
   document.getElementById('clientId').value = activeClient.id + '/' + acct.accountId;
   document.getElementById('age').value     = acct.age;
   document.getElementById('balance').value = acct.balance;
@@ -201,8 +206,70 @@ function setPreset(age, balance) {
   document.getElementById('balance').value = balance;
 }
 
+// ── Validation helpers ────────────────────────────────────────────────
+function showFieldError(fieldId, errorId, msg) {
+  document.getElementById(fieldId).classList.add('field-invalid');
+  document.getElementById(errorId).textContent = msg;
+}
+function clearFieldError(fieldId) {
+  document.getElementById(fieldId).classList.remove('field-invalid');
+  const errEl = document.getElementById(fieldId).querySelector('.field-error');
+  if (errEl) errEl.textContent = '';
+}
+function validateForm() {
+  let valid = true;
+
+  // Client selected
+  const clientId = document.getElementById('clientId').value;
+  if (!clientId) {
+    showFieldError('field-client', 'err-client', 'Please search and select a client.');
+    valid = false;
+  }
+
+  // Account selected (only for multi-account clients)
+  if (activeClient && activeClient.accounts.length > 1 && !activeAccount) {
+    document.getElementById('err-account').textContent = 'Please select an account above.';
+    document.getElementById('accountPickerWrap').classList.add('field-invalid');
+    valid = false;
+  } else {
+    document.getElementById('err-account').textContent = '';
+    document.getElementById('accountPickerWrap').classList.remove('field-invalid');
+  }
+
+  // Age
+  const age = parseInt(document.getElementById('age').value);
+  if (!age || isNaN(age)) {
+    showFieldError('field-age', 'err-age', 'Client age is required.');
+    valid = false;
+  } else if (age < 73) {
+    showFieldError('field-age', 'err-age', 'RMDs apply to clients age 73 and above.');
+    valid = false;
+  } else if (age > 115) {
+    showFieldError('field-age', 'err-age', 'Please enter a valid age.');
+    valid = false;
+  }
+
+  // Balance
+  const balance = parseFloat(document.getElementById('balance').value);
+  if (!balance || isNaN(balance) || balance <= 0) {
+    showFieldError('field-balance', 'err-balance', 'IRA balance must be greater than $0.');
+    valid = false;
+  }
+
+  // Preference
+  const pref = document.getElementById('preference').value;
+  if (!pref) {
+    showFieldError('field-preference', 'err-preference', 'Please select a distribution preference.');
+    valid = false;
+  }
+
+  return valid;
+}
+
 // ── Run Agent ─────────────────────────────────────────────────────────
 async function runAgent() {
+  if (!validateForm()) return;
+
   const btn    = document.getElementById('runBtn');
   const icon   = document.getElementById('runBtnIcon');
   const spin   = document.getElementById('runBtnSpinner');
@@ -232,7 +299,8 @@ async function runAgent() {
     agentContext = buildContext(data, body);
     updateBotContext();
   } catch (e) {
-    alert('Agent run failed. Is the backend running on port 8085?');
+    document.getElementById('err-client').textContent = 'Agent run failed — is the backend running on port 8085?';
+    document.getElementById('field-client').classList.add('field-invalid');
   } finally {
     btn.disabled = false;
     btn.classList.remove('btn-circle-running');

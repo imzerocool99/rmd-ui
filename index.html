@@ -32,36 +32,44 @@
     <aside class="sidebar">
       <h3>Client Profile</h3>
 
-      <div class="form-group client-search-wrap">
+      <div class="form-group client-search-wrap" id="field-client">
         <label>Search Client</label>
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
           <input type="text" id="clientSearch" placeholder="Type name or ID..."
                  autocomplete="off"
-                 oninput="filterClients(this.value)"
+                 oninput="filterClients(this.value); clearFieldError('field-client')"
                  onfocus="openDropdown()"
                  onblur="setTimeout(closeDropdown,150)"/>
           <div class="client-dropdown" id="clientDropdown"></div>
         </div>
+        <div class="field-error" id="err-client"></div>
       </div>
       <div class="selected-client-badge" id="selectedClientBadge"></div>
       <div id="accountPickerWrap"></div>
-      <input type="hidden" id="clientId" value="client_001"/>
+      <div class="field-error" id="err-account"></div>
+      <input type="hidden" id="clientId" value=""/>
 
-      <div class="form-group">
+      <div class="form-group" id="field-age">
         <label>Client Age</label>
-        <input type="number" id="age" value="75" min="70" max="100"/>
+        <input type="number" id="age" placeholder="e.g. 75" min="70" max="100"
+               oninput="clearFieldError('field-age')"/>
+        <div class="field-error" id="err-age"></div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="field-balance">
         <label>IRA Balance ($)</label>
-        <input type="number" id="balance" value="500000" step="1000"/>
+        <input type="number" id="balance" placeholder="e.g. 500000" step="1000"
+               oninput="clearFieldError('field-balance')"/>
+        <div class="field-error" id="err-balance"></div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="field-preference">
         <label>Distribution Preference</label>
-        <select id="preference">
+        <select id="preference" onchange="clearFieldError('field-preference')">
+          <option value="">— Select preference —</option>
           <option value="sell">Cash — Sell Assets</option>
           <option value="in_kind">In-Kind Transfer</option>
         </select>
+        <div class="field-error" id="err-preference"></div>
       </div>
 
       <div class="run-btn-wrap">

@@ -200,6 +200,24 @@ header {
 .form-group select:focus {
   border-color: #58a6ff;
 }
+/* ── FORM VALIDATION ── */
+.field-error {
+  font-size: 10px; color: #f85149; margin-top: 4px;
+  min-height: 14px; line-height: 1.4;
+}
+.field-invalid input,
+.field-invalid select {
+  border-color: #f85149 !important;
+  box-shadow: 0 0 0 2px rgba(248,81,73,0.2);
+}
+.field-invalid .search-input-wrap input {
+  border-color: #f85149 !important;
+  box-shadow: 0 0 0 2px rgba(248,81,73,0.2);
+}
+#accountPickerWrap.field-invalid .acct-picker-label {
+  color: #f85149;
+}
+
 /* ── CIRCULAR RUN BUTTON ── */
 .run-btn-wrap {
   display: flex; flex-direction: column; align-items: center;
