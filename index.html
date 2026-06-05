@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RMD Intelligent Agent</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css?v=20260605l"/>
 </head>
 <body>
 
@@ -80,7 +80,6 @@
         <div class="btn-circle-label" id="runBtnLabel">Optimize &amp; Execute</div>
       </div>
       <button class="btn-secondary" onclick="loadPortfolio()">↻ Refresh Portfolio</button>
-      <button class="btn-secondary" onclick="loadLogs()">📋 View Logs</button>
 
       <hr/>
 
@@ -90,6 +89,10 @@
         <button class="tag-btn" onclick="selectClient('client_002')">W. Davis · $750K</button>
         <button class="tag-btn" onclick="selectClient('client_003')">J. Harrison · $250K</button>
         <button class="tag-btn" onclick="selectClient('client_004')">P. Kim · $1.2M</button>
+      </div>
+
+      <div style="margin-top:auto;padding-top:20px;border-top:1px solid #21262d;margin-top:24px">
+        <button class="btn-secondary" id="logsToggleBtn" onclick="toggleLogsTab()" style="width:100%;font-size:11px">📋 View Agent Logs</button>
       </div>
     </aside>
 
@@ -103,8 +106,9 @@
         <button class="tab" onclick="showTab('results', this)">Agent Results</button>
         <button class="tab" onclick="showTab('reinvest', this)">💡 Reinvestment</button>
         <button class="tab" onclick="showTab('value', this)">📊 Business Value</button>
-        <button class="tab" onclick="showTab('logs', this)">Logs</button>
         <button class="tab demo-tab" onclick="showTab('demo', this)">🎯 Demo Guide</button>
+        <button class="tab" onclick="showTab('faq', this)">❓ FAQ</button>
+        <button class="tab" onclick="showTab('about', this)">👥 About Us</button>
       </div>
 
       <!-- DASHBOARD TAB -->
@@ -154,8 +158,10 @@
         <div class="two-col">
           <div class="panel">
             <div class="panel-title">Portfolio Allocation</div>
-            <div style="position:relative;height:200px">
-              <canvas id="portfolioChart"></canvas>
+            <div style="display:flex;justify-content:center;">
+              <div style="position:relative;width:260px;height:380px">
+                <canvas id="portfolioChart"></canvas>
+              </div>
             </div>
           </div>
           <div class="panel">
@@ -164,6 +170,7 @@
               Run the agent to see the AI-generated explanation of why specific assets were selected and which strategy was chosen.
             </div>
             <div class="reasoning-box" id="reasoningBox"></div>
+            <div id="sourcesBox"></div>
           </div>
         </div>
 
@@ -206,23 +213,30 @@
       <div id="tab-portfolio" class="tab-content">
         <div class="panel">
           <div class="panel-title">Current Holdings</div>
+          <div class="holdings-scroll">
           <table class="data-table">
             <thead>
               <tr>
                 <th>Account</th>
                 <th>Symbol</th>
                 <th>Asset Class</th>
-                <th>Quantity</th>
+                <th>Qty</th>
                 <th>Price</th>
-                <th>Market Value</th>
+                <th>Mkt Value</th>
                 <th>Gain / Loss</th>
+                <th>Analyst Rating</th>
+                <th>12mo Target</th>
+                <th>Catalyst</th>
+                <th>Research Source</th>
                 <th>Recommended Action</th>
+                <th>Discuss</th>
               </tr>
             </thead>
             <tbody id="holdingsBody">
-              <tr><td colspan="6" class="empty">Run the agent to load portfolio data</td></tr>
+              <tr><td colspan="13" class="empty">Run the agent to load portfolio data</td></tr>
             </tbody>
           </table>
+          </div>
         </div>
         <div class="panel" style="margin-top:20px">
           <div class="panel-title">Performance by Asset</div>
@@ -236,6 +250,7 @@
       <div id="tab-results" class="tab-content">
         <div class="panel">
           <div class="panel-title">Assets Selected for RMD Liquidation</div>
+          <div class="holdings-scroll">
           <table class="data-table">
             <thead>
               <tr>
@@ -244,54 +259,92 @@
                 <th>Qty to Sell</th>
                 <th>Price</th>
                 <th>Liquidation Value</th>
-                <th>Realized Gain/Loss</th>
-                <th>Approval Status</th>
+                <th>Gain / Loss</th>
+                <th>Analyst Rating</th>
+                <th>12mo Target</th>
+                <th>Catalyst</th>
+                <th>Research Source</th>
+                <th>Action Select</th>
+                <th>Discuss</th>
               </tr>
             </thead>
             <tbody id="selectedBody">
-              <tr><td colspan="5" class="empty">Run the agent to see selected assets</td></tr>
+              <tr><td colspan="12" class="empty">Run the agent to see selected assets</td></tr>
             </tbody>
           </table>
+          </div>
+          <div class="action-legend">
+            <span class="action-legend-title">Action Key:</span>
+            <span class="action-legend-item sell">🔴 Sell — Cash Distribution: Sell shares inside the IRA; cash proceeds sent to client's bank account. Taxed as ordinary income.</span>
+            <span class="action-legend-item transfer">🔵 In-Kind Transfer to Brokerage: Move actual shares (unsold) from IRA → taxable brokerage at FMV. Satisfies RMD per IRS Pub. 590-B; no immediate sale required.</span>
+            <span class="action-legend-item hold">🟡 Hold — Cover with Other Assets: Exclude this holding from RMD; remaining positions cover the distribution requirement.</span>
+          </div>
+          <div class="execute-bar">
+            <div class="execute-bar-left">
+              <span class="execute-hint">Review each action above, override if needed, then submit.</span>
+            </div>
+            <button class="btn-execute" id="executeBtn" onclick="executeActions()">
+              ▶ Execute Selected Actions
+            </button>
+          </div>
+          <div class="execute-result" id="executeResult" style="display:none"></div>
         </div>
 
         <div class="panel" style="margin-top:20px">
-          <div class="panel-title">RMD Coverage Analysis</div>
-          <div style="position:relative;height:160px">
-            <canvas id="rmdChart"></canvas>
+          <div class="panel-title collapsible-title" onclick="togglePanel('rmdPanelBody','rmdPanelChevron')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+            <span>📊 RMD Coverage Analysis</span>
+            <span id="rmdPanelChevron" style="font-size:12px;transition:transform 0.2s">▶</span>
+          </div>
+          <div id="rmdPanelBody" style="display:none">
+            <div id="rmdStatusLine" style="padding:8px 4px 4px;font-size:13px;color:#ffffff;font-style:italic"></div>
+            <div style="position:relative;height:160px">
+              <canvas id="rmdChart"></canvas>
+            </div>
           </div>
         </div>
 
         <!-- TAX EFFICIENCY PANEL -->
         <div class="panel" style="margin-top:20px">
-          <div class="panel-title">💰 Tax Efficiency — Agent vs Naive Approach</div>
-          <div class="tax-compare" id="taxCompare" style="display:none">
-            <div class="tax-col bad">
-              <div class="tax-col-title">❌ Without Agent (Naive — Highest Gain First)</div>
-              <table class="data-table" id="naiveAssetsTable">
-                <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
-                <tbody id="naiveAssetsBody"></tbody>
-              </table>
-              <div class="tax-total bad-total">Total Gain: <span id="naiveGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="naiveTax">—</span></div>
-            </div>
-            <div class="tax-saved-badge" id="taxSavedBadge">💰<br/>Saved<br/><span id="taxSavedAmt">—</span></div>
-            <div class="tax-col good">
-              <div class="tax-col-title">✅ With Agent (Optimized — Loss-First Selection)</div>
-              <table class="data-table" id="smartAssetsTable">
-                <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
-                <tbody id="smartAssetsBody"></tbody>
-              </table>
-              <div class="tax-total good-total">Total Gain: <span id="smartGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="smartTax">—</span></div>
-            </div>
+          <div class="panel-title collapsible-title" onclick="togglePanel('taxPanelBody','taxPanelChevron')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+            <span>💰 Tax Efficiency — Agent vs Naive Approach</span>
+            <span id="taxPanelChevron" style="font-size:12px;transition:transform 0.2s">▶</span>
           </div>
-          <div class="tax-explanation" id="taxExplanation">Run the agent to see tax savings analysis.</div>
-          <div id="taxChartWrap" style="position:relative;height:140px;margin-top:16px;display:none">
-            <canvas id="taxChart"></canvas>
+          <div id="taxPanelBody" style="display:none">
+            <div class="tax-compare" id="taxCompare" style="display:none">
+              <div class="tax-col bad">
+                <div class="tax-col-title">❌ Without Agent (Naive — Highest Gain First)</div>
+                <table class="data-table" id="naiveAssetsTable">
+                  <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
+                  <tbody id="naiveAssetsBody"></tbody>
+                </table>
+                <div class="tax-total bad-total">Total Gain: <span id="naiveGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="naiveTax">—</span></div>
+              </div>
+              <div class="tax-saved-badge" id="taxSavedBadge">💰<br/>Saved<br/><span id="taxSavedAmt">—</span></div>
+              <div class="tax-col good">
+                <div class="tax-col-title">✅ With Agent (Optimized — Loss-First Selection)</div>
+                <table class="data-table" id="smartAssetsTable">
+                  <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
+                  <tbody id="smartAssetsBody"></tbody>
+                </table>
+                <div class="tax-total good-total">Total Gain: <span id="smartGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="smartTax">—</span></div>
+              </div>
+            </div>
+            <div id="taxStatusLine" style="padding:8px 4px 4px;font-size:13px;color:#ffffff;font-style:italic"></div>
+            <div class="tax-explanation" id="taxExplanation">Run the agent to see tax savings analysis.</div>
+            <div id="taxChartWrap" style="position:relative;height:140px;margin-top:16px;display:none">
+              <canvas id="taxChart"></canvas>
+            </div>
           </div>
         </div>
 
         <div class="panel" style="margin-top:20px">
-          <div class="panel-title">Full Agent Response</div>
-          <pre class="json-view" id="executionJson">Run the agent to see the full execution response...</pre>
+          <div class="panel-title collapsible-title" onclick="togglePanel('jsonPanel', 'jsonChevron')" style="cursor:pointer;user-select:none;">
+            Full Agent Response
+            <span id="jsonChevron" style="margin-left:auto;font-size:12px;color:#8b949e;">▼</span>
+          </div>
+          <div id="jsonPanel" style="display:none">
+            <pre class="json-view" id="executionJson">Run the agent to see the full execution response...</pre>
+          </div>
         </div>
       </div>
 
@@ -316,7 +369,7 @@
           <div class="advice-meta" id="adviceMeta"></div>
         </div>
 
-        <div class="two-col">
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
           <!-- Suggestions table -->
           <div class="panel">
             <div class="panel-title">Suggested Products</div>
@@ -342,7 +395,9 @@
           <!-- Allocation chart -->
           <div class="panel">
             <div class="panel-title">Allocation by Product</div>
-            <canvas id="reinvestChart" height="280"></canvas>
+            <div style="position:relative;height:220px">
+              <canvas id="reinvestChart"></canvas>
+            </div>
           </div>
         </div>
 
@@ -361,7 +416,15 @@
 
         <div class="bv-hero">
           <div class="bv-hero-title">How Agentic AI Transforms RMD Processing</div>
-          <div class="bv-hero-sub">From manual, error-prone operations to autonomous, tax-efficient, client-centric execution</div>
+          <div class="bv-hero-sub">Autonomous, tax-efficient, and client-centric — with the advisor always in control</div>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <span class="bv-pill">🤝 Human-in-the-Loop</span>
+            <span class="bv-pill">💰 Live Tax Recalculation</span>
+            <span class="bv-pill">🔄 Cash &amp; In-Kind Distribution</span>
+            <span class="bv-pill">📋 IRS Source Citations</span>
+            <span class="bv-pill">📊 Analyst Intelligence</span>
+            <span class="bv-pill">📈 Reinvestment Engine</span>
+          </div>
         </div>
 
         <!-- Before vs After -->
@@ -371,9 +434,12 @@
             <ul class="bv-list bad">
               <li>Advisor manually calculates RMD amount each year</li>
               <li>Random or gut-feel asset selection for liquidation</li>
-              <li>No tax optimization — often triggers unnecessary gains</li>
-              <li>Manual trade tickets — slow, error-prone</li>
-              <li>No explanation given to client on asset selection</li>
+              <li>No tax optimization — often triggers unnecessary capital gains</li>
+              <li>No distinction between Cash Distribution vs In-Kind Transfer</li>
+              <li>Manual trade tickets — slow, error-prone, no audit trail</li>
+              <li>No explanation given to client on why specific assets were sold</li>
+              <li>No analyst context — advisor flying blind on market conditions</li>
+              <li>Distributed cash sits idle — no reinvestment plan</li>
               <li>Risk of missing IRS deadline → 25% excise tax penalty</li>
               <li>Cannot scale without hiring more operations staff</li>
             </ul>
@@ -381,60 +447,77 @@
           <div class="panel">
             <div class="panel-title" style="color:#3fb950">✅ With the Intelligent RMD Agent</div>
             <ul class="bv-list good">
-              <li>Agent auto-identifies eligible accounts and calculates RMD</li>
-              <li>AI scores 31 assets across 10 classes for tax efficiency</li>
-              <li>Liquidates losers first — minimizes tax drag automatically</li>
-              <li>Executes trades via Alpaca API — no manual ticket</li>
-              <li>AI generates plain-English explanation for every decision</li>
+              <li>Agent auto-identifies eligible accounts and calculates RMD via IRS Uniform Lifetime Table</li>
+              <li>AI scores assets across 10 classes — sells losers first to minimize tax drag</li>
+              <li>Supports Cash Distribution and In-Kind Transfer to Taxable Brokerage (IRS Pub. 590-B)</li>
+              <li>Human-in-the-loop: advisor reviews Action Select (Sell / Transfer / Hold) before execution</li>
+              <li>RMD Coverage and Tax Savings recalculate live as advisor overrides selections</li>
+              <li>Every decision backed by IRS regulatory citations and professional source links</li>
+              <li>Analyst ratings, 12-month targets, and market catalysts shown per asset</li>
+              <li>Proceeds reinvested across 7 products with Same Bank and alternative options</li>
               <li>Zero missed deadlines — scheduled agent runs year-round</li>
               <li>Scales to thousands of accounts with no added staff</li>
             </ul>
           </div>
         </div>
 
-        <!-- 6 Business Values from PDF -->
+        <!-- Business Value Cards -->
         <div class="bv-grid">
 
           <div class="bv-card">
             <div class="bv-icon">⚖️</div>
             <div class="bv-title">Regulatory Compliance &amp; Risk Reduction</div>
-            <div class="bv-desc">Ensures 100% on-time and accurate RMD execution, eliminating IRS penalty risk. Full audit trail and explainability support regulatory reviews and internal controls.</div>
-            <div class="bv-value">Lower compliance risk · Stronger regulatory posture</div>
+            <div class="bv-desc">Ensures 100% on-time RMD execution. Every AI decision is backed by inline IRS citations (IRS Pub. 590-B, Topic 409, RMD Rules) with clickable source links — full audit trail for regulatory reviews and internal controls.</div>
+            <div class="bv-value">Zero IRS penalty risk · Full explainability · Audit-ready</div>
           </div>
 
           <div class="bv-card">
-            <div class="bv-icon">😊</div>
-            <div class="bv-title">Improved Client Experience &amp; Retention</div>
-            <div class="bv-desc">Removes complexity from clients. Offers cash vs in-kind flexibility. AI explains every decision in plain English — building trust and advisor-client relationships.</div>
-            <div class="bv-value">Higher satisfaction · Increased AUM retention</div>
+            <div class="bv-icon">🤝</div>
+            <div class="bv-title">Human-in-the-Loop Advisor Control</div>
+            <div class="bv-desc">Agent recommends, advisor decides. Each asset has an Action Select dropdown (Sell — Cash Distribution / In-Kind Transfer to Brokerage / Hold). RMD Coverage and Tax Savings update live as the advisor overrides — so they see the impact before submitting.</div>
+            <div class="bv-value">Advisor confidence · No black-box automation · Full override capability</div>
           </div>
 
           <div class="bv-card">
             <div class="bv-icon">💰</div>
             <div class="bv-title">Tax-Efficient Outcomes</div>
-            <div class="bv-desc">Optimizes asset selection based on gains/losses, cost basis, and portfolio impact. Minimizes unnecessary tax drag by liquidating underperformers and loss positions first.</div>
-            <div class="bv-value">Better after-tax returns · Trusted fiduciary positioning</div>
+            <div class="bv-desc">Sells loss positions first to offset gains. Side-by-side comparison shows exact tax bill with vs without the agent. Tax savings recalculate in real time when the advisor changes a Hold/Sell decision — making the value immediately visible.</div>
+            <div class="bv-value">Better after-tax returns · Fiduciary positioning · Live savings display</div>
           </div>
 
           <div class="bv-card">
-            <div class="bv-icon">⚡</div>
-            <div class="bv-title">Operational Efficiency &amp; Cost Savings</div>
-            <div class="bv-desc">Automates a multi-step process spanning operations, tax, and advisory teams. Reduces processing time, errors, and exception handling dramatically.</div>
-            <div class="bv-value">Lower operating costs · Staff redeployed to high-value work</div>
+            <div class="bv-icon">🔄</div>
+            <div class="bv-title">Cash &amp; In-Kind Distribution Flexibility</div>
+            <div class="bv-desc">Supports both IRS-recognized distribution methods: Sell (cash proceeds to bank account) and In-Kind Transfer (shares move unsold to taxable brokerage at FMV, per IRS Pub. 590-B). Default action is pre-set based on the agent's strategy recommendation.</div>
+            <div class="bv-value">Client flexibility · IRS-compliant · No forced liquidation</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">📊</div>
+            <div class="bv-title">Analyst Intelligence at the Point of Decision</div>
+            <div class="bv-desc">Every asset in the portfolio and recommendation table shows Analyst Rating (Buy/Neutral/Sell), 12-month price target, market catalyst, and research source. Advisors can click Discuss to get AI context from the embedded bot before overriding.</div>
+            <div class="bv-value">Informed decisions · Market context · Built-in research layer</div>
+          </div>
+
+          <div class="bv-card">
+            <div class="bv-icon">😊</div>
+            <div class="bv-title">Transparent Client Experience</div>
+            <div class="bv-desc">AI Explanation panel shows a plain-English rationale for every asset selected or protected, with regulatory source icons per line. Plain-language summaries tell the advisor in one sentence: "RMD fully met" or "⚠️ shortfall of $X" — no guesswork.</div>
+            <div class="bv-value">Client trust · Plain language · Every decision explained</div>
           </div>
 
           <div class="bv-card">
             <div class="bv-icon">📈</div>
-            <div class="bv-title">Revenue Protection &amp; Growth</div>
-            <div class="bv-desc">Protects existing AUM by preventing forced outflows from poor RMD handling. Reinvestment suggestions keep assets within the firm's managed products.</div>
-            <div class="bv-value">Stable AUM · Stronger long-term revenue streams</div>
+            <div class="bv-title">Reinvestment &amp; AUM Retention</div>
+            <div class="bv-desc">Proceeds are immediately allocated across 7 product types (T-Bills, CDs, Dividend ETFs, Muni Bonds, MMFs). Each product card shows Same Bank option (highlighted with relationship benefit) plus 2 alternative institutions — keeping assets within the firm's ecosystem.</div>
+            <div class="bv-value">Stable AUM · Same-bank stickiness · $862/yr projected income</div>
           </div>
 
           <div class="bv-card">
             <div class="bv-icon">🚀</div>
             <div class="bv-title">Strategic Platform Differentiation</div>
-            <div class="bv-desc">Positions the firm as an innovator in AI-driven retirement automation. Reusable framework extends to Inherited IRAs, Roth conversions, and retirement income planning.</div>
-            <div class="bv-value">Competitive differentiation · Foundation for future AI capabilities</div>
+            <div class="bv-desc">Positions the firm as an innovator in AI-driven retirement automation. Local AI (Ollama/Phi-3) — no client data leaves the firm. Reusable agentic framework extends to Inherited IRAs, Roth conversions, and holistic retirement income planning.</div>
+            <div class="bv-value">Competitive differentiation · Data privacy · Scalable AI foundation</div>
           </div>
 
         </div>
@@ -445,23 +528,27 @@
           <div class="agent-loop">
             <div class="loop-step">
               <div class="loop-num">1</div>
-              <div class="loop-body"><strong>SENSE</strong><span>Reads client age, IRA balance, 31-asset portfolio, market signals, and client preference from the request context.</span></div>
+              <div class="loop-body"><strong>SENSE</strong><span>Reads client age, IRA balance, 31-asset portfolio, live Alpaca prices, analyst ratings, and client preference (cash vs in-kind) from the request context.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">2</div>
-              <div class="loop-body"><strong>THINK</strong><span>Calculates RMD using IRS Uniform Lifetime Table. Scores every asset for tax efficiency, performance, and concentration risk.</span></div>
+              <div class="loop-body"><strong>THINK</strong><span>Calculates RMD using IRS Uniform Lifetime Table. Scores every asset for tax efficiency, gain/loss position, analyst outlook, and concentration risk. Compares agent vs naive approach to quantify tax savings.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">3</div>
-              <div class="loop-body"><strong>PLAN</strong><span>Tax optimizer selects exact share quantities across asset classes. Ollama/Phi-3 decides cash vs in-kind strategy. Reinvestment engine allocates proceeds across 7 product types.</span></div>
+              <div class="loop-body"><strong>PLAN</strong><span>Tax optimizer selects exact share quantities. Ollama/Phi-3 determines Cash Distribution vs In-Kind Transfer strategy per IRS Pub. 590-B. Reinvestment engine allocates proceeds across 7 product types with institution options.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">4</div>
-              <div class="loop-body"><strong>ACT</strong><span>Executes sell orders or in-kind transfer via Alpaca paper trading API. Updates portfolio positions, NAV, and tax records.</span></div>
+              <div class="loop-body"><strong>RECOMMEND</strong><span>Presents recommendations with Action Select dropdowns (Sell / Transfer / Hold). RMD Coverage and Tax Efficiency panels update live as the advisor overrides any selection — before anything is executed.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">5</div>
-              <div class="loop-body"><strong>REPORT</strong><span>Generates plain-English explanation for client and advisor. Saves decision history to memory. Logs all actions for compliance audit trail.</span></div>
+              <div class="loop-body"><strong>ACT</strong><span>Advisor clicks Execute to submit approved actions. Sell orders and In-Kind transfers route via Alpaca paper trading API. Holds are excluded from this RMD cycle automatically.</span></div>
+            </div>
+            <div class="loop-step">
+              <div class="loop-num">6</div>
+              <div class="loop-body"><strong>EXPLAIN</strong><span>Every asset decision is explained in plain English with per-line IRS regulatory citations (clickable source icons). Plain-language summaries confirm RMD coverage status and tax outcome. Full decision log saved for compliance audit trail.</span></div>
             </div>
           </div>
         </div>
@@ -472,9 +559,15 @@
           <div class="kpi-grid">
             <div class="kpi-card"><div class="kpi-val">100%</div><div class="kpi-label">RMDs Completed On Time</div></div>
             <div class="kpi-card"><div class="kpi-val">0</div><div class="kpi-label">IRS Penalty Incidents</div></div>
+            <div class="kpi-card"><div class="kpi-val">$1,211</div><div class="kpi-label">Tax Saved vs Naive Approach</div></div>
             <div class="kpi-card"><div class="kpi-val">31</div><div class="kpi-label">Assets Analysed Per Run</div></div>
             <div class="kpi-card"><div class="kpi-val">10</div><div class="kpi-label">Asset Classes Covered</div></div>
+            <div class="kpi-card"><div class="kpi-val">3</div><div class="kpi-label">Distribution Strategies (Sell / Transfer / Hold)</div></div>
+            <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Regulatory Source Citations</div></div>
             <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Reinvestment Products</div></div>
+            <div class="kpi-card"><div class="kpi-val">3</div><div class="kpi-label">Institution Options Per Product</div></div>
+            <div class="kpi-card"><div class="kpi-val">$862</div><div class="kpi-label">Projected Annual Income from Reinvestment</div></div>
+            <div class="kpi-card"><div class="kpi-val">Live</div><div class="kpi-label">RMD &amp; Tax Recalculation on Advisor Override</div></div>
             <div class="kpi-card"><div class="kpi-val">&lt;5s</div><div class="kpi-label">End-to-End Agent Runtime</div></div>
           </div>
         </div>
@@ -487,14 +580,32 @@
         <!-- Client Use Case Header -->
         <div class="demo-hero">
           <div class="demo-hero-left">
-            <div class="demo-client-badge">Client Use Case</div>
+            <div class="demo-client-badge">Client Use Cases</div>
             <div class="demo-client-name">Robert & Margaret Chen</div>
-            <div class="demo-client-sub">Retired couple · Ages 75 &amp; 73 · Traditional IRA · $500,000 balance</div>
+            <div class="demo-client-sub">Retired couple · Ages 75 &amp; 73 · Two IRA accounts · $820,000 combined balance</div>
           </div>
           <div class="demo-hero-right">
-            <div class="demo-stat"><span>$20,325</span>Annual RMD Required</div>
+            <div class="demo-stat"><span>$20,325</span>Traditional IRA RMD</div>
             <div class="demo-stat"><span>$1,211</span>Tax Saved by Agent</div>
-            <div class="demo-stat"><span>4s</span>Agent Response Time</div>
+            <div class="demo-stat"><span>2</span>Demo Modes</div>
+            <div class="demo-stat"><span>&lt;5s</span>Agent Runtime</div>
+          </div>
+        </div>
+
+        <!-- Two-mode intro -->
+        <div class="demo-modes-bar">
+          <div class="demo-mode-card mode-cash">
+            <div class="demo-mode-icon">🔴</div>
+            <div class="demo-mode-label">Demo Mode A</div>
+            <div class="demo-mode-name">Cash Distribution</div>
+            <div class="demo-mode-desc">Traditional IRA (IRA-001-A) · Age 75 · $500K · Preference: <strong>sell</strong><br/>Shares are sold, cash proceeds sent to client's bank account</div>
+          </div>
+          <div class="demo-mode-vs">VS</div>
+          <div class="demo-mode-card mode-inkind">
+            <div class="demo-mode-icon">🔵</div>
+            <div class="demo-mode-label">Demo Mode B</div>
+            <div class="demo-mode-name">In-Kind Transfer</div>
+            <div class="demo-mode-desc">Rollover IRA (IRA-001-B) · Age 75 · $320K · Preference: <strong>in_kind</strong><br/>Actual shares move unsold to taxable brokerage at FMV (IRS Pub. 590-B)</div>
           </div>
         </div>
 
@@ -502,189 +613,877 @@
         <div class="demo-problem">
           <div class="demo-problem-title">❌ The Problem Without This Agent</div>
           <div class="demo-problem-grid">
-            <div class="demo-problem-item">Robert's advisor manually calculates RMD each year — takes 2-3 hours per client</div>
+            <div class="demo-problem-item">Advisor manually calculates RMD each year — takes 2–3 hours per client</div>
             <div class="demo-problem-item">Random asset selection triggered a $5,000+ capital gains tax last year</div>
-            <div class="demo-problem-item">Distributed cash sat idle in checking account earning 0.01% APY</div>
-            <div class="demo-problem-item">No explanation given to Robert on why specific stocks were sold</div>
+            <div class="demo-problem-item">No distinction between Cash Distribution vs In-Kind Transfer — client loses optionality</div>
+            <div class="demo-problem-item">Advisor has no analyst context when choosing which assets to sell</div>
+            <div class="demo-problem-item">Distributed cash sits idle — no reinvestment plan, no income</div>
+            <div class="demo-problem-item">No explanation given to client on why specific assets were liquidated</div>
           </div>
         </div>
 
-        <!-- Step-by-Step Presentation Flow -->
+        <!-- MODE A: CASH DISTRIBUTION -->
         <div class="panel" style="margin-bottom:20px">
-          <div class="panel-title">🎯 Presentation Flow — Step by Step</div>
+          <div class="demo-track-header track-cash">🔴 Demo Mode A — Cash Distribution (Sell Strategy)</div>
+          <div class="demo-track-sub">Account: IRA-001-A · Robert Chen Traditional IRA · Age 75 · $500,000 · Preference: sell</div>
 
           <div class="demo-step">
             <div class="demo-step-num">1</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Set the Scene — Enter Client Profile <span class="demo-where">← Left Sidebar</span></div>
-              <div class="demo-step-desc">Enter Robert's details: Age 75, IRA Balance $500,000, Preference: Cash. Say: <em>"Robert is 75 years old with a $500K IRA. The IRS requires him to withdraw a minimum amount every year — let's see what our AI agent recommends."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>IRS mandates RMDs after age 73 — failure = 25% excise tax penalty</li>
-                  <li>The challenge is not just HOW MUCH to withdraw, but WHICH assets to sell</li>
-                  <li>Wrong asset selection can cost thousands in unnecessary taxes</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Set the Scene <span class="demo-where">← Left Sidebar</span></div>
+              <div class="demo-step-desc">Select <strong>Robert & Margaret Chen → Traditional IRA (IRA-001-A)</strong>. Age 75, Balance $500,000, Preference: Cash. Say: <em>"Robert is 75. The IRS requires a minimum withdrawal every year — failure means a 25% excise tax penalty. Let's see what the agent recommends."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>RMD mandated after age 73 — not optional</li>
+                <li>The challenge: not just HOW MUCH to withdraw, but WHICH assets to sell</li>
+                <li>Wrong selection = unnecessary tax drag, every single year</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">2</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Run the Agent <span class="demo-where">← Click ▶ Run Agent</span></div>
-              <div class="demo-step-desc">Click the green Run Agent button. In ~4 seconds, the entire pipeline completes. Say: <em>"In 4 seconds, the agent has analyzed Robert's full portfolio, calculated his RMD, selected the optimal assets, and generated a reinvestment plan."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>This would take an advisor 2-3 hours manually</li>
-                  <li>Agent runs on a schedule — Robert never misses his deadline</li>
-                  <li>No human error, no missed steps</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Run the Agent <span class="demo-where">← ▶ Run Agent button</span></div>
+              <div class="demo-step-desc">Click Run Agent. In ~4 seconds the full pipeline completes. Say: <em>"In under 5 seconds, the agent has calculated Robert's RMD, scored all 13 assets for tax efficiency, selected the optimal ones, and generated a reinvestment plan."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>This would take a human advisor 2–3 hours per client</li>
+                <li>Agent can run on a schedule — zero missed deadlines</li>
+                <li>Powered by local Ollama/Phi-3 AI — no client data leaves the machine</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">3</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Show the Dashboard — RMD Summary <span class="demo-where">← Dashboard Tab</span></div>
-              <div class="demo-step-desc">Point to the 4 cards at the top. Say: <em>"Robert's required withdrawal is $20,325. The agent chose a Cash distribution strategy. It selected assets worth $20,562 — just enough to cover the RMD."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>RMD calculated using IRS Uniform Lifetime Table (age 75 → factor 24.6)</li>
-                  <li>Portfolio doughnut shows allocation by asset class — not just stocks</li>
-                  <li>Scroll down to show the AI Explanation — it tells Robert exactly WHY each asset was picked</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Dashboard — RMD Summary &amp; AI Explanation <span class="demo-where">← Dashboard Tab</span></div>
+              <div class="demo-step-desc">Point to the 4 summary cards. Then scroll to the <strong>AI Agent Explanation</strong> panel. Say: <em>"The agent calculated a $20,325 RMD using the IRS Uniform Lifetime Table. Now look at the explanation — every selected and protected asset has a reason, and each reason is backed by a clickable IRS source."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Click a source icon (📋💹🌱) — it links directly to the IRS page</li>
+                <li>Click 💬 Discuss on any line — the AI bot loads that asset's context automatically</li>
+                <li>Plain-English rationale builds client trust — no black box</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">4</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Show the Portfolio — All Holdings <span class="demo-where">← Portfolio Tab</span></div>
-              <div class="demo-step-desc">Show the full holdings table grouped by asset class. Say: <em>"Robert holds 13 assets across 10 asset classes — equities, bonds, REITs, commodities, ETFs, and money market. The agent analyzed every single one."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>Green = being held (protected from liquidation)</li>
-                  <li>Red "Liquidating" = selected for sale by the agent</li>
-                  <li>Point to VTI (+$2,800 gain) — agent protected this to avoid a large tax bill</li>
-                  <li>Point to TSLA (-$1,800 loss) — agent sold this first to harvest the tax loss</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Portfolio — Analyst Intelligence <span class="demo-where">← Portfolio Tab</span></div>
+              <div class="demo-step-desc">Show the full holdings table. Say: <em>"Every asset shows Analyst Rating, 12-month price target, and the market catalyst. The agent used this context when deciding what to sell."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Point to TSLA: Neutral rating, -$1,800 unrealized loss → agent sold this first</li>
+                <li>Point to VTI: Buy rating, +$2,800 gain → agent protected this (would trigger large tax)</li>
+                <li>Click 💬 Discuss on any asset to get AI context before overriding the recommendation</li>
+                <li>Recommended Action column shows agent's intent per holding</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">5</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Show Tax Savings — The Core Value <span class="demo-where">← Agent Results Tab</span></div>
-              <div class="demo-step-desc">Scroll to the Tax Efficiency panel. Say: <em>"This is the most important part. Without the agent, a random system would have sold VTI and GLD — triggering a $1,211 tax bill. Our agent sold TSLA and EEM instead, which had losses. Robert's tax bill: $0."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>Left side (red) = what a naive/manual system would have done</li>
-                  <li>Right side (green) = what the AI agent did</li>
-                  <li>$1,211 saved in taxes — every year, for every client</li>
-                  <li>At 1,000 clients → $1.2M in client tax savings annually</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Agent Results — Human-in-the-Loop Approval <span class="demo-where">← Agent Results Tab</span></div>
+              <div class="demo-step-desc">Show the <strong>Assets Selected for RMD Liquidation</strong> table. Say: <em>"The agent recommends, but the advisor decides. Each asset has an Action Select dropdown. Watch what happens when I change one to Hold."</em> Change TSLA from Sell to Hold — both the RMD Coverage and Tax Efficiency panels update instantly.</div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>🔴 Sell — Cash Distribution: shares sold, cash wired to client's bank account</li>
+                <li>🟡 Hold: excluded from this cycle, RMD covered by other assets</li>
+                <li>RMD Coverage chart updates live — shows shortfall immediately if you hold too much</li>
+                <li>Tax Efficiency panel updates live — holding TSLA (a loss) reduces the tax savings</li>
+                <li>Advisor sees the financial impact of their override BEFORE submitting</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">6</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Show Reinvestment — Keep Money Working <span class="demo-where">← Reinvestment Tab</span></div>
-              <div class="demo-step-desc">Show the money flow diagram and product table. Say: <em>"Robert's $20,325 doesn't just sit in a checking account. The agent immediately recommends where to reinvest it — generating $862 in annual income from products like T-Bills, CDs, and dividend ETFs."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>Money stays within the firm's managed products — protects AUM</li>
-                  <li>7 products across different risk levels — client chooses what fits</li>
-                  <li>High-Yield Savings stays at the same bank — same relationship</li>
-                  <li>$862/year in projected income from the reinvestment alone</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Tax Efficiency — $1,211 Saved <span class="demo-where">← Expand Tax Efficiency panel</span></div>
+              <div class="demo-step-desc">Expand the Tax Efficiency panel. Say: <em>"Without the agent, a naive system would have sold VTI and GLD — triggering a $1,211 tax bill. The agent sold loss positions instead. Robert's tax bill: $0. That's real money, saved every year."</em> Point to the 🌱💹💰 source icons.</div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Click 🌱 → Investopedia Tax-Loss Harvesting explanation</li>
+                <li>Click 💹 → IRS Topic 409: Capital Gains &amp; Losses</li>
+                <li>At 1,000 clients → $1.2M in annual client tax savings</li>
+                <li>Plain-language sentence above the chart: "✅ The agent saved $1,211 in taxes…"</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">7</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Show AI Assistant — Client Experience <span class="demo-where">← 🤖 Bot Bubble (bottom-right)</span></div>
-              <div class="demo-step-desc">Click the green bot bubble. Ask: <em>"Why were these assets selected?"</em> Show the AI response. Say: <em>"Robert can ask questions in plain English, any time, about his RMD. No jargon. No waiting for a call back."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>Bot knows which tab you're on — context-aware answers</li>
-                  <li>Powered by local AI (Ollama/Phi-3) — no data leaves the machine</li>
-                  <li>Builds client trust through transparency and explainability</li>
-                  <li>Reduces advisor call volume for routine RMD questions</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Execute Advisor Decision <span class="demo-where">← Execute Selected Actions button</span></div>
+              <div class="demo-step-desc">Reset actions back to agent defaults, then click <strong>Execute Selected Actions</strong>. Say: <em>"The advisor is satisfied. One click submits all decisions. The agent records each action — Sell or Hold — with a timestamp for the compliance audit trail."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Confirmation panel shows every decision: symbol, qty, action, status</li>
+                <li>Dropdowns lock — submitted state is frozen for the audit trail</li>
+                <li>RMD Coverage auto-expands to confirm final coverage after submission</li>
+              </ul></div>
             </div>
           </div>
 
           <div class="demo-step">
             <div class="demo-step-num">8</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Close with Business Value <span class="demo-where">← Business Value Tab</span></div>
-              <div class="demo-step-desc">Show the Before/After panel and KPI grid. Say: <em>"This is not just a compliance tool. It's a client retention tool, a tax optimization tool, and a revenue protection tool — all in one automated agent."</em></div>
-              <div class="demo-step-talk">
-                <strong>Talking Points:</strong>
-                <ul>
-                  <li>Scales to thousands of accounts with zero additional staff</li>
-                  <li>Same framework extends to Inherited IRAs, Roth conversions</li>
-                  <li>Positions the firm as an AI-driven wealth management leader</li>
-                  <li>Total build cost for POC: $0 — all open source, runs locally</li>
-                </ul>
-              </div>
+              <div class="demo-step-title">Reinvestment — Cash Put to Work <span class="demo-where">← Reinvestment Tab</span></div>
+              <div class="demo-step-desc">Show the flow diagram and product table. Say: <em>"Robert's $20,325 cash doesn't sit idle. The agent immediately recommends 7 products generating $862/year in income. Click any product icon to understand what it is."</em> Click the 🏦 icon on High-Yield Savings.</div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>⭐ Same Bank option highlighted — no transfer required, keeps AUM within the firm</li>
+                <li>2 alternative institutions shown per product for client choice</li>
+                <li>T-Bills, CDs, Dividend ETFs, Municipal Bonds — different risk levels</li>
+                <li>Municipal Bonds especially valuable: Robert just took a taxable RMD — tax-exempt income offsets it</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE B: IN-KIND TRANSFER -->
+        <div class="panel" style="margin-bottom:20px">
+          <div class="demo-track-header track-inkind">🔵 Demo Mode B — In-Kind Transfer to Taxable Brokerage</div>
+          <div class="demo-track-sub">Account: IRA-001-B · Robert Chen Rollover IRA · Age 75 · $320,000 · Preference: in_kind</div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">1</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Switch Account &amp; Strategy <span class="demo-where">← Left Sidebar</span></div>
+              <div class="demo-step-desc">Select <strong>Robert & Margaret Chen → Rollover IRA (IRA-001-B)</strong>. Balance $320,000, Preference: in_kind. Say: <em>"Robert also holds a Rollover IRA. Here, instead of selling, he wants to keep his investments — just move them to his taxable brokerage account. That's called an In-Kind Transfer."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>In-Kind means the actual shares move — no forced sale, client stays invested</li>
+                <li>FMV on transfer date counts toward the RMD per IRS Pub. 590-B</li>
+                <li>Particularly useful when Robert believes in a holding long-term (e.g., AAPL)</li>
+              </ul></div>
             </div>
           </div>
 
+          <div class="demo-step">
+            <div class="demo-step-num">2</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Run Agent — Notice the Strategy Change <span class="demo-where">← ▶ Run Agent</span></div>
+              <div class="demo-step-desc">Run the agent. Point to the Strategy card on the dashboard — it now shows <strong>In-Kind</strong>. Say: <em>"The agent picked up the client preference and switched strategy automatically. The sub-label reads 'Shares moved to taxable account — client stays invested.'"</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Agent adapts strategy per account — not one-size-fits-all</li>
+                <li>AI Explanation will reference IRS Pub. 590-B (📖 icon) for in-kind rules</li>
+                <li>Tax treatment differs: income tax is owed on FMV transferred, but no capital gain is realized at transfer time</li>
+              </ul></div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">3</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Agent Results — Dropdowns Default to Transfer <span class="demo-where">← Agent Results Tab</span></div>
+              <div class="demo-step-desc">Show the selected assets table. Say: <em>"Notice all Action dropdowns default to 🔵 In-Kind Transfer to Brokerage — the agent pre-sets the most appropriate action for this account. But the advisor can override any single row."</em> Change one row to 🔴 Sell — Cash Distribution.</div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>🔵 In-Kind Transfer to Brokerage = shares move unsold, client retains the investment</li>
+                <li>🔴 Sell — Cash Distribution = available as an override on any individual asset</li>
+                <li>🟡 Hold = exclude from this RMD cycle; other assets cover the shortfall</li>
+                <li>Watch RMD Coverage recalculate live when any action changes</li>
+              </ul></div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">4</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">AI Explanation — IRS Pub. 590-B Citations <span class="demo-where">← Dashboard Tab → AI Explanation</span></div>
+              <div class="demo-step-desc">Scroll to the AI Explanation panel. Say: <em>"For in-kind accounts the agent cites IRS Pub. 590-B — the definitive rule that allows shares to satisfy an RMD at fair market value without selling. Click the 📖 icon to go straight to the source."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>📖 IRS Pub. 590-B covers in-kind RMD rules — click to verify</li>
+                <li>Each line item in SELECTED and PROTECTED sections has its own relevant citation</li>
+                <li>Compliance team can trace every AI decision back to the exact IRS rule</li>
+              </ul></div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">5</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Execute &amp; Confirm Transfer <span class="demo-where">← Execute Selected Actions</span></div>
+              <div class="demo-step-desc">Click Execute. Show the confirmation panel. Say: <em>"Each row now shows 'Transfer Initiated' instead of 'Order Submitted' — the agent knows the difference between a sell and a transfer, and records it correctly for the audit trail."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Confirmation clearly distinguishes Transfer vs Sell vs Hold per asset</li>
+                <li>RMD Coverage panel opens automatically — confirms coverage post-submission</li>
+                <li>All decisions locked and timestamped for compliance</li>
+              </ul></div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">6</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Reinvestment — Products Available at the Brokerage <span class="demo-where">← Reinvestment Tab</span></div>
+              <div class="demo-step-desc">Show the reinvestment tab. Say: <em>"Even with an in-kind transfer, the agent suggests where to put any residual cash and how to optimize the taxable brokerage holdings. Municipal Bonds are highlighted — especially valuable because Robert just recognized income on the transferred FMV."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>⭐ Same Brokerage option for ETF and Bond products — no extra transfer</li>
+                <li>Click product icons to explain the product purpose to the audience</li>
+                <li>Tax-exempt muni income directly offsets the ordinary income from the in-kind distribution</li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Common Close -->
+        <div class="panel" style="margin-bottom:20px">
+          <div class="demo-track-header" style="background:#161b22;color:#e6edf3">🎯 Close — Business Value (Both Modes)</div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">★</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">AI Assistant — Any Question, Any Time <span class="demo-where">← 🤖 Bot Bubble (bottom-right)</span></div>
+              <div class="demo-step-desc">Click the bot bubble. Ask: <em>"Why was TSLA selected for this RMD?"</em> or <em>"What is an in-kind transfer?"</em> Show the context-aware response. Say: <em>"Robert can ask any question in plain English. The bot knows which account he's on, what the agent decided, and why."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>Context pre-loaded from the active tab — no manual copy-paste</li>
+                <li>💬 Discuss buttons on every asset row pass that asset's context directly to the bot</li>
+                <li>Reduces advisor call volume · Builds client self-service capability</li>
+              </ul></div>
+            </div>
+          </div>
+
+          <div class="demo-step">
+            <div class="demo-step-num">★</div>
+            <div class="demo-step-body">
+              <div class="demo-step-title">Business Value Tab — The Closing Argument <span class="demo-where">← Business Value Tab</span></div>
+              <div class="demo-step-desc">Show the feature pills, Before/After, and KPI grid. Say: <em>"This is not just a compliance tool. It is a client retention tool, a tax optimization engine, an advisor productivity multiplier — and a platform that can extend to every retirement planning scenario this firm handles."</em></div>
+              <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
+                <li>🤝 Human-in-the-Loop: agent recommends, advisor controls — not black-box automation</li>
+                <li>💰 Live tax recalculation: advisor sees financial impact of every override before executing</li>
+                <li>📋 IRS source citations: every decision is audit-ready and defensible</li>
+                <li>Scales to thousands of accounts · Same framework for Inherited IRAs, Roth conversions</li>
+                <li>Fully on-premises — no cloud dependency, no external data transfer, no vendor lock-in</li>
+              </ul></div>
+            </div>
+          </div>
         </div>
 
         <!-- Quick Cheat Sheet -->
-        <div class="panel">
+        <div class="panel" style="margin-bottom:20px">
           <div class="panel-title">📋 Quick Cheat Sheet — Key Numbers to Quote</div>
           <div class="cheat-grid">
-            <div class="cheat-card"><div class="cheat-val">$20,325</div><div class="cheat-label">Robert's Annual RMD (age 75, $500K IRA)</div></div>
-            <div class="cheat-card"><div class="cheat-val">$1,211</div><div class="cheat-label">Tax saved vs naive asset selection</div></div>
-            <div class="cheat-card"><div class="cheat-val">$862</div><div class="cheat-label">Annual income from reinvestment plan</div></div>
-            <div class="cheat-card"><div class="cheat-val">4 sec</div><div class="cheat-label">Full agent pipeline (vs 3 hrs manual)</div></div>
-            <div class="cheat-card"><div class="cheat-val">13</div><div class="cheat-label">Assets analyzed across 10 classes</div></div>
-            <div class="cheat-card"><div class="cheat-val">$0</div><div class="cheat-label">Total POC cost — 100% open source</div></div>
+            <div class="cheat-card"><div class="cheat-val">$20,325</div><div class="cheat-label">Robert's Annual RMD — Traditional IRA (age 75, $500K)</div></div>
+            <div class="cheat-card"><div class="cheat-val">$1,211</div><div class="cheat-label">Tax saved vs naive asset selection (24% bracket)</div></div>
+            <div class="cheat-card"><div class="cheat-val">$862</div><div class="cheat-label">Projected annual income from reinvestment plan</div></div>
+            <div class="cheat-card"><div class="cheat-val">2 modes</div><div class="cheat-label">Cash Distribution + In-Kind Transfer to Brokerage</div></div>
+            <div class="cheat-card"><div class="cheat-val">Live</div><div class="cheat-label">RMD Coverage &amp; Tax recalculates on every advisor override</div></div>
+            <div class="cheat-card"><div class="cheat-val">7</div><div class="cheat-label">IRS regulatory source citations — all clickable</div></div>
+            <div class="cheat-card"><div class="cheat-val">3</div><div class="cheat-label">Institution options per reinvestment product (incl. Same Bank)</div></div>
+            <div class="cheat-card"><div class="cheat-val">&lt;5s</div><div class="cheat-label">Full agent pipeline (vs 2–3 hrs manual per client)</div></div>
+            <div class="cheat-card"><div class="cheat-val">On-Prem</div><div class="cheat-label">Fully local — no cloud, no external API keys, no data transfer</div></div>
           </div>
         </div>
 
         <!-- Anticipated Questions -->
         <div class="panel" style="margin-top:20px">
-          <div class="panel-title">❓ Anticipated Questions & Answers</div>
+          <div class="panel-title">❓ Anticipated Questions &amp; Answers</div>
           <div class="qa-list">
             <div class="qa-item">
+              <div class="qa-q">What is the difference between Cash Distribution and In-Kind Transfer?</div>
+              <div class="qa-a">Cash Distribution (Sell): assets are sold inside the IRA and cash proceeds are wired to the client's bank account. In-Kind Transfer: actual shares move unsold from the IRA to a taxable brokerage account at fair market value — the client keeps the investment. Both methods satisfy the IRS RMD requirement per IRS Pub. 590-B. The agent selects the appropriate strategy based on client preference and can handle both within the same session.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">How does the live RMD recalculation work?</div>
+              <div class="qa-a">When the advisor changes any Action Select dropdown (Sell / Transfer / Hold), the app immediately recalculates how much of the RMD is covered by the remaining active assets. Hold excludes that asset's value from coverage. Both Sell and Transfer count toward the RMD. The RMD Coverage chart and plain-language status line update in real time — before the advisor submits — so they can see the impact of every override.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Why do the Tax Efficiency numbers change when I change an action?</div>
+              <div class="qa-a">The agent's tax savings come from selling loss positions first. If the advisor overrides a loss-making asset to Hold, that loss is no longer realized — reducing the tax offset. The Tax Efficiency panel recalculates the smart tax bill in real time using only the assets still marked Sell or Transfer, so the advisor immediately sees how much of the $1,211 savings they're giving up.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What are the source citation icons in the AI Explanation?</div>
+              <div class="qa-a">Each line in the AI Explanation has one or more clickable icons (📋💹🌱💰📖🔄⚠️) that link directly to the IRS or Investopedia page most relevant to that specific decision. For example, a line about tax-loss harvesting gets a 🌱 icon linking to Investopedia's tax-loss harvesting guide and a 💹 icon linking to IRS Topic 409. This gives compliance teams and clients a direct audit trail from the AI decision to the regulatory source.</div>
+            </div>
+            <div class="qa-item">
               <div class="qa-q">Is this using real money / real trades?</div>
-              <div class="qa-a">This POC uses Alpaca Paper Trading — a simulated environment. No real orders are placed. Production upgrade is straightforward: replace the paper trading API key with a live one.</div>
+              <div class="qa-a">This solution uses Alpaca Paper Trading — a simulated brokerage environment. No real orders are placed. The upgrade path to a live environment is straightforward: replace the paper trading API credentials with a live brokerage integration.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Where does the AI run — is client data going to the cloud?</div>
-              <div class="qa-a">The AI (Ollama/Phi-3) runs 100% locally on the machine. No client data leaves the server. The language model is downloaded once and runs offline.</div>
+              <div class="qa-q">Where does the AI run — does client data leave the firm?</div>
+              <div class="qa-a">The AI (Ollama/Phi-3) runs 100% locally on the machine. No client data is sent to any cloud service. The language model is downloaded once and runs fully offline — meeting the most stringent data residency requirements.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Can it handle multiple clients at once?</div>
-              <div class="qa-a">Yes — the agent is stateless per request. It can process multiple clients in parallel. The scheduler runs automatically for all eligible accounts.</div>
-            </div>
-            <div class="qa-item">
-              <div class="qa-q">What about regulatory compliance and audit trail?</div>
-              <div class="qa-a">Every agent decision is logged with timestamps in the Logs tab. The explanation of why each asset was selected is stored per client. Full audit trail is available for regulatory review.</div>
+              <div class="qa-q">Can advisors always override the agent?</div>
+              <div class="qa-a">Yes — by design. The agent recommends, the advisor decides. Every asset has an Action Select dropdown that the advisor can freely change before submitting. The system is built around human-in-the-loop: the agent does the analysis, the advisor retains full control and accountability. Nothing executes until the advisor clicks Execute.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">How accurate is the tax savings calculation?</div>
-              <div class="qa-a">The POC uses a 24% marginal tax rate as a baseline. In production, the actual client tax bracket and state taxes would be integrated from the firm's tax engine for precise calculations.</div>
+              <div class="qa-a">This solution uses a 24% marginal rate as a demonstration baseline. The actual client tax bracket, state taxes, and carryforward losses would be integrated from the firm's tax engine for precise per-client calculations.</div>
             </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FAQ TAB -->
+      <div id="tab-faq" class="tab-content">
+
+        <div class="bv-hero" style="margin-bottom:20px">
+          <div class="bv-hero-title">❓ Frequently Asked Questions</div>
+          <div class="bv-hero-sub">Everything advisors, compliance teams, and technology leaders ask about the Intelligent RMD Agent</div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">📋 RMD Rules &amp; Compliance</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">What is a Required Minimum Distribution (RMD)?</div>
+              <div class="qa-a">An RMD is the minimum amount the IRS requires you to withdraw from a Traditional IRA or employer-sponsored retirement plan each year, starting at age 73. The amount is calculated by dividing your prior year-end account balance by a life expectancy factor from the IRS Uniform Lifetime Table. Failure to take the full RMD triggers a 25% excise tax on the shortfall (reduced to 10% if corrected promptly). <a class="faq-link" href="https://www.irs.gov/retirement-plans/retirement-plans-faqs-regarding-required-minimum-distributions" target="_blank">IRS RMD FAQ ↗</a></div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">How does the agent calculate the RMD amount?</div>
+              <div class="qa-a">The agent uses the IRS Uniform Lifetime Table (the same table the IRS publishes in IRS Pub. 590-B). It divides the prior year-end IRA balance by the applicable distribution period factor for the client's age. For example, at age 75 the factor is 24.6 — so a $500,000 IRA requires a $20,325 withdrawal. The calculation is shown on the Dashboard and cited with a link to the IRS source.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What is the difference between Cash Distribution and In-Kind Transfer?</div>
+              <div class="qa-a"><strong>Cash Distribution (Sell):</strong> Assets are sold inside the IRA and cash proceeds are sent to the client's bank account. The distributed amount is taxed as ordinary income in the year of distribution.<br/><br/><strong>In-Kind Transfer:</strong> The actual shares (unsold) move from the IRA to the client's taxable brokerage account. The fair market value (FMV) on the transfer date counts toward the RMD and is taxed as ordinary income — but the client keeps the investment. The cost basis in the taxable account becomes the FMV on transfer date. This is explicitly permitted by IRS Pub. 590-B. <a class="faq-link" href="https://www.irs.gov/publications/p590b" target="_blank">IRS Pub. 590-B ↗</a></div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Does an In-Kind Transfer satisfy the full RMD requirement?</div>
+              <div class="qa-a">Yes — the FMV of the shares on the date of transfer counts toward the RMD, even though no shares are sold. The client still owes ordinary income tax on the FMV transferred. The advantage is the client retains the investment and does not realize any capital gain or loss at the time of transfer.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What happens if the RMD is not fully covered?</div>
+              <div class="qa-a">The RMD Coverage Analysis panel will show a ⚠️ shortfall in red with a plain-language warning. This can happen if the advisor sets too many assets to Hold. The IRS imposes a 25% excise tax on any shortfall (reduced to 10% if corrected within the correction window). The agent is designed to prevent this — but advisors can override, and the live recalculation makes any shortfall immediately visible.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">📊 Portfolio &amp; Analyst Intelligence</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Where do the analyst ratings and 12-month price targets come from?</div>
+              <div class="qa-a">The solution uses a curated analyst data library mapped to 28 common symbols, with ratings (Buy / Neutral / Underweight / Sell), 12-month price targets, market catalysts, and attributed research firms (e.g., Morgan Stanley, JPMorgan). In production these would be fed in real time from a third-party research data provider (Bloomberg, FactSet, Refinitiv).</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What does the 💬 Discuss button do?</div>
+              <div class="qa-a">Each 💬 Discuss button pre-loads that specific asset's context — symbol, analyst rating, gain/loss, agent recommendation, and rationale — into the AI bot. When you click it, the bot is already briefed and can immediately answer questions like "Should I override the agent's recommendation given this analyst outlook?" without you having to copy-paste any data.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Can the agent handle multiple IRA accounts for the same client?</div>
+              <div class="qa-a">Yes — the demo shows exactly this with Robert & Margaret Chen, who have two accounts: a Traditional IRA (Cash Distribution strategy) and a Rollover IRA (In-Kind Transfer strategy). Each account runs its own independent agent analysis. The Quick Select in the sidebar lets you switch between accounts instantly.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">🤝 Human-in-the-Loop &amp; Advisor Control</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Does the agent execute trades automatically without advisor approval?</div>
+              <div class="qa-a">No — by design. The agent analyzes and recommends. The advisor reviews every asset in the Action Select table (Sell / Transfer / Hold), overrides any row as needed, and must explicitly click <strong>Execute Selected Actions</strong> to submit. Nothing executes until the advisor approves. This is the human-in-the-loop architecture.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What happens when I change an action from Sell to Hold?</div>
+              <div class="qa-a">Two things update in real time before you submit: (1) The <strong>RMD Coverage Analysis</strong> recalculates — if you hold too much the chart shows a shortfall. (2) The <strong>Tax Efficiency</strong> panel recalculates — if you hold a loss position, the tax savings decrease because that loss is no longer offsetting gains. This gives advisors full visibility into the financial impact of their override before committing.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Can an advisor partially override — change some assets but accept others?</div>
+              <div class="qa-a">Yes — each asset row is independent. The advisor can change any subset of rows (e.g., change TSLA from Sell to Hold but leave all others as the agent recommended). The live recalculation reflects only the rows that were changed. The Execute button submits all rows in their current state.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">💰 Tax Efficiency &amp; Source Citations</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">What is tax-loss harvesting and how does the agent use it?</div>
+              <div class="qa-a">Tax-loss harvesting is the strategy of selling positions with unrealized losses to offset realized gains — reducing the overall tax bill. The agent scores every asset in the portfolio by its gain/loss position and selects loss-making or low-gain assets first. Compared to a naive approach (randomly selecting assets), this can save thousands of dollars per client per year. The Tax Efficiency panel shows the exact comparison side-by-side. <a class="faq-link" href="https://www.investopedia.com/terms/t/taxlossharvesting.asp" target="_blank">Investopedia ↗</a></div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What are the source citation icons in the AI Explanation?</div>
+              <div class="qa-a">Each line in the AI Explanation panel has one or more clickable icons linking to the regulatory or professional source most relevant to that specific decision:<br/>
+                📋 IRS RMD Rules &nbsp;·&nbsp; 📖 IRS Pub. 590-B (In-Kind) &nbsp;·&nbsp; 💹 IRS Topic 409 (Capital Gains) &nbsp;·&nbsp; 💰 IRS Tax Rate Tables &nbsp;·&nbsp; 🌱 Tax-Loss Harvesting (Investopedia) &nbsp;·&nbsp; 🔄 In-Kind Transfer Guide &nbsp;·&nbsp; ⚠️ RMD Penalty Rules<br/>
+                This gives compliance teams a direct audit trail from AI decision to regulatory source.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What tax rate does the agent use?</div>
+              <div class="qa-a">The POC uses a 24% marginal federal rate as a baseline. In production, the actual client tax bracket, applicable state tax, and carryforward losses would be integrated from the firm's tax engine for precise per-client calculations.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">🔒 Technology &amp; Data Privacy</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Does client data leave the firm's infrastructure?</div>
+              <div class="qa-a">No. The AI language model (Ollama/Phi-3) runs 100% locally on the server. No client data is sent to any external API or cloud service. The model is downloaded once and runs fully offline. This meets even the most stringent data residency and client confidentiality requirements.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Is this using real money or real brokerage accounts?</div>
+              <div class="qa-a">This solution uses Alpaca Paper Trading — a simulated brokerage environment with realistic market data. No real orders are placed and no real money is at risk. Moving to a live environment simply requires replacing the paper trading API credentials with live brokerage integration.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Is there a full audit trail of agent decisions?</div>
+              <div class="qa-a">Yes — every agent run logs the client, account, RMD amount, assets selected, rationale, and execution actions with timestamps. The Logs tab (accessible from the sidebar) shows the complete execution history. The AI Explanation panel preserves the full reasoning for each decision, with regulatory source citations, for compliance review.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Can this scale to thousands of clients?</div>
+              <div class="qa-a">Yes — the agent is stateless per request. Multiple accounts can be processed in parallel. The scheduler can automatically trigger runs for all eligible accounts on a defined schedule (daily, monthly, annually). No additional staff is needed as the client base grows.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">🔄 Strategy &amp; Edge Cases</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Can the advisor mix Cash and In-Kind in the same RMD run?</div>
+              <div class="qa-a">Yes — within the same run, the advisor can override individual assets. For example, if the agent defaults all rows to In-Kind Transfer, the advisor can change Asset A to Sell (Cash Distribution) and leave Asset B as Transfer. Both count toward the RMD. The RMD Coverage panel reflects the combined total immediately.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What if the client's portfolio doesn't have enough assets to cover the RMD?</div>
+              <div class="qa-a">The RMD Coverage Analysis panel shows the shortfall in red with the exact gap amount and a ⚠️ plain-language warning. In production the agent would escalate to the advisor and potentially suggest additional assets or partial liquidations. The agent covers this detection; automated escalation workflow is a planned enhancement.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What if the client's tax bracket is different from 24%?</div>
+              <div class="qa-a">This solution uses 24% as a demonstration baseline. The tax savings calculation is proportional — at a 32% bracket the tax savings from the same $1,211 gain offset would be even larger (~$1,614 saved). In production the exact marginal rate per client, including state tax and alternative minimum tax considerations, would be pulled from the firm's tax engine.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Does the agent consider wash sale rules when harvesting losses?</div>
+              <div class="qa-a">Wash sale awareness is a production enhancement. The agent demonstrates the tax-loss harvesting concept and quantifies the savings. In production, the agent would cross-check the 30-day wash sale window (IRS Section 1091) to ensure that recently purchased substantially identical securities do not disqualify the harvested loss.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-section">
+          <div class="faq-section-title">📈 Reinvestment &amp; Products</div>
+          <div class="qa-list">
+            <div class="qa-item">
+              <div class="qa-q">Why does the reinvestment tab show Same Bank options?</div>
+              <div class="qa-a">The agent is designed to keep assets within the firm's ecosystem wherever possible. The ⭐ Same Bank option on each product card represents the firm's own offering for that product type — no transfer is required, the relationship is maintained, and the firm retains the AUM. Two alternative institutions are shown for comparison and client choice transparency.</div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">Why are Municipal Bonds highlighted for RMD clients?</div>
+              <div class="qa-a">Municipal Bond interest income is exempt from federal income tax (and often state tax). RMD distributions are taxed as ordinary income — so a client who just took a large taxable RMD distribution is in a higher-than-normal tax situation that year. Investing some of the proceeds in tax-exempt muni bonds directly offsets that income tax impact. The agent specifically surfaces this for clients in the 22%+ bracket.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ABOUT TAB -->
+      <div id="tab-about" class="tab-content">
+
+        <div class="bv-hero" style="margin-bottom:24px">
+          <div class="bv-hero-title">ℹ️ About This Solution</div>
+          <div class="bv-hero-sub">Intelligent RMD Liquidation Agent · Built for Enterprise Asset Management</div>
+        </div>
+
+        <div class="panel" style="margin-bottom:20px">
+          <div class="panel-title">🎯 Purpose &amp; Vision</div>
+          <p style="font-size:13px;color:#c9d1d9;line-height:1.8;margin:0">
+            This solution demonstrates how <strong>Agentic AI</strong> can transform Required Minimum Distribution processing — one of the most compliance-critical, tax-sensitive, and operationally burdensome workflows in retail wealth management.<br/><br/>
+            The agent does not replace the advisor. It amplifies them — handling the analytical heavy lifting (RMD calculation, tax optimization, asset selection, reinvestment planning) while the advisor retains full control and accountability over every decision.<br/><br/>
+            The same agentic framework is designed to extend to Inherited IRAs, Roth conversions, retirement income planning, and beyond.
+          </p>
+        </div>
+
+        <!-- Team Introduction -->
+        <div class="panel" style="margin-bottom:24px">
+          <div class="panel-title">👥 Meet the Team</div>
+          <p style="font-size:13px;color:#8b949e;margin:0 0 20px;line-height:1.6">The people who designed, built, and delivered the Intelligent RMD Liquidation Agent.</p>
+          <div class="team-grid">
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member1.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">TM</div>
+              </div>
+              <div class="team-name">Team Member 1</div>
+              <div class="team-role">Role / Title</div>
+              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member2.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">TM</div>
+              </div>
+              <div class="team-name">Team Member 2</div>
+              <div class="team-role">Role / Title</div>
+              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member3.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">TM</div>
+              </div>
+              <div class="team-name">Team Member 3</div>
+              <div class="team-role">Role / Title</div>
+              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member4.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">TM</div>
+              </div>
+              <div class="team-name">Team Member 4</div>
+              <div class="team-role">Role / Title</div>
+              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member5.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">TM</div>
+              </div>
+              <div class="team-name">Team Member 5</div>
+              <div class="team-role">Role / Title</div>
+              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Platform Design & Architecture -->
+        <div class="panel" style="margin-top:4px">
+          <div class="panel-title collapsible-title" onclick="togglePanel('reqDocBody','reqDocChevron')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+            <span>🏗️ Platform Design &amp; Architecture</span>
+            <span id="reqDocChevron" style="font-size:12px;transition:transform 0.2s">▶</span>
+          </div>
+          <div id="reqDocBody" style="display:none">
+
+            <div style="text-align:right;margin-bottom:16px">
+              <a href="RMD_Architecture_Plan.html" target="_blank" style="font-size:12px;color:#58a6ff;text-decoration:none;font-weight:600">↗ Open Full Architecture Document</a>
+            </div>
+
+            <!-- Business Problem -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('bpBody','bpChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>🔴 Business Problem</span>
+                <span id="bpChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="bpBody">
+                <ul class="req-list">
+                  <li>IRS mandates annual RMDs after age 73 — failure triggers a <strong>25% excise tax</strong> on the undistributed amount.</li>
+                  <li>Poor asset selection generates unnecessary capital gains and tax drag — advisors typically pick randomly or by account size.</li>
+                  <li>Operations teams spend hours per account on manual calculations, trade tickets, and compliance documentation.</li>
+                  <li>Clients lack transparency — they don't know <em>why</em> specific assets were chosen for liquidation.</li>
+                  <li>RMD cash sitting in a checking account earns nothing — no reinvestment guidance is typically provided.</li>
+                  <li>The process does not scale without proportional staffing increases.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Spec-Driven Development -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('specBody','specChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>📐 Spec-Driven Development</span>
+                <span id="specChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="specBody">
+                <p class="req-text" style="margin-bottom:14px">This solution was built end-to-end using a <strong>Spec-Driven Development</strong> methodology — every feature was defined as a formal written specification before a single line of code was written. Requirements, architecture, API contracts, and user stories were all documented upfront, then implemented using <strong>Claude Code</strong> (Anthropic's AI coding agent) as the primary development tool.</p>
+                <div class="arch-mods-grid" style="margin-bottom:14px">
+                  <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">📋</div><div class="arch-mod-name">Requirements Spec</div><div class="arch-mod-sub">FR / NFR / REG requirements defined upfront with priority, acceptance criteria, and P1/P2 classification</div></div>
+                  <div class="arch-mod arch-mod-teal"><div class="arch-mod-icon">🏗️</div><div class="arch-mod-name">Architecture Spec</div><div class="arch-mod-sub">Layer diagram, API contracts, data models, and service boundaries fully documented before coding began</div></div>
+                  <div class="arch-mod arch-mod-green"><div class="arch-mod-icon">🧪</div><div class="arch-mod-name">Behaviour Spec</div><div class="arch-mod-sub">User stories and acceptance tests defined per feature — agent run, advisor override, execute, log, reinvest</div></div>
+                  <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Claude Code</div><div class="arch-mod-sub">Anthropic's AI coding agent — implemented the full stack from spec in days, not months</div></div>
+                </div>
+                <ul class="req-list" style="margin-bottom:12px">
+                  <li><strong>Traceability:</strong> Every feature maps to a named requirement — FR-01 → RMDService.java, FR-05 → human-in-loop dropdowns, FR-08 → AI explanation with source citations.</li>
+                  <li><strong>Claude Code:</strong> The entire Spring Boot backend, Vanilla JS frontend, and this dashboard were built spec-first using Claude Code as the AI development partner — dramatically accelerating delivery while maintaining production-quality output.</li>
+                  <li><strong>Change control:</strong> Every new feature (Advisory Intelligence strip, live recalculation, RAG planning) was added as a spec item first, then implemented — no undocumented scope creep.</li>
+                  <li><strong>Handover-ready:</strong> A new developer can read the spec and understand exactly what every service does and why — without reverse-engineering the code.</li>
+                  <li><strong>Enterprise alignment:</strong> The same spec serves as input to security review, compliance sign-off, and client-facing documentation.</li>
+                </ul>
+                <div class="req-highlight">Built with <strong>Claude Code (Anthropic)</strong> · Full-stack delivery in days using AI-assisted spec-driven development · Backend + Frontend + Documentation generated from formal specs</div>
+              </div>
+            </div>
+
+            <!-- Solution Overview -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('soBody','soChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>✅ Solution Overview</span>
+                <span id="soChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="soBody">
+                <ol class="req-list">
+                  <li>Calculates the IRS-mandated RMD amount using the Uniform Lifetime Table for the client's age and prior year-end balance.</li>
+                  <li>Analyzes the full portfolio across 10 asset classes — scores each asset for tax efficiency, gain/loss, and concentration risk.</li>
+                  <li>Selects assets with losses or underperformance first to minimize tax impact (<strong>tax-loss harvesting</strong>). Shows side-by-side savings vs naive random selection.</li>
+                  <li>Two execution modes: <strong>Cash Distribution</strong> (sell assets → transfer proceeds to client's bank) and <strong>In-Kind Transfer</strong> (move shares to taxable brokerage at FMV — no immediate sale).</li>
+                  <li><strong>Human-in-the-Loop:</strong> Advisor reviews every asset recommendation via Action Select dropdown (Sell / Transfer / Hold). Live RMD coverage and tax impact recalculate instantly on each change before submission.</li>
+                  <li>AI explanation panel with <strong>per-line IRS / Investopedia source citations</strong> (🌱💹💰📋 icons) for every selected and protected asset.</li>
+                  <li><strong>Advisory Intelligence strip</strong> below each panel — real-time market catalysts, AI signals, and firm product recommendations to support advisor decision-making.</li>
+                  <li>Reinvestment engine suggests 7 product types (HYSA, CD, T-Bills, Muni Bonds, Dividend ETF, Fixed Annuity, Money Market) with yield, risk, institution options, and annual income projection.</li>
+                  <li>Context-aware AI chatbot — reads the active tab and injects relevant context. 💬 Discuss buttons on asset rows pre-load that asset's rationale into the bot.</li>
+                  <li>Full audit trail: every agent run, advisor override, and execution action is timestamped and logged.</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- High-Level Architecture -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('archBody','archChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>🏗️ High-Level Architecture</span>
+                <span id="archChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="archBody">
+                <div class="arch-diag">
+
+                  <!-- CLIENT LAYER -->
+                  <div class="arch-diag-layer arch-dl-client">
+                    <div class="arch-diag-lhdr">
+                      <span class="arch-diag-ldot"></span>
+                      <span class="arch-diag-lname">CLIENT LAYER</span>
+                      <span class="arch-diag-lport">localhost:4500 · HTML5 / Chart.js</span>
+                    </div>
+                    <div class="arch-tab-chips">
+                      <span class="arch-tc">📊 Dashboard</span>
+                      <span class="arch-tc">📁 Portfolio</span>
+                      <span class="arch-tc">🎯 Agent Results</span>
+                      <span class="arch-tc">💡 Reinvestment</span>
+                      <span class="arch-tc">📈 Business Value</span>
+                      <span class="arch-tc">🎤 Demo Guide</span>
+                      <span class="arch-tc">❓ FAQ</span>
+                      <span class="arch-tc">👥 About Us</span>
+                    </div>
+                    <div class="arch-chatbot-bar">🤖 Floating AI Chatbot — tab-aware context · 💬 per-asset Discuss buttons · quick-question chips</div>
+                  </div>
+
+                  <!-- CONNECTOR REST API -->
+                  <div class="arch-diag-conn">
+                    <div class="arch-conn-track arch-conn-up">
+                      <div class="arch-conn-dot" style="animation-delay:0s"></div>
+                      <div class="arch-conn-dot" style="animation-delay:0.6s"></div>
+                    </div>
+                    <div class="arch-conn-mid">
+                      <div class="arch-conn-arrow arch-arr-up">▲</div>
+                      <div class="arch-conn-pill">REST API · JSON</div>
+                      <div class="arch-conn-arrow arch-arr-dn">▼</div>
+                    </div>
+                    <div class="arch-conn-track arch-conn-dn">
+                      <div class="arch-conn-dot" style="animation-delay:0.3s"></div>
+                      <div class="arch-conn-dot" style="animation-delay:0.9s"></div>
+                    </div>
+                  </div>
+
+                  <!-- ORCHESTRATION LAYER -->
+                  <div class="arch-diag-layer arch-dl-orch">
+                    <div class="arch-diag-lhdr">
+                      <span class="arch-diag-ldot"></span>
+                      <span class="arch-diag-lname">ORCHESTRATION LAYER — Master Agent</span>
+                      <span class="arch-diag-lport">localhost:8085 · Spring Boot 3.2 / Java 17</span>
+                    </div>
+                    <div class="arch-mods-grid">
+                      <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">📊</div><div class="arch-mod-name">RMD Engine</div><div class="arch-mod-sub">IRS Uniform Lifetime Table · age-based factor</div></div>
+                      <div class="arch-mod arch-mod-green"><div class="arch-mod-icon">📈</div><div class="arch-mod-name">Asset Ranker</div><div class="arch-mod-sub">Loss-first · tax scoring · concentration check</div></div>
+                      <div class="arch-mod arch-mod-orange"><div class="arch-mod-icon">💰</div><div class="arch-mod-name">Tax Optimizer</div><div class="arch-mod-sub">Naive vs smart · quantified savings</div></div>
+                      <div class="arch-mod arch-mod-teal"><div class="arch-mod-icon">💡</div><div class="arch-mod-name">Reinvestment Engine</div><div class="arch-mod-sub">7 product types · institution options</div></div>
+                      <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🧠</div><div class="arch-mod-name">Memory Service</div><div class="arch-mod-sub">Client history · decision audit trail</div></div>
+                      <div class="arch-mod arch-mod-gray"><div class="arch-mod-icon">📋</div><div class="arch-mod-name">Monitor / Logs</div><div class="arch-mod-sub">Timestamped agent actions · compliance log</div></div>
+                      <div class="arch-mod arch-mod-gold"><div class="arch-mod-icon">🔄</div><div class="arch-mod-name">Alpaca MCP</div><div class="arch-mod-sub">Trade execution · paper trading API</div></div>
+                      <div class="arch-mod arch-mod-red"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Ollama Chat</div><div class="arch-mod-sub">phi3 local AI · chat &amp; reinvest advice</div></div>
+                    </div>
+                  </div>
+
+                  <!-- CONNECTOR EXTERNAL APIs -->
+                  <div class="arch-diag-conn">
+                    <div class="arch-conn-track arch-conn-up">
+                      <div class="arch-conn-dot" style="animation-delay:0.15s"></div>
+                      <div class="arch-conn-dot" style="animation-delay:0.75s"></div>
+                    </div>
+                    <div class="arch-conn-mid">
+                      <div class="arch-conn-arrow arch-arr-up">▲</div>
+                      <div class="arch-conn-pill">External APIs</div>
+                      <div class="arch-conn-arrow arch-arr-dn">▼</div>
+                    </div>
+                    <div class="arch-conn-track arch-conn-dn">
+                      <div class="arch-conn-dot" style="animation-delay:0.45s"></div>
+                      <div class="arch-conn-dot" style="animation-delay:1.05s"></div>
+                    </div>
+                  </div>
+
+                  <!-- INTEGRATION LAYER -->
+                  <div class="arch-diag-layer arch-dl-integ">
+                    <div class="arch-diag-lhdr">
+                      <span class="arch-diag-ldot"></span>
+                      <span class="arch-diag-lname">INTEGRATION LAYER</span>
+                    </div>
+                    <div class="arch-integ-row">
+                      <div class="arch-integ-item"><div class="arch-integ-icon">📈</div><div class="arch-integ-name">Alpaca Paper Trading</div><div class="arch-integ-sub">Simulated trades · 3 IRA accounts</div></div>
+                      <div class="arch-integ-item"><div class="arch-integ-icon">📋</div><div class="arch-integ-name">IRS Life Expectancy Tables</div><div class="arch-integ-sub">RMD calculation · regulatory rules</div></div>
+                      <div class="arch-integ-item"><div class="arch-integ-icon">🤖</div><div class="arch-integ-name">Ollama / Phi-3</div><div class="arch-integ-sub">Port 11434 · fully local · no cloud</div></div>
+                      <div class="arch-integ-item"><div class="arch-integ-icon">💹</div><div class="arch-integ-name">Market Price Data</div><div class="arch-integ-sub">Live portfolio valuation</div></div>
+                    </div>
+                  </div>
+
+                  <!-- GOVERNANCE & SECURITY LAYER -->
+                  <div class="arch-gov-bar">
+                    <div class="arch-gov-title">
+                      <span class="arch-gov-dot"></span>
+                      🛡️ GOVERNANCE, SECURITY &amp; RESILIENCE GUARDRAILS
+                      <span style="font-size:10px;font-weight:500;color:#86efac;margin-left:8px">— applied across all layers</span>
+                    </div>
+                    <div class="arch-gov-grid">
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">🔐</div>
+                        <div class="arch-gov-name">Data Privacy</div>
+                        <div class="arch-gov-sub">All AI runs on-premises · no client data leaves the network · zero external API calls</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">📜</div>
+                        <div class="arch-gov-name">Regulatory Compliance</div>
+                        <div class="arch-gov-sub">Every decision traceable to IRS Pub. 590-B · SEC / FINRA audit-ready logs</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">🧑‍⚖️</div>
+                        <div class="arch-gov-name">Human-in-the-Loop</div>
+                        <div class="arch-gov-sub">No trade executes without advisor approval · override at any point before submission</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">🔑</div>
+                        <div class="arch-gov-name">Access Control</div>
+                        <div class="arch-gov-sub">API authentication on all endpoints · client data scoped by clientId · no cross-tenant exposure</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">📋</div>
+                        <div class="arch-gov-name">Audit Trail</div>
+                        <div class="arch-gov-sub">Timestamped log of every agent run, advisor override, and trade action · immutable records</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">⚡</div>
+                        <div class="arch-gov-name">Resilience</div>
+                        <div class="arch-gov-sub">Ollama AI timeout with instant rule-based fallback · stateless API · no single point of failure</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">🧩</div>
+                        <div class="arch-gov-name">Explainability</div>
+                        <div class="arch-gov-sub">Every asset decision backed by a clickable IRS / Investopedia citation · no black-box outcomes</div>
+                      </div>
+                      <div class="arch-gov-item">
+                        <div class="arch-gov-icon">📡</div>
+                        <div class="arch-gov-name">Observability</div>
+                        <div class="arch-gov-sub">Spring Boot Actuator health endpoints · real-time agent log viewer · prod path: Prometheus + Grafana</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Agent Execution Flow -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('flowBody','flowChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>⚙️ Agent Execution Flow — SENSE → THINK → PLAN → ACT → REPORT</span>
+                <span id="flowChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="flowBody">
+                <div class="req-flow">
+                  <div class="req-flow-step"><span class="req-step-num">1</span><div><strong>SENSE</strong> — Reads client age, IRA balance, portfolio (13 assets / 10 classes), market prediction, and advisor mode preference (cash / in-kind).</div></div>
+                  <div class="req-flow-step"><span class="req-step-num">2</span><div><strong>THINK</strong> — Calculates RMD via IRS Uniform Lifetime Table. Scores every asset: losses first, then underperformers, then concentrated positions. Generates analyst intelligence signals per asset.</div></div>
+                  <div class="req-flow-step"><span class="req-step-num">3</span><div><strong>PLAN</strong> — Allocates exact quantities to match the RMD. Runs naive vs optimised tax comparison. Generates 7 reinvestment suggestions and AI explanation with IRS source citations. All in parallel.</div></div>
+                  <div class="req-flow-step"><span class="req-step-num">4</span><div><strong>ACT (Human-in-the-Loop)</strong> — Advisor reviews per-asset recommendations, adjusts Action Select dropdowns, sees RMD coverage and tax impact update live, then approves. Agent executes via Alpaca Paper Trading API.</div></div>
+                  <div class="req-flow-step"><span class="req-step-num">5</span><div><strong>REPORT</strong> — Displays results across all tabs. Logs every action with timestamps. Injects full context into the floating AI chatbot for follow-up questions.</div></div>
+                </div>
+                <div class="req-highlight">Total runtime: ~4 seconds &nbsp;|&nbsp; Rule-based logic (RMD, tax, trade): &lt; 0.1s &nbsp;|&nbsp; Ollama AI advice (async, phi3): ~4s with instant rule-based fallback</div>
+              </div>
+            </div>
+
+            <!-- Technology Stack -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('techBody','techChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>🛠️ Technology Stack</span>
+                <span id="techChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="techBody">
+                <table class="req-table">
+                  <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+                  <tbody>
+                    <tr><td>Backend Runtime</td><td>Java 17 (OpenJDK)</td><td>JVM runtime</td></tr>
+                    <tr><td>Backend Framework</td><td>Spring Boot 3.2</td><td>REST APIs, dependency injection, scheduling, actuator</td></tr>
+                    <tr><td>Build Tool</td><td>Apache Maven 3.9.6</td><td>Compile, package, dependency management</td></tr>
+                    <tr><td>AI Runtime</td><td>Ollama — port 11434</td><td>Hosts LLM locally — no API key, no cloud data transfer</td></tr>
+                    <tr><td>AI Model</td><td>Phi-3 (Microsoft, 3.8B params)</td><td>Chat assistant and reinvestment advice (not agent decisions)</td></tr>
+                    <tr><td>Trading API</td><td>Alpaca Paper Trading</td><td>Simulated trade execution — 3 IRA accounts</td></tr>
+                    <tr><td>Frontend</td><td>HTML5 / CSS3 / Vanilla JS</td><td>Dashboard UI — no framework, no build step required</td></tr>
+                    <tr><td>Charts</td><td>Chart.js 4.5</td><td>Doughnut, bar, and horizontal bar charts</td></tr>
+                    <tr><td>Static Server</td><td>http-server (npx)</td><td>Serves frontend on port 4500</td></tr>
+                  </tbody>
+                </table>
+                <div class="req-highlight" style="margin-top:10px">🔒 Fully on-premises — no cloud APIs, no external data transfer, no vendor subscriptions. AI inference runs locally via Ollama.</div>
+              </div>
+            </div>
+
+            <!-- RAG & Organizational Tuning -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('ragBody','ragChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>🔍 RAG — Organizational Knowledge Tuning</span>
+                <span id="ragChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="ragBody">
+                <p class="req-text" style="margin-bottom:12px">The current agent uses <strong>Ollama / Phi-3</strong> as its base language model — a general-purpose LLM. <strong>Retrieval-Augmented Generation (RAG)</strong> is the next evolution: it wraps the LLM with your firm's own knowledge base so every AI answer is grounded in your specific policies, products, and compliance rules — not generic internet knowledge.</p>
+                <div class="arch-diag" style="margin-bottom:14px">
+                  <div class="arch-diag-layer arch-dl-client" style="padding:12px 16px">
+                    <div style="font-size:12px;font-weight:700;color:#79c0ff;margin-bottom:8px">1 — Advisor asks a question</div>
+                    <div style="font-size:12px;color:#c9d1d9">"What is our firm's recommendation for TSLA given the client's age and risk profile?"</div>
+                  </div>
+                  <div class="arch-diag-conn" style="height:36px">
+                    <div class="arch-conn-track arch-conn-dn" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0s"></div></div>
+                    <div class="arch-conn-mid"><div class="arch-conn-pill">Embed query → vector search</div></div>
+                    <div class="arch-conn-track arch-conn-dn" style="height:100%"></div>
+                  </div>
+                  <div class="arch-diag-layer arch-dl-orch" style="padding:12px 16px">
+                    <div style="font-size:12px;font-weight:700;color:#3fb950;margin-bottom:8px">2 — RAG Layer retrieves relevant firm documents</div>
+                    <div class="arch-integ-row" style="grid-template-columns:repeat(4,1fr)">
+                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📑</div><div class="arch-integ-name" style="font-size:11px">Investment Policy</div></div>
+                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">🏦</div><div class="arch-integ-name" style="font-size:11px">Product Catalog</div></div>
+                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">⚖️</div><div class="arch-integ-name" style="font-size:11px">Compliance Rules</div></div>
+                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📊</div><div class="arch-integ-name" style="font-size:11px">Research Reports</div></div>
+                    </div>
+                  </div>
+                  <div class="arch-diag-conn" style="height:36px">
+                    <div class="arch-conn-track arch-conn-dn" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0.3s"></div></div>
+                    <div class="arch-conn-mid"><div class="arch-conn-pill">Inject context → Phi-3</div></div>
+                    <div class="arch-conn-track arch-conn-up" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0s"></div></div>
+                  </div>
+                  <div class="arch-diag-layer arch-dl-integ" style="padding:12px 16px">
+                    <div style="font-size:12px;font-weight:700;color:#d29922;margin-bottom:6px">3 — Firm-grounded AI answer</div>
+                    <div style="font-size:12px;color:#c9d1d9">"Per our Q2 2026 equity research note, TSLA is rated Neutral with a 12-month target of $240. Given Robert's age 75 and conservative profile, our policy recommends limiting concentration to &lt;5% — the agent's Hold recommendation aligns with this."</div>
+                  </div>
+                </div>
+                <table class="req-table">
+                  <thead><tr><th>Knowledge Source</th><th>What RAG Enables</th></tr></thead>
+                  <tbody>
+                    <tr><td>Firm Investment Policy</td><td>AI answers cite your firm's asset allocation guidelines, not generic financial advice</td></tr>
+                    <tr><td>Proprietary Product Catalog</td><td>Reinvestment suggestions prioritize your firm's managed products over generic alternatives</td></tr>
+                    <tr><td>Compliance Rule Book</td><td>Agent flags suitability issues based on your specific regulatory obligations and client agreements</td></tr>
+                    <tr><td>Analyst Research Reports</td><td>Per-asset AI rationale references your internal analyst ratings, not public consensus</td></tr>
+                    <tr><td>Historical Client Decisions</td><td>Agent learns from past advisor overrides to improve future recommendations per client</td></tr>
+                  </tbody>
+                </table>
+                <div class="req-highlight" style="margin-top:10px">RAG stack: <strong>ChromaDB / Pinecone</strong> (vector store) · <strong>sentence-transformers</strong> (embedding model) · <strong>LangChain4j</strong> (Java RAG pipeline) — all can run fully on-premises alongside the existing Spring Boot backend.</div>
+              </div>
+            </div>
+
+            <!-- Scalability -->
+            <div class="req-section">
+              <div class="req-section-title collapsible-title" onclick="togglePanel('scaleBody','scaleChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>📡 Scalability &amp; Production Architecture</span>
+                <span id="scaleChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              </div>
+              <div id="scaleBody">
+                <table class="req-table" style="margin-bottom:12px">
+                  <thead><tr><th>Capability</th><th>Current State</th><th>Production Path</th></tr></thead>
+                  <tbody>
+                    <tr><td>API Design</td><td>Stateless REST — each request is fully self-contained</td><td>Horizontal scale behind load balancer (NGINX / AWS ALB) — no shared state conflicts</td></tr>
+                    <tr><td>Async Processing</td><td>Ollama AI runs in CompletableFuture async thread in parallel with tax analysis</td><td>Apache Kafka / RabbitMQ for batch nightly RMD runs across all accounts simultaneously</td></tr>
+                    <tr><td>Data Persistence</td><td>In-memory MemoryService</td><td>PostgreSQL for audit trail + Redis cache for portfolio state — multi-tenant with client isolation</td></tr>
+                    <tr><td>AI Layer</td><td>Single local Ollama / Phi-3 instance</td><td>Ollama cluster or swap model to Claude API / Azure OpenAI for higher throughput — zero code change (interface-based)</td></tr>
+                    <tr><td>Deployment</td><td>Single Windows machine, JAR + http-server</td><td>Docker containers + Kubernetes for orchestration — one Helm chart deploys the full stack</td></tr>
+                    <tr><td>Multi-Tenancy</td><td>3 accounts, 2 clients (demo data)</td><td>Firm-level tenant isolation — each client's data scoped by clientId in every service call</td></tr>
+                    <tr><td>Scheduling</td><td>Manual trigger (advisor runs agent)</td><td>Spring @Scheduled — auto-run RMD analysis for all eligible accounts on Dec 1 each year; email alerts for deadline risk</td></tr>
+                    <tr><td>Monitoring</td><td>Agent log endpoint /agent/logs</td><td>Prometheus metrics + Grafana dashboards — alert on failed executions, RMD shortfalls, API errors</td></tr>
+                  </tbody>
+                </table>
+                <div class="req-highlight">Design principle: <strong>stateless core, async AI, interface-abstracted integrations</strong> — the same codebase scales from a single advisor to thousands of accounts with no architectural rework.</div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -746,6 +1545,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20260605l"></script>
 </body>
 </html>
