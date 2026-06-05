@@ -1429,156 +1429,126 @@ hr { border-color: #21262d; margin: 16px 0; }
   padding: 10px 14px; font-size: 12.5px; color: #79c0ff; margin-top: 12px;
 }
 
-/* ── ARCH DIAGRAM ─────────────────────────────────────────────────── */
-.arch-diag { display:flex; flex-direction:column; gap:0; margin-top:12px; }
+/* ── ARCH DIAGRAM — black bg, blue boxes, white text, white arrows ── */
+.arch-diag {
+  display:flex; flex-direction:column; gap:0; margin-top:12px;
+  background:#000; border-radius:12px; padding:16px;
+}
 
-/* Layer boxes */
+/* Layer boxes — all blue, progressively lighter */
 .arch-diag-layer { border-radius:10px; padding:18px 20px; border-width:2px; border-style:solid; }
-.arch-dl-client {
-  background: linear-gradient(135deg, #0c1e3d 0%, #112852 100%);
-  border-color: #3b82f6;
-  box-shadow: 0 0 24px #3b82f620, inset 0 1px 0 #3b82f630;
-}
-.arch-dl-orch {
-  background: linear-gradient(135deg, #170d30 0%, #1e1040 100%);
-  border-color: #8b5cf6;
-  box-shadow: 0 0 24px #8b5cf620, inset 0 1px 0 #8b5cf630;
-}
-.arch-dl-integ {
-  background: linear-gradient(135deg, #1c1200 0%, #261a00 100%);
-  border-color: #f59e0b;
-  box-shadow: 0 0 24px #f59e0b20, inset 0 1px 0 #f59e0b30;
-}
+.arch-dl-client { background:#0d2357; border-color:#4a90d9; box-shadow:0 0 20px #4a90d930; }
+.arch-dl-orch   { background:#0a1c47; border-color:#3a7bc8; box-shadow:0 0 20px #3a7bc830; }
+.arch-dl-integ  { background:#071538; border-color:#2a6ab8; box-shadow:0 0 20px #2a6ab830; }
 
 /* Layer header */
 .arch-diag-lhdr { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
-.arch-diag-ldot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
-.arch-dl-client .arch-diag-ldot { background:#60a5fa; box-shadow:0 0 10px #60a5fa; animation:archPulse 2s ease-in-out infinite; }
-.arch-dl-orch   .arch-diag-ldot { background:#a78bfa; box-shadow:0 0 10px #a78bfa; animation:archPulse 2s ease-in-out infinite .5s; }
-.arch-dl-integ  .arch-diag-ldot { background:#fbbf24; box-shadow:0 0 10px #fbbf24; animation:archPulse 2s ease-in-out infinite 1s; }
-@keyframes archPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+.arch-diag-ldot { width:11px; height:11px; border-radius:50%; flex-shrink:0; background:#fff; box-shadow:0 0 10px #fff; animation:archPulse 2s ease-in-out infinite; }
+.arch-dl-orch .arch-diag-ldot  { animation-delay:.5s; }
+.arch-dl-integ .arch-diag-ldot { animation-delay:1s; }
+@keyframes archPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
 
-.arch-diag-lname { font-size:13px; font-weight:800; color:#f0f6ff; letter-spacing:.6px; text-transform:uppercase; }
-.arch-dl-client .arch-diag-lname { color:#93c5fd; }
-.arch-dl-orch   .arch-diag-lname { color:#c4b5fd; }
-.arch-dl-integ  .arch-diag-lname { color:#fcd34d; }
-.arch-diag-lport {
-  font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px;
-}
-.arch-dl-client .arch-diag-lport { color:#bfdbfe; background:#1e3a6e; border:1px solid #3b82f650; }
-.arch-dl-orch   .arch-diag-lport { color:#ddd6fe; background:#2e1065; border:1px solid #8b5cf650; }
-.arch-dl-integ  .arch-diag-lport { color:#fde68a; background:#451a03; border:1px solid #f59e0b50; }
+.arch-diag-lname { font-size:13px; font-weight:800; color:#fff; letter-spacing:.7px; text-transform:uppercase; }
+.arch-diag-lport { font-size:11px; font-weight:600; color:#fff; background:#ffffff18; border:1px solid #ffffff40; padding:3px 10px; border-radius:20px; }
 
 /* Tab chips */
 .arch-tab-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
-.arch-tc {
-  font-size:11px; font-weight:600; color:#bfdbfe;
-  background: linear-gradient(135deg, #1e3a6e, #1a3060);
-  border:1px solid #3b82f660; padding:4px 12px; border-radius:14px;
-}
+.arch-tc { font-size:11px; font-weight:600; color:#fff; background:#ffffff18; border:1px solid #ffffff40; padding:4px 12px; border-radius:14px; }
 .arch-chatbot-bar {
-  font-size:12px; font-weight:500; color:#93c5fd;
-  background: linear-gradient(90deg, #1e3a6e50, #1a306050);
-  border:1px solid #3b82f640; border-radius:8px;
-  padding:8px 14px; margin-top:4px;
-  display:flex; align-items:center; gap:8px;
+  font-size:12px; font-weight:500; color:#fff;
+  background:#ffffff12; border:1px solid #ffffff30;
+  border-radius:8px; padding:8px 14px; margin-top:4px;
 }
 
 /* Connectors */
-.arch-diag-conn { display:flex; align-items:stretch; justify-content:center; height:60px; gap:12px; padding:0 30px; }
-.arch-conn-track { width:3px; position:relative; overflow:hidden; border-radius:2px; flex-shrink:0; }
-.arch-conn-up { background:linear-gradient(to top, #60a5fa, #60a5fa20); }
-.arch-conn-dn { background:linear-gradient(to bottom, #a78bfa, #a78bfa20); }
-.arch-conn-dot { position:absolute; width:8px; height:8px; border-radius:50%; left:-2.5px; }
-.arch-conn-up .arch-conn-dot { background:#60a5fa; box-shadow:0 0 10px #60a5fa, 0 0 20px #60a5fa80; animation:dotUp 1.4s linear infinite; }
-.arch-conn-dn .arch-conn-dot { background:#a78bfa; box-shadow:0 0 10px #a78bfa, 0 0 20px #a78bfa80; animation:dotDn 1.4s linear infinite; }
+.arch-diag-conn { display:flex; align-items:stretch; justify-content:center; height:60px; gap:12px; padding:0 30px; background:#000; }
+.arch-conn-track { width:3px; position:relative; overflow:hidden; border-radius:2px; flex-shrink:0; background:#ffffff30; }
+.arch-conn-dot { position:absolute; width:8px; height:8px; border-radius:50%; left:-2.5px; background:#fff; box-shadow:0 0 10px #fff, 0 0 20px #fff8; }
+.arch-conn-up .arch-conn-dot { animation:dotUp 1.4s linear infinite; }
+.arch-conn-dn .arch-conn-dot { animation:dotDn 1.4s linear infinite; }
 @keyframes dotUp { 0%{top:calc(100% + 8px);opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{top:-8px;opacity:0} }
 @keyframes dotDn { 0%{top:-8px;opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{top:calc(100% + 8px);opacity:0} }
 
 .arch-conn-mid { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; flex:1; max-width:180px; }
-.arch-conn-pill {
-  font-size:11px; font-weight:700; color:#e2e8f0;
-  background: linear-gradient(90deg, #1e293b, #1e2d47);
-  border:1px solid #334155; padding:4px 14px; border-radius:20px;
-  letter-spacing:.3px; white-space:nowrap; box-shadow:0 2px 8px #00000040;
-}
-.arch-conn-arrow { font-size:10px; line-height:1; }
-.arch-arr-up { color:#60a5fa; }
-.arch-arr-dn { color:#a78bfa; }
+.arch-conn-pill { font-size:11px; font-weight:700; color:#fff; background:#1a3a6a; border:1px solid #4a90d9; padding:4px 14px; border-radius:20px; letter-spacing:.3px; white-space:nowrap; }
+.arch-conn-arrow { font-size:10px; line-height:1; color:#fff; }
+.arch-arr-up { color:#fff; }
+.arch-arr-dn { color:#fff; }
 
-/* Module grid */
+/* Module grid — all blue, white text */
 .arch-mods-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
 .arch-mod {
-  border-radius:8px; padding:12px 14px; border:1px solid;
-  display:flex; flex-direction:column; gap:4px;
-  transition: transform .15s ease, box-shadow .15s ease;
+  background:#1a3a6a; border:1px solid #4a90d9; border-radius:8px;
+  padding:12px 14px; color:#fff; display:flex; flex-direction:column; gap:4px;
+  transition:transform .15s ease, box-shadow .15s ease;
+  animation:mPulseB 3.5s ease-in-out infinite;
 }
-.arch-mod:hover { transform:translateY(-2px); }
+.arch-mod:hover { transform:translateY(-2px); box-shadow:0 0 18px #4a90d970; }
 .arch-mod-icon { font-size:22px; line-height:1; margin-bottom:2px; }
-.arch-mod-name { font-size:12px; font-weight:700; }
-.arch-mod-sub  { font-size:10.5px; line-height:1.5; opacity:.8; }
+.arch-mod-name { font-size:12px; font-weight:700; color:#fff; }
+.arch-mod-sub  { font-size:10.5px; color:#ffffffcc; line-height:1.5; }
 
-.arch-mod-blue   { background:linear-gradient(135deg,#1e3a8a,#1e40af); border-color:#3b82f6; color:#bfdbfe; animation:mPulse 3.5s ease-in-out infinite 0s; }
-.arch-mod-green  { background:linear-gradient(135deg,#14532d,#166534); border-color:#22c55e; color:#bbf7d0; animation:mPulse 3.5s ease-in-out infinite .3s; }
-.arch-mod-orange { background:linear-gradient(135deg,#7c2d12,#9a3412); border-color:#f97316; color:#fed7aa; animation:mPulse 3.5s ease-in-out infinite .6s; }
-.arch-mod-teal   { background:linear-gradient(135deg,#134e4a,#115e59); border-color:#14b8a6; color:#99f6e4; animation:mPulse 3.5s ease-in-out infinite .9s; }
-.arch-mod-purple { background:linear-gradient(135deg,#4c1d95,#5b21b6); border-color:#a78bfa; color:#ddd6fe; animation:mPulse 3.5s ease-in-out infinite 1.2s; }
-.arch-mod-gray   { background:linear-gradient(135deg,#1e293b,#263347); border-color:#64748b; color:#cbd5e1; animation:mPulse 3.5s ease-in-out infinite 1.5s; }
-.arch-mod-gold   { background:linear-gradient(135deg,#78350f,#92400e); border-color:#f59e0b; color:#fde68a; animation:mPulse 3.5s ease-in-out infinite 1.8s; }
-.arch-mod-red    { background:linear-gradient(135deg,#881337,#9f1239); border-color:#f43f5e; color:#fecdd3; animation:mPulse 3.5s ease-in-out infinite 2.1s; }
+/* stagger the pulse per card using nth-child */
+.arch-mods-grid .arch-mod:nth-child(1) { animation-delay:0s; }
+.arch-mods-grid .arch-mod:nth-child(2) { animation-delay:.3s; }
+.arch-mods-grid .arch-mod:nth-child(3) { animation-delay:.6s; }
+.arch-mods-grid .arch-mod:nth-child(4) { animation-delay:.9s; }
+.arch-mods-grid .arch-mod:nth-child(5) { animation-delay:1.2s; }
+.arch-mods-grid .arch-mod:nth-child(6) { animation-delay:1.5s; }
+.arch-mods-grid .arch-mod:nth-child(7) { animation-delay:1.8s; }
+.arch-mods-grid .arch-mod:nth-child(8) { animation-delay:2.1s; }
 
-.arch-mod-blue .arch-mod-name   { color:#93c5fd; }
-.arch-mod-green .arch-mod-name  { color:#86efac; }
-.arch-mod-orange .arch-mod-name { color:#fb923c; }
-.arch-mod-teal .arch-mod-name   { color:#5eead4; }
-.arch-mod-purple .arch-mod-name { color:#c4b5fd; }
-.arch-mod-gray .arch-mod-name   { color:#94a3b8; }
-.arch-mod-gold .arch-mod-name   { color:#fcd34d; }
-.arch-mod-red .arch-mod-name    { color:#fb7185; }
+/* remove old color variants (all use same blue now) */
+.arch-mod-blue,.arch-mod-green,.arch-mod-orange,.arch-mod-teal,
+.arch-mod-purple,.arch-mod-gray,.arch-mod-gold,.arch-mod-red {
+  background:#1a3a6a; border-color:#4a90d9; color:#fff;
+  animation:mPulseB 3.5s ease-in-out infinite;
+}
+.arch-mod-blue .arch-mod-name,.arch-mod-green .arch-mod-name,
+.arch-mod-orange .arch-mod-name,.arch-mod-teal .arch-mod-name,
+.arch-mod-purple .arch-mod-name,.arch-mod-gray .arch-mod-name,
+.arch-mod-gold .arch-mod-name,.arch-mod-red .arch-mod-name { color:#fff; }
 
-@keyframes mPulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 16px currentColor} }
+@keyframes mPulseB { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 14px #4a90d960; border-color:#7ab8f5;} }
 
-/* Integration items */
+/* Integration items — blue boxes, white text */
 .arch-integ-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
 .arch-integ-item {
-  background: linear-gradient(135deg,#1c1400,#261a00);
-  border:1.5px solid #f59e0b60; border-radius:8px;
+  background:#1a3a6a; border:1.5px solid #4a90d9; border-radius:8px;
   padding:14px 12px; text-align:center;
-  transition:transform .15s ease;
+  transition:transform .15s ease, box-shadow .15s ease;
 }
-.arch-integ-item:hover { transform:translateY(-2px); border-color:#f59e0b; }
+.arch-integ-item:hover { transform:translateY(-2px); box-shadow:0 0 16px #4a90d960; }
 .arch-integ-icon { font-size:24px; margin-bottom:6px; }
-.arch-integ-name { font-size:12px; font-weight:700; color:#fcd34d; margin-bottom:3px; }
-.arch-integ-sub  { font-size:10.5px; color:#d97706; line-height:1.4; }
+.arch-integ-name { font-size:12px; font-weight:700; color:#fff; margin-bottom:3px; }
+.arch-integ-sub  { font-size:10.5px; color:#ffffffb0; line-height:1.4; }
 
-/* Governance bar */
+/* Governance bar — blue, white text */
 .arch-gov-bar {
   margin-top:10px; border-radius:10px; padding:16px 20px;
-  background: linear-gradient(135deg, #0a1f0a 0%, #0f2a14 100%);
-  border:2px solid #22c55e;
-  box-shadow: 0 0 28px #22c55e18, inset 0 1px 0 #22c55e30;
+  background:#0a2050; border:2px solid #4a90d9;
+  box-shadow:0 0 24px #4a90d930;
 }
 .arch-gov-title {
   display:flex; align-items:center; gap:8px;
-  font-size:12px; font-weight:800; color:#86efac;
+  font-size:12px; font-weight:800; color:#fff;
   letter-spacing:.5px; text-transform:uppercase;
   margin-bottom:14px; flex-wrap:wrap;
 }
 .arch-gov-dot {
   width:10px; height:10px; border-radius:50%; flex-shrink:0;
-  background:#22c55e; box-shadow:0 0 10px #22c55e;
+  background:#fff; box-shadow:0 0 10px #fff;
   animation:archPulse 2s ease-in-out infinite 0.3s;
 }
 .arch-gov-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
 .arch-gov-item {
-  background: linear-gradient(135deg,#0f2e12,#122e16);
-  border:1px solid #22c55e40; border-radius:8px; padding:10px 12px;
-  transition:transform .15s ease, border-color .15s ease;
+  background:#1a3a6a; border:1px solid #4a90d9; border-radius:8px; padding:10px 12px;
+  transition:transform .15s ease, box-shadow .15s ease;
 }
-.arch-gov-item:hover { transform:translateY(-2px); border-color:#22c55e; }
+.arch-gov-item:hover { transform:translateY(-2px); box-shadow:0 0 14px #4a90d960; }
 .arch-gov-icon { font-size:20px; margin-bottom:5px; }
-.arch-gov-name { font-size:11.5px; font-weight:700; color:#86efac; margin-bottom:3px; }
-.arch-gov-sub  { font-size:10.5px; color:#4ade8090; line-height:1.45; }
+.arch-gov-name { font-size:11.5px; font-weight:700; color:#fff; margin-bottom:3px; }
+.arch-gov-sub  { font-size:10.5px; color:#ffffffb0; line-height:1.45; }
 
 @media (max-width:1000px) {
   .arch-mods-grid { grid-template-columns:repeat(2,1fr); }
