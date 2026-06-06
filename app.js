@@ -1285,9 +1285,9 @@ function renderReinvestment(r, age) {
   const totalIncome = scaledSuggestions.reduce((t, s) => t + s.annualIncome, 0);
 
   // Flow boxes
-  const flowIraLbl = document.getElementById('flow-ira-label');
-  if (flowIraLbl) flowIraLbl.textContent = `${clientName} · ${acctCount} IRA Account${acctCount > 1 ? 's' : ''}`;
-  document.getElementById('flow-rmd-amt').textContent    = fmtBal(rmd);
+  // Use live total allocated (cash+IK+QCD) from RMD Advice — stays in sync with s4-alloc
+  const allocatedRmd = Object.values(rmdActionState).filter(s => s.cur !== 'hold').reduce((t, s) => t + s.value, 0);
+  document.getElementById('flow-rmd-amt').textContent    = fmtBal(allocatedRmd || rmd);
   document.getElementById('flow-bank-amt').textContent   = fmtBal(cashToBank);
   document.getElementById('flow-income-amt').textContent = fmtBal(totalIncome) + ' / yr income';
 
