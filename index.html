@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RMD Intelligent Agent</title>
+  <title>Financial Advisor — RMD Platform</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css?v=20260605y"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="style.css?v=20260606m"/>
 </head>
 <body>
 
@@ -16,8 +18,8 @@
         <div class="coin-inner">$</div>
       </div>
       <div>
-        <div class="logo">RMD Intelligent Agent</div>
-        <span class="tagline">Autonomous IRA Required Minimum Distribution Platform</span>
+        <div class="logo">Financial Advisor</div>
+        <span class="tagline">AI-Powered Insights for Smarter Client Decisions</span>
       </div>
     </div>
     <div class="header-right">
@@ -50,36 +52,6 @@
       <div class="field-error" id="err-account"></div>
       <input type="hidden" id="clientId" value=""/>
 
-      <div class="form-group" id="field-age">
-        <label>Client Age</label>
-        <input type="number" id="age" placeholder="e.g. 75" min="70" max="100"
-               oninput="clearFieldError('field-age')"/>
-        <div class="field-error" id="err-age"></div>
-      </div>
-      <div class="form-group" id="field-balance">
-        <label>IRA Balance ($)</label>
-        <input type="number" id="balance" placeholder="e.g. 500000" step="1000"
-               oninput="clearFieldError('field-balance')"/>
-        <div class="field-error" id="err-balance"></div>
-      </div>
-      <div class="form-group" id="field-preference">
-        <label>Distribution Preference</label>
-        <select id="preference" onchange="clearFieldError('field-preference')">
-          <option value="">— Select preference —</option>
-          <option value="sell">Cash — Sell Assets</option>
-          <option value="in_kind">In-Kind Transfer</option>
-        </select>
-        <div class="field-error" id="err-preference"></div>
-      </div>
-
-      <div class="run-btn-wrap">
-        <button class="btn-circle" id="runBtn" onclick="runAgent()">
-          <span class="btn-circle-icon" id="runBtnIcon">⚡</span>
-          <span class="btn-circle-spinner" id="runBtnSpinner" style="display:none"></span>
-        </button>
-        <div class="btn-circle-label" id="runBtnLabel">Optimize &amp; Execute</div>
-      </div>
-      <button class="btn-secondary" onclick="loadPortfolio()">↻ Refresh Portfolio</button>
 
       <hr/>
 
@@ -91,8 +63,14 @@
         <button class="tag-btn" onclick="selectClient('client_004')">P. Kim · $1.2M</button>
       </div>
 
-      <div style="margin-top:auto;padding-top:20px;border-top:1px solid #21262d;margin-top:24px">
-        <button class="btn-secondary" id="logsToggleBtn" onclick="toggleLogsTab()" style="width:100%;font-size:11px">📋 View Agent Logs</button>
+      <div style="margin-top:auto;padding-top:20px;border-top:1px solid #21262d;margin-top:24px;display:flex;flex-direction:column;gap:5px">
+        <button class="nav-tab-btn" onclick="showTab('value', null)">📈 Business Value</button>
+        <button class="nav-tab-btn" onclick="showTab('demo', null)">🎤 Demo Guide</button>
+        <button class="nav-tab-btn" onclick="showTab('faq', null)">❓ FAQ</button>
+        <button class="nav-tab-btn" onclick="showTab('about', null)">👥 About Us</button>
+        <button class="nav-tab-btn" id="logsToggleBtn" onclick="toggleLogsTab()">📋 View Agent Logs</button>
+        <div style="border-top:1px solid #21262d;margin:6px 0"></div>
+        <a href="http://localhost:4500/admin.html" target="_blank" class="nav-tab-btn nav-tab-admin">⚙️ Admin</a>
       </div>
     </aside>
 
@@ -103,74 +81,94 @@
       <div class="tabs">
         <button class="tab active" onclick="showTab('dashboard', this)">Dashboard</button>
         <button class="tab" onclick="showTab('portfolio', this)">Portfolio</button>
-        <button class="tab" onclick="showTab('results', this)">Agent Results</button>
+        <button class="tab" id="tab-btn-results" onclick="showTab('results', this)">RMD Advice</button>
         <button class="tab" onclick="showTab('reinvest', this)">Reinvestment</button>
-        <button class="tab" onclick="showTab('value', this)">Business Value</button>
-        <button class="tab demo-tab" onclick="showTab('demo', this)">Demo Guide</button>
-        <button class="tab" onclick="showTab('faq', this)">FAQ</button>
-        <button class="tab" onclick="showTab('about', this)">About Us</button>
       </div>
 
       <!-- DASHBOARD TAB -->
       <div id="tab-dashboard" class="tab-content active">
-        <div class="cards-row">
+
+        <!-- Account Summary Cards — populated on account select -->
+        <div class="acct-summary-notice" id="acctSummaryNotice">
+          Select a client and account to view account summary
+        </div>
+
+        <div class="cards-row" id="summaryCards" style="display:none">
           <div class="card">
-            <div class="card-label">Required Minimum Distribution</div>
-            <div class="card-value" id="rmdValue">—</div>
-            <div class="card-sub">Annual IRS-mandated withdrawal</div>
+            <div class="card-label">Total Asset Value</div>
+            <div class="card-value" id="cardTotalAsset">—</div>
+            <div class="card-sub">All holdings at market value</div>
           </div>
           <div class="card">
-            <div class="card-label">Distribution Method</div>
-            <div class="card-value" id="strategyValue">—</div>
-            <div class="card-sub" id="strategySubLabel">Client-selected preference</div>
+            <div class="card-label">Available Cash</div>
+            <div class="card-value" id="cardAvailCash">—</div>
+            <div class="card-sub">Uninvested cash balance</div>
           </div>
           <div class="card">
-            <div class="card-label">Total Liquidated</div>
-            <div class="card-value" id="totalValue">—</div>
-            <div class="card-sub">Market value of selected assets</div>
+            <div class="card-label">12/31 Fair Market Value</div>
+            <div class="card-value" id="cardFmv">—</div>
+            <div class="card-sub">Prior year-end IRS FMV basis</div>
           </div>
           <div class="card">
-            <div class="card-label">Assets Selected</div>
-            <div class="card-value" id="assetsCount">—</div>
-            <div class="card-sub">Holdings chosen for distribution</div>
+            <div class="card-label">Current Year RMD</div>
+            <div class="card-value" id="cardCurRmd">—</div>
+            <div class="card-sub" id="cardCurRmdSub">IRS Uniform Lifetime Table</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Current Year Distribution</div>
+            <div class="card-value" id="cardCurDist">—</div>
+            <div class="card-sub" id="cardCurDistSub">Year-to-date taken</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Prior Year RMD</div>
+            <div class="card-value" id="cardPriorRmd">—</div>
+            <div class="card-sub">2024 required amount</div>
+          </div>
+          <div class="card">
+            <div class="card-label">Prior Year Distribution</div>
+            <div class="card-value" id="cardPriorDist">—</div>
+            <div class="card-sub" id="cardPriorDistSub">2024 actual taken</div>
           </div>
         </div>
 
-        <!-- Distribution Method Legend -->
-        <div class="method-legend">
-          <div class="method-legend-item">
-            <div class="method-dot cash"></div>
-            <div>
-              <div class="method-legend-title">Cash Sale</div>
-              <div class="method-legend-desc">Selected assets are <strong>sold</strong>. Cash proceeds distributed to client's bank account. Best when client needs funds for living expenses.</div>
-            </div>
-          </div>
-          <div class="method-legend-divider"></div>
-          <div class="method-legend-item">
-            <div class="method-dot inkind"></div>
-            <div>
-              <div class="method-legend-title">In-Kind Transfer</div>
-              <div class="method-legend-desc">Selected <strong>shares are moved</strong> from IRA to a taxable brokerage — no selling. Client stays invested and retains market exposure while satisfying the RMD.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="two-col">
-          <div class="panel">
-            <div class="panel-title">Portfolio Allocation</div>
-            <div style="display:flex;justify-content:center;">
-              <div style="position:relative;width:260px;height:380px">
-                <canvas id="portfolioChart"></canvas>
+        <!-- Financial Advisor panel -->
+        <div class="fa-panel">
+          <div class="fa-panel-label">Financial Advisors</div>
+          <div class="fa-panel-divider"></div>
+          <div class="fa-panel-actions">
+            <div class="fa-action">
+              <div class="btn-circle fa-btn" id="runBtn" onclick="runAgent()">
+                <span class="btn-circle-spinner" id="runBtnSpinner" style="display:none"></span>
+                <span class="fa-btn-inner-label" id="runBtnLabel">RMD Advisor</span>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="two-col" id="dashTwoCol" style="display:none">
           <div class="panel">
-            <div class="panel-title">AI Agent Explanation</div>
-            <div class="explanation-box" id="explanationBox">
-              Run the agent to see the AI-generated explanation of why specific assets were selected and which strategy was chosen.
+            <div class="panel-title">Client Holdings</div>
+            <div style="display:flex;justify-content:center;">
+              <div style="position:relative;width:240px;height:280px">
+                <canvas id="portfolioChart"></canvas>
+              </div>
             </div>
-            <div class="reasoning-box" id="reasoningBox"></div>
-            <div id="sourcesBox"></div>
+            <!-- Holdings allocation table -->
+            <table class="alloc-table" id="allocTable">
+              <thead>
+                <tr><th>Holding</th><th>Asset Class</th><th style="text-align:right">Value</th><th style="text-align:right">Weight</th></tr>
+              </thead>
+              <tbody id="allocBody">
+                <tr><td colspan="4" class="empty">Select an account to view holdings</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Highlights of Client Holdings</div>
+            <div class="holdings-highlights-sub">Top 5 positions by market value · Select accounts to update</div>
+            <div id="holdingsHighlights">
+              <div class="highlights-placeholder">Select a client account to see holding highlights</div>
+            </div>
           </div>
         </div>
 
@@ -233,7 +231,7 @@
               </tr>
             </thead>
             <tbody id="holdingsBody">
-              <tr><td colspan="13" class="empty">Run the agent to load portfolio data</td></tr>
+              <tr><td colspan="13" class="empty">Select a client and account to view holdings</td></tr>
             </tbody>
           </table>
           </div>
@@ -248,104 +246,173 @@
 
       <!-- RESULTS TAB -->
       <div id="tab-results" class="tab-content">
-        <div class="panel">
-          <div class="panel-title">Assets Selected for RMD Liquidation</div>
-          <div class="holdings-scroll">
-          <table class="data-table">
+        <div id="rmdAdviceDebug" style="padding:8px 12px;margin-bottom:12px;background:#1a1030;border:1px solid #a78bfa;border-radius:6px;font-size:12px;color:#a78bfa;display:none"></div>
+
+        <!-- SUCCESS BANNER -->
+        <div id="rmdSuccessBanner" class="rmd-success-banner" style="display:none">
+          <strong>✓ All 6 agents complete</strong>
+          <span>·</span>
+          <span id="bannerStrategy">Advisor selected optimal strategy</span>
+          <span>·</span>
+          <span id="bannerClient">—</span>
+          <span>·</span>
+          <span id="bannerRmd" style="color:#7EC8F5;font-weight:700">—</span>
+        </div>
+
+        <!-- 4 HORIZONTAL PANELS -->
+        <div class="s4-top">
+
+          <!-- Panel 0: Client Holdings Summary -->
+          <div class="s4-panel">
+            <div class="s4-phdr">Client Holdings Summary <span id="s4-client-span">—</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1">
+              <div class="s4-kpi"><div class="s4-kpi-val kv-b" id="s4-total-val">—</div><div class="s4-kpi-lbl">Total Asset Value</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val" style="color:#ffffff" id="s4-cash-val">—</div><div class="s4-kpi-lbl">Available Cash</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val" style="color:#ffffff" id="s4-fmv-val">—</div><div class="s4-kpi-lbl">12/31 FMV</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-b" id="s4-rmd-val">—</div><div class="s4-kpi-lbl">Current Year RMD</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-dist-val">$0</div><div class="s4-kpi-lbl">Cur Year Distribution</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val" id="s4-qcd-budget" style="color:#4ade80">—</div><div class="s4-kpi-lbl">QCD Budget (<span id="s4-qcd-pct">5</span>%)</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-rmd-status">Pending ▶</div><div class="s4-kpi-lbl" id="s4-rmd-status-lbl">RMD Status</div></div>
+            </div>
+          </div>
+
+          <!-- Panel 1: Optimization Summary -->
+          <div class="s4-panel">
+            <div class="s4-phdr">RMD Optimization Summary <span>6 agents · auto strategy</span></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:1">
+              <div class="s4-kpi"><div class="s4-kpi-val kv-b" id="s4-alloc">—</div><div class="s4-kpi-lbl">Total Allocated</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-r" id="s4-tax">—</div><div class="s4-kpi-lbl">Est. Fed Tax</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-saved">—</div><div class="s4-kpi-lbl">Saved vs All-Cash</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-p" id="s4-assets-cnt">—</div><div class="s4-kpi-lbl">Assets Selected</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val" style="color:#ffffff" id="s4-holdings-cnt">—</div><div class="s4-kpi-lbl">Holdings Reviewed</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-irmaa">Safe ✓</div><div class="s4-kpi-lbl">IRMAA Status</div></div>
+            </div>
+          </div>
+
+          <!-- Panel 2: Distribution Mix -->
+          <div class="s4-panel">
+            <div class="s4-phdr">Distribution Mix <span>Agent-determined</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div class="s4-stacked">
+                <div class="s4-ss" id="mix-qcd-bar"  style="background:#4ade80"></div>
+                <div class="s4-ss" id="mix-cash-bar" style="background:#4AAEE0"></div>
+                <div class="s4-ss" id="mix-ik-bar"   style="background:#7EC8F5"></div>
+                <div class="s4-ss" id="mix-hold-bar" style="background:#484f58"></div>
+              </div>
+              <div id="mix-rows"></div>
+            </div>
+          </div>
+
+          <!-- Panel 3: Tax Impact -->
+          <div class="s4-panel">
+            <div class="s4-phdr">Tax Impact Summary</div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+              <div>
+                <div class="s4-tx-row"><span style="color:#ffffff" id="tx-smart-label">Optimized selection</span><span class="s4-tx-val t-r" id="tx-smart-val">—</span></div>
+                <div class="s4-tx-row"><span style="color:#ffffff">Loss harvesting offset</span><span class="s4-tx-val t-g" id="tx-offset-val">—</span></div>
+                <div class="s4-tx-row"><span style="color:#ffffff">Naive approach (all-cash)</span><span class="s4-tx-val t-r" id="tx-naive-val">—</span></div>
+              </div>
+              <div style="border-top:1px solid #21262d;padding-top:6px;margin-top:6px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700">
+                  <span style="color:#ffffff">Net Tax (Agent)</span><span class="t-r" id="tx-net-val">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:3px">
+                  <span style="color:#4ade80">Tax Saved</span><span style="color:#4ade80;font-weight:700" id="tx-saved-val">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end s4-top -->
+
+        <!-- CONSEQUENCE BAR -->
+        <div id="consequenceBar" style="display:none;align-items:flex-start;gap:10px;background:#2d1b00;border:1px solid #f59e0b55;border-radius:8px;padding:12px 16px;margin:0 0 12px 0">
+          <div style="font-size:16px;flex-shrink:0">⚠</div>
+          <div>
+            <div id="consequenceTitle" style="font-size:12px;font-weight:700;color:#f59e0b;margin-bottom:3px"></div>
+            <div id="consequenceMsg" style="font-size:11px;color:#d1a832;line-height:1.5"></div>
+          </div>
+        </div>
+
+        <!-- HOLDINGS TABLE (mockup style) -->
+        <div class="rmd-tbl-wrap">
+          <div class="rmd-tbl-hdr">
+            <div>
+              <div class="rmd-tbl-title">Portfolio — Holdings Selected for RMD</div>
+              <div class="rmd-tbl-sub" id="rmdTblSub">Run agent to populate · Click action pills to override</div>
+            </div>
+            <button onclick="runAgent()" style="font-size:11px;font-weight:600;padding:4px 12px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#8b949e;cursor:pointer;display:flex;align-items:center;gap:5px" onmouseover="this.style.borderColor='#58a6ff';this.style.color='#58a6ff'" onmouseout="this.style.borderColor='#30363d';this.style.color='#8b949e'">↺ Reset</button>
+          </div>
+          <div class="rmd-reopt" id="rmdReoptBanner">
+            <div style="width:12px;height:12px;border-radius:50%;border:2px solid #f59e0b30;border-top-color:#f59e0b;animation:spin .7s linear infinite;flex-shrink:0"></div>
+            <div>Override detected — re-optimizing remaining holdings…</div>
+          </div>
+          <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse">
             <thead>
               <tr>
-                <th>Account</th>
-                <th>Symbol</th>
-                <th>Qty to Sell</th>
-                <th>Price</th>
-                <th>Liquidation Value</th>
-                <th>Gain / Loss</th>
-                <th>Analyst Rating</th>
-                <th>12mo Target</th>
-                <th>Catalyst</th>
-                <th>Research Source</th>
-                <th>Action Select</th>
-                <th>Discuss</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;width:160px">Holding</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;width:100px">Qty to Sell</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;text-align:right;width:80px">Price</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;text-align:right;width:110px">Liq. Value</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;text-align:right;width:110px">Gain / Loss</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;width:240px">Action</th>
+                <th style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#8b949e;padding:9px 10px;border-bottom:2px solid #30363d;background:#161b22;text-align:right;width:90px">Tax Impact</th>
               </tr>
             </thead>
             <tbody id="selectedBody">
-              <tr><td colspan="12" class="empty">Run the agent to see selected assets</td></tr>
+              <tr><td colspan="7" style="padding:20px;text-align:center;color:#6e7681;font-size:12px">Run the agent to see selected assets</td></tr>
             </tbody>
           </table>
-          </div>
-          <div class="action-legend">
-            <span class="action-legend-title">Action Key:</span>
-            <span class="action-legend-item sell">🔴 Sell — Cash Distribution: Sell shares inside the IRA; cash proceeds sent to client's bank account. Taxed as ordinary income.</span>
-            <span class="action-legend-item transfer">🔵 In-Kind Transfer to Brokerage: Move actual shares (unsold) from IRA → taxable brokerage at FMV. Satisfies RMD per IRS Pub. 590-B; no immediate sale required.</span>
-            <span class="action-legend-item hold">🟡 Hold — Cover with Other Assets: Exclude this holding from RMD; remaining positions cover the distribution requirement.</span>
           </div>
           <div class="execute-bar">
             <div class="execute-bar-left">
               <span class="execute-hint">Review each action above, override if needed, then submit.</span>
             </div>
-            <button class="btn-execute" id="executeBtn" onclick="executeActions()">
-              ▶ Execute Selected Actions
-            </button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn-send-report" id="exportPdfBtn" onclick="exportRmdPdf()">⬇ Export PDF</button>
+              <button class="btn-send-report" id="sendReportBtn" onclick="sendRmdReport()">📧 Send Report to Client</button>
+              <button class="btn-execute" id="executeBtn" onclick="executeWizard()">▶ Execute Plan</button>
+            </div>
           </div>
           <div class="execute-result" id="executeResult" style="display:none"></div>
         </div>
 
-        <div class="panel" style="margin-top:20px">
-          <div class="panel-title collapsible-title" onclick="togglePanel('rmdPanelBody','rmdPanelChevron')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-            <span>📊 RMD Coverage Analysis</span>
-            <span id="rmdPanelChevron" style="font-size:12px;transition:transform 0.2s">▶</span>
-          </div>
-          <div id="rmdPanelBody" style="display:none">
-            <div id="rmdStatusLine" style="padding:8px 4px 4px;font-size:13px;color:#ffffff;font-style:italic"></div>
-            <div style="position:relative;height:160px">
-              <canvas id="rmdChart"></canvas>
-            </div>
-          </div>
+        <!-- hidden compat: rmdChart, taxChart canvases still needed by JS but not shown -->
+        <div style="display:none">
+          <canvas id="rmdChart"></canvas>
+          <canvas id="taxChart"></canvas>
+          <div id="rmdStatusLine"></div>
+          <div id="taxStatusLine"></div>
+          <div id="taxCompare"></div>
+          <tbody id="naiveAssetsBody"></tbody>
+          <tbody id="smartAssetsBody"></tbody>
+          <span id="naiveGain"></span><span id="naiveTax"></span>
+          <span id="smartGain"></span><span id="smartTax"></span>
+          <div id="taxExplanation"></div>
+          <span id="taxSavedAmt"></span>
+          <div id="taxChartWrap"></div>
         </div>
 
-        <!-- TAX EFFICIENCY PANEL -->
-        <div class="panel" style="margin-top:20px">
-          <div class="panel-title collapsible-title" onclick="togglePanel('taxPanelBody','taxPanelChevron')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-            <span>💰 Tax Efficiency — Agent vs Naive Approach</span>
-            <span id="taxPanelChevron" style="font-size:12px;transition:transform 0.2s">▶</span>
-          </div>
-          <div id="taxPanelBody" style="display:none">
-            <div class="tax-compare" id="taxCompare" style="display:none">
-              <div class="tax-col bad">
-                <div class="tax-col-title">❌ Without Agent (Naive — Highest Gain First)</div>
-                <table class="data-table" id="naiveAssetsTable">
-                  <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
-                  <tbody id="naiveAssetsBody"></tbody>
-                </table>
-                <div class="tax-total bad-total">Total Gain: <span id="naiveGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="naiveTax">—</span></div>
-              </div>
-              <div class="tax-saved-badge" id="taxSavedBadge">💰<br/>Saved<br/><span id="taxSavedAmt">—</span></div>
-              <div class="tax-col good">
-                <div class="tax-col-title">✅ With Agent (Optimized — Loss-First Selection)</div>
-                <table class="data-table" id="smartAssetsTable">
-                  <thead><tr><th>Symbol</th><th>Qty</th><th>Realized Gain</th></tr></thead>
-                  <tbody id="smartAssetsBody"></tbody>
-                </table>
-                <div class="tax-total good-total">Total Gain: <span id="smartGain">—</span> &nbsp;|&nbsp; Tax Bill: <span id="smartTax">—</span></div>
-              </div>
-            </div>
-            <div id="taxStatusLine" style="padding:8px 4px 4px;font-size:13px;color:#ffffff;font-style:italic"></div>
-            <div class="tax-explanation" id="taxExplanation">Run the agent to see tax savings analysis.</div>
-            <div id="taxChartWrap" style="position:relative;height:140px;margin-top:16px;display:none">
-              <canvas id="taxChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel" style="margin-top:20px">
-          <div class="panel-title collapsible-title" onclick="togglePanel('jsonPanel', 'jsonChevron')" style="cursor:pointer;user-select:none;">
-            Full Agent Response
-            <span id="jsonChevron" style="margin-left:auto;font-size:12px;color:#8b949e;">▼</span>
+        <!-- FULL RESPONSE (collapsible) -->
+        <div class="panel" style="margin-top:12px">
+          <div class="panel-title collapsible-title" onclick="togglePanel('jsonPanel','jsonChevron')" style="cursor:pointer;user-select:none;">
+            Full Agent Response <span id="jsonChevron" style="margin-left:auto;font-size:12px;color:#8b949e;">▼</span>
           </div>
           <div id="jsonPanel" style="display:none">
             <pre class="json-view" id="executionJson">Run the agent to see the full execution response...</pre>
           </div>
         </div>
+
+        <!-- Hidden elements kept for renderResults compatibility -->
+        <span id="rmdValue" style="display:none"></span>
+        <span id="strategyValue" style="display:none"></span>
+        <span id="strategySubLabel" style="display:none"></span>
+        <span id="totalValue" style="display:none"></span>
+        <span id="assetsCount" style="display:none"></span>
+        <div id="explanationBox" style="display:none"></div>
+        <div id="sourcesBox" style="display:none"></div>
+        <div id="reasoningBox" style="display:none"></div>
       </div>
 
       <!-- REINVESTMENT TAB -->
@@ -353,20 +420,19 @@
 
         <!-- Flow diagram -->
         <div class="reinvest-flow">
-          <div class="flow-box ira">🏦 IRA Account<br/><span id="flow-rmd-amt">—</span></div>
+          <div class="flow-box ira">🏦 <span id="flow-ira-label">IRA Account</span><br/><span id="flow-rmd-amt">—</span></div>
           <div class="flow-arrow">→<br/><small>RMD Withdrawal</small></div>
-          <div class="flow-box bank">🏛 Same Bank Account<br/><span id="flow-bank-amt">—</span></div>
+          <div class="flow-box bank">💵 Cash Distribution<br/><span id="flow-bank-amt">—</span></div>
           <div class="flow-arrow">→<br/><small>Agent Suggests</small></div>
           <div class="flow-box invest">📈 Reinvested Products<br/><span id="flow-income-amt">— / yr income</span></div>
         </div>
 
         <!-- AI Agent Advice -->
         <div class="panel" style="margin-bottom:20px">
-          <div class="panel-title">🤖 Agentic AI Reinvestment Recommendation</div>
+          <div class="panel-title">🤖 Reinvestment Advice</div>
           <div class="agent-advice-box" id="agentAdviceBox">
             Run the agent to see the AI-generated reinvestment recommendation for this client.
           </div>
-          <div class="advice-meta" id="adviceMeta"></div>
         </div>
 
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
@@ -376,28 +442,57 @@
             <table class="data-table" id="reinvestTable">
               <thead>
                 <tr>
+                  <th style="width:32px"><input type="checkbox" id="reinvestSelectAll" onchange="reinvestToggleAll(this)" style="accent-color:#3fb950"></th>
                   <th>Product</th>
                   <th>Type</th>
-                  <th>Allocation</th>
+                  <th>Allocation %</th>
                   <th>Amount</th>
                   <th>Yield</th>
                   <th>Annual Income</th>
                   <th>Risk</th>
-                  <th>Account</th>
                 </tr>
               </thead>
               <tbody id="reinvestBody">
-                <tr><td colspan="8" class="empty">Run the agent to see suggestions</td></tr>
+                <tr><td colspan="9" class="empty">Run the agent to see suggestions</td></tr>
               </tbody>
+              <tfoot id="reinvestTotals" style="display:none">
+                <tr style="border-top:2px solid #30363d;background:#0d1117">
+                  <td></td>
+                  <td style="font-weight:700;color:#e6edf3">Selected Total</td>
+                  <td></td>
+                  <td style="font-weight:700;color:#58a6ff" id="rt-pct">—</td>
+                  <td style="font-weight:700;color:#58a6ff" id="rt-amt">—</td>
+                  <td></td>
+                  <td style="font-weight:700;color:#d29922" id="rt-income">—</td>
+                  <td></td>
+                </tr>
+              </tfoot>
             </table>
+            <div style="display:flex;justify-content:flex-end;margin-top:12px">
+              <button class="btn-execute" id="deployFundsBtn" onclick="deployFundsWizard()" style="padding:9px 22px;font-size:13px">▶ Deploy Funds</button>
+            </div>
           </div>
 
           <!-- Allocation chart -->
           <div class="panel">
             <div class="panel-title">Allocation by Product</div>
-            <div style="position:relative;height:220px">
+            <div style="position:relative;height:200px;margin-bottom:16px">
               <canvas id="reinvestChart"></canvas>
             </div>
+            <table class="data-table" style="font-size:11px">
+              <thead>
+                <tr>
+                  <th style="width:14px"></th>
+                  <th>Product</th>
+                  <th>Type</th>
+                  <th style="text-align:right">Amount</th>
+                  <th style="text-align:right">Weight</th>
+                </tr>
+              </thead>
+              <tbody id="reinvestWeightBody">
+                <tr><td colspan="5" class="empty">—</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -712,8 +807,8 @@
           <div class="demo-step">
             <div class="demo-step-num">7</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Execute Advisor Decision <span class="demo-where">← Execute Selected Actions button</span></div>
-              <div class="demo-step-desc">Reset actions back to agent defaults, then click <strong>Execute Selected Actions</strong>. Say: <em>"The advisor is satisfied. One click submits all decisions. The agent records each action — Sell or Hold — with a timestamp for the compliance audit trail."</em></div>
+              <div class="demo-step-title">Execute Advisor Decision <span class="demo-where">← Execute Plan button</span></div>
+              <div class="demo-step-desc">Reset actions back to agent defaults, then click <strong>Execute Plan</strong>. Say: <em>"The advisor is satisfied. One click submits all decisions. The agent records each action — Sell or Hold — with a timestamp for the compliance audit trail."</em></div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
                 <li>Confirmation panel shows every decision: symbol, qty, action, status</li>
                 <li>Dropdowns lock — submitted state is frozen for the audit trail</li>
@@ -798,7 +893,7 @@
           <div class="demo-step">
             <div class="demo-step-num">5</div>
             <div class="demo-step-body">
-              <div class="demo-step-title">Execute &amp; Confirm Transfer <span class="demo-where">← Execute Selected Actions</span></div>
+              <div class="demo-step-title">Execute &amp; Confirm Transfer <span class="demo-where">← Execute Plan</span></div>
               <div class="demo-step-desc">Click Execute. Show the confirmation panel. Say: <em>"Each row now shows 'Transfer Initiated' instead of 'Order Submitted' — the agent knows the difference between a sell and a transfer, and records it correctly for the audit trail."</em></div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
                 <li>Confirmation clearly distinguishes Transfer vs Sell vs Hold per asset</li>
@@ -969,7 +1064,7 @@
           <div class="qa-list">
             <div class="qa-item">
               <div class="qa-q">Does the agent execute trades automatically without advisor approval?</div>
-              <div class="qa-a">No — by design. The agent analyzes and recommends. The advisor reviews every asset in the Action Select table (Sell / Transfer / Hold), overrides any row as needed, and must explicitly click <strong>Execute Selected Actions</strong> to submit. Nothing executes until the advisor approves. This is the human-in-the-loop architecture.</div>
+              <div class="qa-a">No — by design. The agent analyzes and recommends. The advisor reviews every asset in the Action Select table (Sell / Transfer / Hold), overrides any row as needed, and must explicitly click <strong>Execute Plan</strong> to submit. Nothing executes until the advisor approves. This is the human-in-the-loop architecture.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What happens when I change an action from Sell to Hold?</div>
@@ -1543,6 +1638,129 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260605y"></script>
+  <!-- FLOATING AGENT OVERLAY -->
+  <div id="agentOverlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center">
+    <div style="background:#161b22;border:1px solid #21262d;border-radius:14px;padding:28px 32px;width:520px;max-width:95vw">
+      <div style="font-size:16px;font-weight:800;color:#e6edf3;margin-bottom:4px">AI Agents Analyzing Portfolio</div>
+      <div style="font-size:12px;color:#8b949e;margin-bottom:20px" id="overlaySubtitle">Autonomous strategy selection in progress…</div>
+
+      <div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:10px 14px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#ffffff;margin-bottom:6px">
+          <strong id="overlayProgLabel">Dispatching agents…</strong><span id="overlayProgPct">0%</span>
+        </div>
+        <div style="height:6px;background:#21262d;border-radius:3px;overflow:hidden">
+          <div id="overlayProgFill" style="height:100%;width:0%;background:linear-gradient(90deg,#4ade80,#7EC8F5);border-radius:3px;transition:width .2s linear"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px" id="overlayAgentList">
+        <div class="ov-agent" id="ova-tax">
+          <div class="ova-icon" id="ovai-tax">···</div>
+          <div style="flex:1"><div class="ova-name">Tax &amp; Gain Analysis Agent</div><div class="ova-status" id="ovas-tax">Queued</div></div>
+          <div class="ova-time" id="ovat-tax">—</div>
+        </div>
+        <div class="ov-agent" id="ova-risk">
+          <div class="ova-icon" id="ovai-risk">···</div>
+          <div style="flex:1"><div class="ova-name">Risk &amp; IRMAA Guard Agent</div><div class="ova-status" id="ovas-risk">Queued</div></div>
+          <div class="ova-time" id="ovat-risk">—</div>
+        </div>
+        <div class="ov-agent" id="ova-qcd">
+          <div class="ova-icon" id="ovai-qcd">···</div>
+          <div style="flex:1"><div class="ova-name">QCD Optimization Agent</div><div class="ova-status" id="ovas-qcd">Queued</div></div>
+          <div class="ova-time" id="ovat-qcd">—</div>
+        </div>
+        <div class="ov-agent" id="ova-ik">
+          <div class="ova-icon" id="ovai-ik">···</div>
+          <div style="flex:1"><div class="ova-name">In-Kind Transfer Agent</div><div class="ova-status" id="ovas-ik">Queued</div></div>
+          <div class="ova-time" id="ovat-ik">—</div>
+        </div>
+        <div class="ov-agent" id="ova-cash">
+          <div class="ova-icon" id="ovai-cash">···</div>
+          <div style="flex:1"><div class="ova-name">Cash Flow Agent</div><div class="ova-status" id="ovas-cash">Queued</div></div>
+          <div class="ova-time" id="ovat-cash">—</div>
+        </div>
+        <div class="ov-agent ov-orch" id="ova-orch">
+          <div class="ova-icon" id="ovai-orch">···</div>
+          <div style="flex:1"><div class="ova-name" style="color:#a78bfa">Advisor</div><div class="ova-status" id="ovas-orch">Waiting for all agents…</div></div>
+          <div class="ova-time" id="ovat-orch">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pill hover tooltip -->
+  <div id="rmd-tip-box">
+    <div class="tip-hdr" id="rmd-tip-hdr"></div>
+    <div class="tip-body" id="rmd-tip-body"></div>
+    <div class="tip-tax" id="rmd-tip-tax" style="display:none">
+      <span>Est. Tax Impact</span><span id="rmd-tip-tax-val"></span>
+    </div>
+  </div>
+
+  <!-- Execution Wizard -->
+  <div id="execWizard" style="display:none;position:fixed;inset:0;z-index:10001;background:#0d1117;overflow-y:auto">
+    <div id="execWizardInner" style="max-width:780px;margin:0 auto;padding:36px 20px 60px"></div>
+  </div>
+
+  <!-- Deploy Funds Wizard -->
+  <div id="deployWizard" style="display:none;position:fixed;inset:0;z-index:10002;background:#0d1117;overflow-y:auto">
+    <div id="deployWizardInner" style="max-width:780px;margin:0 auto;padding:36px 20px 60px"></div>
+  </div>
+
+  <!-- Email Compose Modal -->
+  <div id="emailModal" style="display:none;position:fixed;inset:0;z-index:10000;background:#00000090;backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center">
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;width:560px;max-width:95vw;box-shadow:0 24px 64px #000000c0">
+      <!-- Modal header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #21262d">
+        <div style="font-size:14px;font-weight:700;color:#e6edf3">📧 Send RMD Report to Client</div>
+        <button onclick="closeEmailModal()" style="background:none;border:none;color:#8b949e;font-size:18px;cursor:pointer;line-height:1">✕</button>
+      </div>
+      <!-- Fields -->
+      <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e;font-weight:600;text-transform:uppercase;letter-spacing:.5px">To (Client Email)</label>
+          <input id="emailTo" type="email" placeholder="client@example.com"
+            style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;color:#e6edf3;font-size:13px;outline:none"
+            onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Subject</label>
+          <input id="emailSubject" type="text"
+            style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;color:#e6edf3;font-size:13px;outline:none"
+            onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"/>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:11px;color:#8b949e;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Message Preview</label>
+          <textarea id="emailBody" rows="10"
+            style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:8px 12px;color:#8b949e;font-size:11px;font-family:monospace;outline:none;resize:vertical;line-height:1.6"
+            onfocus="this.style.borderColor='#58a6ff'" onblur="this.style.borderColor='#30363d'"></textarea>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid #21262d">
+        <span style="font-size:11px;color:#6e7681">For advisor review only · Not a regulated communication</span>
+        <div style="display:flex;gap:8px">
+          <button onclick="closeEmailModal()" style="padding:8px 16px;font-size:12px;background:#21262d;color:#8b949e;border:1px solid #30363d;border-radius:6px;cursor:pointer">Cancel</button>
+          <button id="emailSendBtn" onclick="submitEmail()"
+            style="padding:8px 20px;font-size:12px;font-weight:700;background:#1a3a1a;color:#3fb950;border:1px solid #3fb950;border-radius:6px;cursor:pointer">
+            ✉ Send Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="rmd-toast" style="display:none;position:fixed;bottom:28px;right:28px;z-index:9999;background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px 20px;min-width:300px;max-width:420px;box-shadow:0 8px 32px #00000080;transition:opacity 0.3s">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div id="rmd-toast-icon" style="font-size:20px;flex-shrink:0;margin-top:1px"></div>
+      <div>
+        <div id="rmd-toast-title" style="font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:3px"></div>
+        <div id="rmd-toast-msg" style="font-size:11px;color:#8b949e;line-height:1.5"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=20260607k"></script>
 </body>
 </html>
