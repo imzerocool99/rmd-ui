@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RAG — Live Walkthrough</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',sans-serif;font-size:13px;overflow-x:hidden}
+
+/* ── TOPBAR ── */
+.topbar{background:#161b22;border-bottom:1px solid #21262d;padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tb-logo{font-size:14px;font-weight:800;color:#e6edf3}.tb-logo span{color:#7EC8F5}
+.tb-title{font-size:11px;color:#8b949e}
+.tb-badge{font-size:10px;font-weight:700;background:#0d1a2e;color:#7EC8F5;border:1px solid #7EC8F550;padding:3px 12px;border-radius:20px}
+
+/* ── LAYOUT ── */
+.main{max-width:1200px;margin:0 auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0a1628,#0d1117 60%,#0a1628);border:1px solid #7EC8F530;border-radius:14px;padding:28px 32px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:500px;height:200px;background:radial-gradient(ellipse,#7EC8F50d 0%,transparent 70%);pointer-events:none}
+.hero-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#7EC8F5;margin-bottom:10px}
+.hero-h1{font-size:26px;font-weight:800;color:#e6edf3;margin-bottom:8px}.hero-h1 span{color:#7EC8F5}
+.hero-sub{font-size:12px;color:#8b949e;max-width:580px;margin:0 auto 20px;line-height:1.7}
+.start-btn{background:linear-gradient(135deg,#1a5fa8,#0d2a5a);border:1.5px solid #7EC8F5;color:#7EC8F5;font-size:14px;font-weight:700;padding:12px 36px;border-radius:30px;cursor:pointer;transition:all .2s;letter-spacing:.5px;box-shadow:0 0 20px #7EC8F520}
+.start-btn:hover{background:linear-gradient(135deg,#2060b0,#0f3060);box-shadow:0 0 32px #7EC8F540;transform:translateY(-2px)}
+.start-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.reset-btn{background:transparent;border:1px solid #30363d;color:#8b949e;font-size:12px;font-weight:600;padding:10px 24px;border-radius:20px;cursor:pointer;margin-left:12px;transition:all .2s}
+.reset-btn:hover{border-color:#484f58;color:#c9d1d9}
+
+/* ── STEP PROGRESS ── */
+.progress-bar-wrap{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px 24px}
+.pb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.pb-label{font-size:11px;font-weight:700;color:#7EC8F5;text-transform:uppercase;letter-spacing:.5px}
+.pb-count{font-size:11px;color:#484f58}
+.steps-track{display:flex;align-items:center;gap:0}
+.step-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative;cursor:pointer}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid #30363d;background:#0d1117;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#484f58;transition:all .4s;position:relative;z-index:2}
+.step-dot.active{border-color:#7EC8F5;background:#0d1a2e;color:#7EC8F5;box-shadow:0 0 16px #7EC8F540}
+.step-dot.done{border-color:#4ade80;background:#0a1a0a;color:#4ade80}
+.step-lbl{font-size:9px;color:#484f58;text-align:center;line-height:1.3;max-width:70px;transition:color .3s}
+.step-lbl.active{color:#7EC8F5}
+.step-lbl.done{color:#4ade80}
+.step-connector{flex:1;height:2px;background:#21262d;margin-top:-18px;position:relative;overflow:hidden;max-width:60px}
+.step-connector .sc-fill{height:100%;background:linear-gradient(90deg,#4ade80,#7EC8F5);width:0;transition:width .5s ease}
+
+/* ── PIPELINE CANVAS ── */
+.pipeline-section{background:#161b22;border:1px solid #21262d;border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.pipeline-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#484f58;margin-bottom:20px}
+.pipeline-svg{width:100%;height:340px;display:block}
+
+/* ── INFO PANEL ── */
+.info-panel{background:#0d1117;border:1px solid #21262d;border-radius:12px;padding:20px 24px;min-height:160px;transition:all .3s;position:relative;overflow:hidden}
+.info-panel::before{content:'';position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(to bottom,#7EC8F5,#4ade80);border-radius:3px 0 0 3px}
+.ip-step{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#7EC8F5;margin-bottom:6px}
+.ip-title{font-size:18px;font-weight:800;color:#e6edf3;margin-bottom:8px;line-height:1.3}
+.ip-desc{font-size:12px;color:#8b949e;line-height:1.8;margin-bottom:12px}
+.ip-code{background:#161b22;border:1px solid #21262d;border-left:3px solid #7EC8F5;border-radius:6px;padding:10px 14px;font-family:monospace;font-size:11px;color:#a78bfa;line-height:1.8}
+.ip-code .hi-green{color:#4ade80;font-weight:700}
+.ip-code .hi-blue{color:#7EC8F5;font-weight:700}
+.ip-code .hi-orange{color:#f59e0b;font-weight:700}
+.ip-result{background:#0a1a0a;border:1px solid #4ade8040;border-left:3px solid #4ade80;border-radius:6px;padding:10px 14px;font-size:11px;color:#8b949e;margin-top:8px;line-height:1.7}
+.ip-result em{color:#4ade80;font-style:normal;font-weight:700}
+
+/* ── SIDE PANELS ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel-box{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px}
+.panel-hd{font-size:11px;font-weight:700;color:#7EC8F5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+
+/* doc list */
+.doc-list{display:flex;flex-direction:column;gap:6px}
+.doc-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;border:1px solid #21262d;background:#0d1117;transition:all .4s}
+.doc-item.ingested{border-color:#7EC8F550;background:#0d1a2e}
+.doc-item.embedded{border-color:#4ade8050;background:#0a1a0a}
+.di-icon{font-size:16px}
+.di-name{font-size:11px;font-weight:600;color:#8b949e;flex:1;transition:color .4s}
+.doc-item.ingested .di-name,.doc-item.embedded .di-name{color:#c9d1d9}
+.di-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;background:#1a1a1a;color:#484f58;transition:all .4s;border:1px solid transparent}
+.doc-item.ingested .di-badge{background:#0d1a2e;color:#7EC8F5;border-color:#7EC8F530}
+.doc-item.embedded .di-badge{background:#0a1a0a;color:#4ade80;border-color:#4ade8030}
+
+/* vector grid */
+.vec-grid{display:flex;flex-direction:column;gap:6px}
+.vec-row{display:flex;align-items:center;gap:8px;opacity:.3;transition:opacity .5s}
+.vec-row.active{opacity:1}
+.vec-label{font-size:10px;color:#8b949e;min-width:130px}
+.vec-bar{flex:1;height:6px;background:#21262d;border-radius:3px;overflow:hidden}
+.vec-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1a3a6a,#7EC8F5);width:0;transition:width 1s}
+.vec-score{font-size:10px;color:#7EC8F5;font-weight:700;min-width:32px;text-align:right}
+
+/* guardrails */
+.gr-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gr-item{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px;text-align:center;transition:all .4s}
+.gr-item.active-guard{border-color:#4ade8060;background:#0a1a0a}
+.gr-num{font-size:20px;font-weight:800;color:#21262d;margin-bottom:4px;transition:color .4s}
+.gr-item.active-guard .gr-num{color:#4ade80}
+.gr-txt{font-size:10px;color:#484f58;transition:color .4s}
+.gr-item.active-guard .gr-txt{color:#8b949e}
+
+/* idle */
+.idle-msg{text-align:center;padding:60px 20px;color:#484f58;font-size:13px}
+.idle-msg .idle-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.idle-msg p{line-height:1.7}
+
+/* fade in */
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">RMD <span>Agent</span></div>
+  <div class="tb-title">RAG — Retrieval-Augmented Generation · Interactive Walkthrough</div>
+  <div class="tb-badge">Architecture Explainer</div>
+</div>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Click Start to Watch It Live</div>
+    <div class="hero-h1">How <span>Institutional Knowledge</span> Tunes the AI</div>
+    <div class="hero-sub">Watch how firm documents get ingested, embedded into vectors, retrieved at query time, and used to ground every recommendation — step by step with live animation.</div>
+    <div>
+      <button class="start-btn" id="startBtn" onclick="startWalkthrough()">&#9654; Start Walkthrough</button>
+      <button class="reset-btn" id="resetBtn" onclick="resetWalkthrough()">&#8635; Reset</button>
+    </div>
+  </div>
+
+  <!-- STEP PROGRESS -->
+  <div class="progress-bar-wrap">
+    <div class="pb-header">
+      <div class="pb-label">RAG Pipeline — 7 Steps</div>
+      <div class="pb-count" id="stepCount">Step 0 of 7</div>
+    </div>
+    <div class="steps-track" id="stepsTrack"></div>
+  </div>
+
+  <!-- PIPELINE SVG -->
+  <div class="pipeline-section">
+    <div class="pipeline-title">Live Pipeline Visualization</div>
+    <svg class="pipeline-svg" id="pipelineSvg" viewBox="0 0 1100 320">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#484f58"/>
+        </marker>
+        <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#7EC8F5"/>
+        </marker>
+        <marker id="arrGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#4ade80"/>
+        </marker>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- TOP ROW CONNECTORS -->
+      <line id="conn-01" x1="155" y1="99" x2="238" y2="99" stroke="#21262d" stroke-width="2" marker-end="url(#arr)"/>
+      <line id="conn-12" x1="353" y1="99" x2="438" y2="99" stroke="#21262d" stroke-width="2" marker-end="url(#arr)"/>
+      <line id="conn-23" x1="553" y1="99" x2="638" y2="99" stroke="#21262d" stroke-width="2" marker-end="url(#arr)"/>
+
+      <!-- VERTICAL: VectorStore down to Retrieval -->
+      <path id="conn-vsr" d="M 710 138 L 710 160 L 770 160" stroke="#21262d" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+
+      <!-- Orchestrator sends query right -->
+      <path id="conn-oq" d="M 580 182 L 770 182" stroke="#21262d" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+
+      <!-- Retrieval returns context left to Orchestrator -->
+      <path id="conn-ro" d="M 770 198 L 580 198" stroke="#21262d" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+
+      <!-- Orchestrator right to output -->
+      <line id="conn-out" x1="580" y1="215" x2="868" y2="215" stroke="#21262d" stroke-width="2" marker-end="url(#arr)"/>
+
+      <!-- TOP ROW NODES -->
+      <!-- NODE 0: Firm Docs -->
+      <g id="node-docs">
+        <rect x="30" y="60" width="125" height="78" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="92" y="83" text-anchor="middle" fill="#484f58" font-size="17">&#127970;</text>
+        <text x="92" y="103" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">FIRM DOCUMENTS</text>
+        <text x="92" y="117" text-anchor="middle" fill="#30363d" font-size="9">Products · Rates · Rules</text>
+        <text x="92" y="131" text-anchor="middle" fill="#21262d" font-size="9">STEP 1</text>
+      </g>
+
+      <!-- NODE 1: Chunking -->
+      <g id="node-chunk">
+        <rect x="240" y="60" width="113" height="78" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="296" y="83" text-anchor="middle" fill="#484f58" font-size="17">&#9986;</text>
+        <text x="296" y="103" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">CHUNKING</text>
+        <text x="296" y="117" text-anchor="middle" fill="#30363d" font-size="9">Split into passages</text>
+        <text x="296" y="131" text-anchor="middle" fill="#21262d" font-size="9">STEP 2</text>
+      </g>
+
+      <!-- NODE 2: Embedding -->
+      <g id="node-embed">
+        <rect x="440" y="60" width="113" height="78" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="496" y="83" text-anchor="middle" fill="#484f58" font-size="17">&#129522;</text>
+        <text x="496" y="103" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">EMBEDDING</text>
+        <text x="496" y="117" text-anchor="middle" fill="#30363d" font-size="9">Text &#8594; Vectors</text>
+        <text x="496" y="131" text-anchor="middle" fill="#21262d" font-size="9">STEP 3</text>
+      </g>
+
+      <!-- NODE 3: Vector Store -->
+      <g id="node-vstore">
+        <rect x="640" y="60" width="140" height="78" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="710" y="83" text-anchor="middle" fill="#484f58" font-size="17">&#128452;</text>
+        <text x="710" y="103" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">VECTOR STORE</text>
+        <text x="710" y="117" text-anchor="middle" fill="#30363d" font-size="9">On-premises &#183; Local</text>
+        <text x="710" y="131" text-anchor="middle" fill="#21262d" font-size="9">STEP 4</text>
+      </g>
+
+      <!-- BOTTOM ROW NODES -->
+      <!-- NODE 4: Orchestrator -->
+      <g id="node-orch">
+        <rect x="430" y="155" width="150" height="80" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="505" y="176" text-anchor="middle" fill="#484f58" font-size="17">&#129504;</text>
+        <text x="505" y="196" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">ORCHESTRATOR</text>
+        <text x="505" y="210" text-anchor="middle" fill="#30363d" font-size="9">Sends query, gets context</text>
+        <text x="505" y="227" text-anchor="middle" fill="#21262d" font-size="9">STEP 5</text>
+      </g>
+
+      <!-- NODE 5: Retrieval -->
+      <g id="node-ret">
+        <rect x="770" y="155" width="120" height="80" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="830" y="176" text-anchor="middle" fill="#484f58" font-size="17">&#128269;</text>
+        <text x="830" y="196" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">RETRIEVAL</text>
+        <text x="830" y="210" text-anchor="middle" fill="#30363d" font-size="9">Top-K matched docs</text>
+        <text x="830" y="227" text-anchor="middle" fill="#21262d" font-size="9">STEP 6</text>
+      </g>
+
+      <!-- NODE 6: Output -->
+      <g id="node-out">
+        <rect x="870" y="60" width="200" height="78" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.5"/>
+        <text x="970" y="83" text-anchor="middle" fill="#484f58" font-size="17">&#9989;</text>
+        <text x="970" y="103" text-anchor="middle" fill="#484f58" font-size="10" font-weight="700">GROUNDED ADVICE</text>
+        <text x="970" y="117" text-anchor="middle" fill="#30363d" font-size="9">Institutional context applied</text>
+        <text x="970" y="131" text-anchor="middle" fill="#21262d" font-size="9">STEP 7</text>
+      </g>
+
+      <!-- Orch up to Output (right side diagonal) -->
+      <path id="conn-oo" d="M 580 175 Q 900 175 970 138" stroke="#21262d" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+      <!-- ANIMATED PACKETS GROUP -->
+      <g id="packets"></g>
+    </svg>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="info-panel" id="infoPanel">
+    <div class="idle-msg">
+      <div class="idle-icon">&#9654;</div>
+      <p>Click <strong style="color:#7EC8F5">Start Walkthrough</strong> to see<br/>how each step of the RAG pipeline works — live and animated.</p>
+    </div>
+  </div>
+
+  <!-- DOCUMENT + VECTOR STATUS -->
+  <div class="two-col">
+    <div class="panel-box">
+      <div class="panel-hd">&#128196; Firm Document Status</div>
+      <div class="doc-list" id="docList">
+        <div class="doc-item" id="doc-0"><div class="di-icon">&#128188;</div><div class="di-name">Product Catalog (28 products)</div><div class="di-badge" id="dbadge-0">Pending</div></div>
+        <div class="doc-item" id="doc-1"><div class="di-icon">&#9878;</div><div class="di-name">Compliance Rules &amp; Reg BI</div><div class="di-badge" id="dbadge-1">Pending</div></div>
+        <div class="doc-item" id="doc-2"><div class="di-icon">&#128202;</div><div class="di-name">Competitive Rate Sheet</div><div class="di-badge" id="dbadge-2">Pending</div></div>
+        <div class="doc-item" id="doc-3"><div class="di-icon">&#128203;</div><div class="di-name">Firm Policies &amp; Preferences</div><div class="di-badge" id="dbadge-3">Pending</div></div>
+        <div class="doc-item" id="doc-4"><div class="di-icon">&#127963;</div><div class="di-name">IRS Publication 590-B</div><div class="di-badge" id="dbadge-4">Pending</div></div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-hd">&#128269; Semantic Similarity Match (Step 6)</div>
+      <div style="font-size:10px;color:#484f58;margin-bottom:10px">Query: <em style="color:#484f58" id="queryText">"Waiting for query..."</em></div>
+      <div class="vec-grid" id="vecGrid">
+        <div class="vec-row" id="vr-0"><div class="vec-label">Prime MMF 4.82%</div><div class="vec-bar"><div class="vec-fill" id="vf-0"></div></div><div class="vec-score">0.94</div></div>
+        <div class="vec-row" id="vr-1"><div class="vec-label">Ultra Short Bond ETF</div><div class="vec-bar"><div class="vec-fill" id="vf-1"></div></div><div class="vec-score">0.78</div></div>
+        <div class="vec-row" id="vr-2"><div class="vec-label">Donor-Advised Fund</div><div class="vec-bar"><div class="vec-fill" id="vf-2"></div></div><div class="vec-score">0.71</div></div>
+        <div class="vec-row" id="vr-3"><div class="vec-label">12-Month CD 5.1%</div><div class="vec-bar"><div class="vec-fill" id="vf-3"></div></div><div class="vec-score">0.63</div></div>
+        <div class="vec-row" id="vr-4"><div class="vec-label">Roth IRA Platform</div><div class="vec-bar"><div class="vec-fill" id="vf-4"></div></div><div class="vec-score">0.31</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUARDRAILS -->
+  <div class="panel-box">
+    <div class="panel-hd">&#128737; Compliance Guardrails — Activated in Step 7</div>
+    <div class="gr-row" id="grRow">
+      <div class="gr-item" id="gr-0"><div class="gr-num">Reg BI</div><div class="gr-txt">Best Interest Check</div></div>
+      <div class="gr-item" id="gr-1"><div class="gr-num">&#177;0.25%</div><div class="gr-txt">Outcome Threshold</div></div>
+      <div class="gr-item" id="gr-2"><div class="gr-num">15%</div><div class="gr-txt">Institutional Bias Cap</div></div>
+      <div class="gr-item" id="gr-3"><div class="gr-num">Audit</div><div class="gr-txt">Full Decision Log</div></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── STEP DEFINITIONS ──────────────────────────────────────────────
+const STEPS = [
+  {
+    label:"Firm Docs",
+    headline:"Step 1 — Firm Documents Loaded",
+    desc:"The knowledge base is built from your firm's own documents: product catalog, current rates, compliance rules, IRS publications, and internal policies. These are <strong style='color:#c9d1d9'>never sent to any external service</strong> — everything stays on-premises.",
+    code:null, result:null,
+    activeNodes:["node-docs"], doneNodes:[],
+    packets:[{x1:92,y1:99,x2:180,y2:99,c:'#7EC8F5'}],
+    docs:[{id:0,s:'ingested'},{id:1,s:'ingested'},{id:2,s:'ingested'},{id:3,s:'ingested'},{id:4,s:'ingested'}],
+    vecs:[],guards:[],
+    queryText:null
+  },
+  {
+    label:"Chunking",
+    headline:"Step 2 — Chunking the Documents",
+    desc:"Each document is split into small overlapping passages (~200–400 tokens). A 50-page IRS publication becomes 43 chunks. A product sheet becomes 8 chunks. This lets the AI retrieve the exact paragraph it needs, not an entire document.",
+    code:`IRS Pub 590-B       → 43 chunks\nProduct Catalog     → 31 chunks\nCompliance Rules    → 28 chunks\nRate Sheet          → 12 chunks\nFirm Policies       → 19 chunks\n<span class='hi-blue'>──────────────────────────────\nTotal: 133 chunks ready for embedding</span>`,
+    result:null,
+    activeNodes:["node-chunk"], doneNodes:["node-docs"],
+    packets:[{x1:353,y1:99,x2:438,y2:99,c:'#7EC8F5'}],
+    docs:[{id:0,s:'ingested'},{id:1,s:'ingested'},{id:2,s:'ingested'},{id:3,s:'ingested'},{id:4,s:'ingested'}],
+    vecs:[],guards:[],
+    queryText:null
+  },
+  {
+    label:"Embedding",
+    headline:"Step 3 — Embedding: Text Becomes Math",
+    desc:"A local embedding model (LangChain4j + nomic-embed) converts every chunk into a 768-dimension numeric vector. Similar concepts end up near each other in vector space — even without keyword overlap. Runs entirely on your hardware.",
+    code:`"Prime MMF yielding 4.82% — RMD landing account"\n  → [0.023, -0.411, 0.887, 0.102 ... 764 more]  <span class='hi-blue'>(768-dim)</span>\n\n"Charitable IRA distribution — federal tax free"\n  → [0.731, -0.028, 0.114, 0.699 ... 764 more]\n\n<span class='hi-green'>Cosine distance between these vectors: 0.82  (very different ✓)</span>`,
+    result:null,
+    activeNodes:["node-embed"], doneNodes:["node-docs","node-chunk"],
+    packets:[{x1:553,y1:99,x2:638,y2:99,c:'#a78bfa'}],
+    docs:[{id:0,s:'embedded'},{id:1,s:'embedded'},{id:2,s:'embedded'},{id:3,s:'embedded'},{id:4,s:'embedded'}],
+    vecs:[],guards:[],
+    queryText:null
+  },
+  {
+    label:"Vector Store",
+    headline:"Step 4 — Vector Store Built",
+    desc:"133 vectors indexed in an on-premises vector database (HNSW index). When a query arrives, similarity search completes in under 10ms. Rebuild takes ~45 seconds when you add new products or update rates. Zero internet required.",
+    code:`Vector Store: 133 vectors indexed\nIndex type: HNSW (Hierarchical Navigable Small World)\nDimensions: 768  |  Metric: cosine similarity\nLookup time: <span class='hi-blue'>~8ms per query</span>\nLocation: <span class='hi-green'>localhost:6333 (on-premises only)</span>\nLast rebuild: 2026-06-05 09:15:00`,
+    result:null,
+    activeNodes:["node-vstore"], doneNodes:["node-docs","node-chunk","node-embed"],
+    packets:[],
+    docs:[{id:0,s:'embedded'},{id:1,s:'embedded'},{id:2,s:'embedded'},{id:3,s:'embedded'},{id:4,s:'embedded'}],
+    vecs:[],guards:[],
+    queryText:null
+  },
+  {
+    label:"Query",
+    headline:"Step 5 — Orchestrator Sends a Query",
+    desc:"The Orchestrator is deciding where to land Margaret's $4,245 cash distribution. Before answering, it queries the vector store — this is the <strong style='color:#7EC8F5'>Retrieval</strong> step of Retrieval-Augmented Generation. The query is embedded and sent to the vector store.",
+    code:`<span class='hi-orange'>ORCHESTRATOR → VECTOR STORE:</span>\n\nquery: "client age 74 cash distribution $4,245\n        RMD landing account recommendation\n        tax bracket 24% wants liquidity"\n\nembedding(query) → [0.441, -0.201, 0.733 ...]\n<span class='hi-blue'>Searching 133 vectors for nearest neighbors...</span>`,
+    result:null,
+    activeNodes:["node-orch"], doneNodes:["node-docs","node-chunk","node-embed","node-vstore"],
+    packets:[{x1:580,y1:182,x2:770,y2:182,c:'#f59e0b'}],
+    docs:[{id:0,s:'embedded'},{id:1,s:'embedded'},{id:2,s:'embedded'},{id:3,s:'embedded'},{id:4,s:'embedded'}],
+    vecs:[],guards:[],
+    queryText:'"client cash distribution $4,245 — landing account, age 74, bracket 24%"'
+  },
+  {
+    label:"Retrieval",
+    headline:"Step 6 — Top-K Semantic Retrieval",
+    desc:"The vector store returns the 3 closest matches by cosine similarity. Not keywords — actual meaning similarity. These 3 passages become the context injected into the AI's prompt alongside the client data.",
+    code:`<span class='hi-green'>TOP 3 MATCHES RETURNED:</span>\n\n[0.94] "Prime MMF: 4.82% yield, FDIC-adjacent,\n       RMD-eligible, AUM retained in-house"\n\n[0.78] "Ultra Short Bond: 4.71% SEC yield, 0.08% ER,\n       available at firm and market"\n\n[0.71] "Firm policy: default cash to Prime MMF\n       unless client explicitly requests otherwise"`,
+    result:null,
+    activeNodes:["node-ret"], doneNodes:["node-docs","node-chunk","node-embed","node-vstore","node-orch"],
+    packets:[{x1:770,y1:198,x2:580,y2:198,c:'#4ade80'}],
+    docs:[{id:0,s:'embedded'},{id:1,s:'embedded'},{id:2,s:'embedded'},{id:3,s:'embedded'},{id:4,s:'embedded'}],
+    vecs:[0,1,2,3,4],guards:[],
+    queryText:'"client cash distribution $4,245 — landing account, age 74, bracket 24%"'
+  },
+  {
+    label:"Answer",
+    headline:"Step 7 — Grounded, Compliant Recommendation",
+    desc:"Retrieved context injected into the prompt. Orchestrator scores every option using 85/15 weighting (client outcome vs institutional fit). Threshold guard confirms client is not worse off. Full decision logged for compliance audit.",
+    code:`<span class='hi-blue'>AUGMENTED PROMPT = Client data + Retrieved context</span>\n\nSCORING:\n  Prime MMF:    client(91)×0.85 + inst(95)×0.15 = <span class='hi-green'>91.6  WINNER ✓</span>\n  Ultra Short:  client(89)×0.85 + inst(0)×0.15  = 75.6\n  CD Ladder:    client(82)×0.85 + inst(90)×0.15  = 83.2\n\n<span class='hi-blue'>THRESHOLD GUARD: delta = +2pts → client is BETTER off ✓</span>`,
+    result:`<em>→ RECOMMEND: Prime Money Market Fund — $4,245 cash landing account.</em>\nYield: 4.82% (+0.21% above market). Client: better return. Institution: AUM retained.\nRAG influence: YES · Bias weight: 15% · Guard: PASSED · Logged: 2026-06-05 14:32:07`,
+    activeNodes:["node-out"], doneNodes:["node-docs","node-chunk","node-embed","node-vstore","node-orch","node-ret"],
+    packets:[{x1:580,y1:175,x2:870,y2:99,c:'#4ade80'}],
+    docs:[{id:0,s:'embedded'},{id:1,s:'embedded'},{id:2,s:'embedded'},{id:3,s:'embedded'},{id:4,s:'embedded'}],
+    vecs:[0,1,2,3,4],guards:[0,1,2,3],
+    queryText:'"client cash distribution $4,245 — landing account, age 74, bracket 24%"'
+  }
+];
+
+const STEP_LABELS = ["Firm Docs","Chunking","Embedding","Vector Store","Query","Retrieval","Answer"];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let currentStep = -1;
+let running = false;
+let stepTimer = null;
+
+// ── BUILD TRACK ────────────────────────────────────────────────────
+function buildTrack() {
+  const track = document.getElementById('stepsTrack');
+  track.innerHTML = '';
+  STEPS.forEach((s,i) => {
+    const nd = document.createElement('div');
+    nd.className='step-node'; nd.id=`sn-${i}`;
+    nd.innerHTML=`<div class="step-dot" id="sd-${i}">${i+1}</div><div class="step-lbl" id="sl-${i}">${STEP_LABELS[i]}</div>`;
+    nd.onclick = () => jumpToStep(i);
+    track.appendChild(nd);
+    if(i < STEPS.length-1) {
+      const conn = document.createElement('div');
+      conn.className='step-connector'; conn.id=`sc-${i}`;
+      conn.innerHTML=`<div class="sc-fill" id="scf-${i}"></div>`;
+      track.appendChild(conn);
+    }
+  });
+}
+
+// ── COLOR SVG NODE ─────────────────────────────────────────────────
+function colorNode(nodeId, state) {
+  const g = document.getElementById(nodeId);
+  if(!g) return;
+  const rect = g.querySelector('rect');
+  const texts = g.querySelectorAll('text');
+  if(state==='active') {
+    rect.setAttribute('stroke','#7EC8F5');
+    rect.setAttribute('fill','#0d1a2e');
+    texts.forEach(t=>t.setAttribute('fill','#7EC8F5'));
+    g.style.filter='drop-shadow(0 0 10px #7EC8F570)';
+  } else if(state==='done') {
+    rect.setAttribute('stroke','#4ade80');
+    rect.setAttribute('fill','#0a1a0a');
+    texts.forEach(t=>t.setAttribute('fill','#4ade80'));
+    g.style.filter='drop-shadow(0 0 6px #4ade8030)';
+  } else {
+    rect.setAttribute('stroke','#30363d');
+    rect.setAttribute('fill','#0d1117');
+    texts.forEach(t=>t.setAttribute('fill','#484f58'));
+    g.style.filter='none';
+  }
+}
+
+// ── SPAWN ANIMATED PACKET ──────────────────────────────────────────
+function spawnPacket(x1,y1,x2,y2,color,delay) {
+  const svg = document.getElementById('pipelineSvg');
+  const ns='http://www.w3.org/2000/svg';
+  const pkts=document.getElementById('packets');
+  const c=document.createElementNS(ns,'circle');
+  c.setAttribute('r','5'); c.setAttribute('fill',color); c.setAttribute('filter','url(#glow)');
+  pkts.appendChild(c);
+  const am=document.createElementNS(ns,'animateMotion');
+  am.setAttribute('dur','700ms'); am.setAttribute('begin',delay+'ms'); am.setAttribute('fill','remove');
+  am.setAttribute('path',`M ${x1} ${y1} L ${x2} ${y2}`);
+  c.appendChild(am);
+  const af=document.createElementNS(ns,'animate');
+  af.setAttribute('attributeName','opacity'); af.setAttribute('values','0;1;1;0');
+  af.setAttribute('dur','700ms'); af.setAttribute('begin',delay+'ms'); af.setAttribute('fill','remove');
+  c.appendChild(af);
+  am.beginElement(); af.beginElement();
+  setTimeout(()=>{ if(c.parentNode) c.parentNode.removeChild(c); }, delay+800);
+}
+
+function sendPackets(x1,y1,x2,y2,color,count) {
+  for(let i=0;i<count;i++) spawnPacket(x1,y1,x2,y2,color,i*240);
+}
+
+// ── RENDER STEP ────────────────────────────────────────────────────
+function renderStep(i) {
+  if(i<0||i>=STEPS.length) return;
+  const s=STEPS[i];
+
+  // track
+  document.getElementById('stepCount').textContent=`Step ${i+1} of ${STEPS.length}`;
+  STEPS.forEach((_,j)=>{
+    const dot=document.getElementById(`sd-${j}`);
+    const lbl=document.getElementById(`sl-${j}`);
+    const fill=document.getElementById(`scf-${j}`);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active','done');
+    if(fill) fill.style.width='0';
+    if(j<i){ dot.classList.add('done'); dot.textContent='✓'; lbl.classList.add('done'); if(fill) fill.style.width='100%'; }
+    else if(j===i){ dot.classList.add('active'); dot.textContent=j+1; lbl.classList.add('active'); }
+    else { dot.textContent=j+1; }
+  });
+
+  // svg nodes
+  const allNodes=['node-docs','node-chunk','node-embed','node-vstore','node-orch','node-ret','node-out'];
+  allNodes.forEach(nid=>{
+    if(s.activeNodes.includes(nid)) colorNode(nid,'active');
+    else if(s.doneNodes.includes(nid)) colorNode(nid,'done');
+    else colorNode(nid,'normal');
+  });
+
+  // packets
+  document.getElementById('packets').innerHTML='';
+  if(s.packets && s.packets.length) {
+    s.packets.forEach((p,pi)=> sendPackets(p.x1,p.y1,p.x2,p.y2,p.c,5));
+  }
+
+  // info panel
+  const panel=document.getElementById('infoPanel');
+  panel.classList.remove('fade-in');
+  void panel.offsetWidth;
+  panel.classList.add('fade-in');
+  let html=`<div class="ip-step">Step ${i+1} of ${STEPS.length}</div>
+            <div class="ip-title">${s.headline}</div>
+            <div class="ip-desc">${s.desc}</div>`;
+  if(s.code) html+=`<div class="ip-code">${s.code}</div>`;
+  if(s.result) html+=`<div class="ip-result">${s.result}</div>`;
+  panel.innerHTML=html;
+
+  // documents
+  document.querySelectorAll('.doc-item').forEach(d=>d.classList.remove('ingested','embedded'));
+  document.querySelectorAll('.di-badge').forEach(b=>{ b.textContent='Pending'; });
+  if(s.docs) s.docs.forEach(({id,s:ds})=>{
+    const el=document.getElementById(`doc-${id}`);
+    const badge=document.getElementById(`dbadge-${id}`);
+    if(el&&badge){ el.classList.add(ds); badge.textContent=ds==='embedded'?'✓ Vectorized':'✓ Loaded'; }
+  });
+
+  // query text
+  if(s.queryText) document.getElementById('queryText').textContent=s.queryText;
+
+  // vectors
+  document.querySelectorAll('.vec-row').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('.vec-fill').forEach(f=>f.style.width='0');
+  const vecWidths=[94,78,71,63,31];
+  if(s.vecs&&s.vecs.length) {
+    s.vecs.forEach((vi,idx)=>{
+      const row=document.getElementById(`vr-${vi}`);
+      if(row){ row.classList.add('active'); setTimeout(()=>{ document.getElementById(`vf-${vi}`).style.width=vecWidths[vi]+'%'; },300+idx*150); }
+    });
+  }
+
+  // guardrails
+  document.querySelectorAll('.gr-item').forEach(g=>g.classList.remove('active-guard'));
+  if(s.guards&&s.guards.length) s.guards.forEach(gi=>{ const el=document.getElementById(`gr-${gi}`); if(el) el.classList.add('active-guard'); });
+}
+
+// ── CONTROLS ───────────────────────────────────────────────────────
+function startWalkthrough() {
+  if(running) return;
+  if(currentStep>=STEPS.length-1){ resetWalkthrough(); setTimeout(startWalkthrough,100); return; }
+  running=true;
+  document.getElementById('startBtn').disabled=true;
+  advanceStep();
+}
+
+function advanceStep() {
+  currentStep++;
+  if(currentStep>=STEPS.length){ running=false; document.getElementById('startBtn').disabled=false; document.getElementById('startBtn').textContent='↺ Run Again'; return; }
+  renderStep(currentStep);
+  stepTimer=setTimeout(advanceStep,2800);
+}
+
+function jumpToStep(i) {
+  if(stepTimer) clearTimeout(stepTimer);
+  running=false;
+  currentStep=i;
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('startBtn').textContent='▶ Continue';
+  renderStep(i);
+}
+
+function resetWalkthrough() {
+  if(stepTimer) clearTimeout(stepTimer);
+  running=false; currentStep=-1;
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('startBtn').textContent='▶ Start Walkthrough';
+  document.getElementById('stepCount').textContent='Step 0 of 7';
+  STEPS.forEach((_,j)=>{
+    const dot=document.getElementById(`sd-${j}`);
+    const lbl=document.getElementById(`sl-${j}`);
+    const fill=document.getElementById(`scf-${j}`);
+    if(dot){dot.classList.remove('active','done');dot.textContent=j+1;}
+    if(lbl) lbl.classList.remove('active','done');
+    if(fill) fill.style.width='0';
+  });
+  ['node-docs','node-chunk','node-embed','node-vstore','node-orch','node-ret','node-out'].forEach(nid=>colorNode(nid,'normal'));
+  document.getElementById('packets').innerHTML='';
+  document.getElementById('infoPanel').innerHTML=`<div class="idle-msg"><div class="idle-icon">&#9654;</div><p>Click <strong style="color:#7EC8F5">Start Walkthrough</strong> to see<br/>how each step of the RAG pipeline works — live and animated.</p></div>`;
+  document.querySelectorAll('.doc-item').forEach(d=>d.classList.remove('ingested','embedded'));
+  document.querySelectorAll('.di-badge').forEach(b=>b.textContent='Pending');
+  document.querySelectorAll('.vec-row').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('.vec-fill').forEach(f=>f.style.width='0');
+  document.getElementById('queryText').textContent='"Waiting for query..."';
+  document.querySelectorAll('.gr-item').forEach(g=>g.classList.remove('active-guard'));
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+buildTrack();
+</script>
+</body>
+</html>

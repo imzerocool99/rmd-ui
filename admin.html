@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RMD Agent — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d1117;color:#e6edf3;font-family:'Segoe UI',sans-serif;font-size:13px}
+a{color:#7EC8F5;text-decoration:none}
+
+/* ── TOPBAR ── */
+.topbar{background:#161b22;border-bottom:1px solid #21262d;padding:0 24px;height:50px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tb-logo{font-size:14px;font-weight:800}.tb-logo span{color:#7EC8F5}
+.tb-badge{font-size:10px;font-weight:700;background:#3d1f00;color:#f59e0b;border:1px solid #f59e0b40;
+  padding:3px 12px;border-radius:20px;letter-spacing:.5px}
+.tb-status{display:flex;align-items:center;gap:6px;font-size:11px;color:#8b949e}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#484f58}
+.status-dot.up{background:#4ade80;box-shadow:0 0 6px #4ade8060}
+.status-dot.down{background:#f85149}
+
+/* ── NAV TABS ── */
+.nav{background:#161b22;border-bottom:1px solid #21262d;display:flex;padding:0 24px;gap:2px}
+.tab{padding:12px 18px;font-size:12px;font-weight:600;color:#484f58;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:#c9d1d9}
+.tab.active{color:#7EC8F5;border-bottom-color:#7EC8F5}
+
+/* ── LAYOUT ── */
+.content{max-width:1200px;margin:0 auto;padding:24px}
+.panel{display:none}.panel.active{display:block}
+
+/* ── CARDS ── */
+.card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:20px;margin-bottom:16px}
+.card-title{font-size:11px;font-weight:700;color:#7EC8F5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+
+/* ── HEALTH GRID ── */
+.health-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.health-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:16px;text-align:center}
+.health-card.ok{border-color:#4ade8040}
+.health-card.warn{border-color:#f59e0b40}
+.health-card.err{border-color:#f8514940}
+.hc-icon{font-size:24px;margin-bottom:8px}
+.hc-label{font-size:11px;color:#8b949e;margin-bottom:4px}
+.hc-value{font-size:14px;font-weight:700;color:#e6edf3}
+.hc-sub{font-size:10px;color:#484f58;margin-top:4px}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-box{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center}
+.stat-num{font-size:22px;font-weight:800;color:#7EC8F5}
+.stat-lbl{font-size:10px;color:#484f58;margin-top:4px}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+
+/* ── DOC LIST ── */
+.doc-list{background:#0d1117;border:1px solid #21262d;border-radius:8px;overflow:hidden;max-height:600px;overflow-y:auto}
+.doc-list-header{padding:10px 14px;font-size:10px;font-weight:700;color:#484f58;
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #21262d;
+  display:flex;justify-content:space-between;align-items:center}
+.doc-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid #161b22;transition:background .15s}
+.doc-item:hover{background:#161b22}
+.doc-item.selected{background:#0d1a2e;border-left:2px solid #7EC8F5}
+.di-title{font-size:11px;font-weight:600;color:#c9d1d9;margin-bottom:3px}
+.di-cat{font-size:9px;font-weight:700;padding:1px 7px;border-radius:6px;display:inline-block}
+.cat-irs{background:#0d1a2e;color:#7EC8F5;border:1px solid #7EC8F530}
+.cat-strategies{background:#0a1a0a;color:#4ade80;border:1px solid #4ade8030}
+.cat-products{background:#1a0d2e;color:#a78bfa;border:1px solid #a78bfa30}
+.cat-policies{background:#1a1000;color:#f59e0b;border:1px solid #f59e0b30}
+.cat-compliance{background:#1a050a;color:#f87171;border:1px solid #f8717130}
+
+/* ── EDITOR ── */
+.editor-form{display:flex;flex-direction:column;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{font-size:10px;font-weight:700;color:#8b949e;display:block;margin-bottom:4px;
+  text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{width:100%;background:#0d1117;border:1px solid #21262d;border-radius:6px;
+  color:#e6edf3;font-size:12px;padding:8px 12px;font-family:inherit;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:#7EC8F560}
+textarea{resize:vertical;min-height:200px;line-height:1.7}
+select option{background:#0d1117}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:6px;font-size:12px;font-weight:700;padding:8px 18px;
+  cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:#1a3a6a;color:#7EC8F5;border:1px solid #7EC8F540}
+.btn-primary:hover{background:#1e4580;border-color:#7EC8F5}
+.btn-success{background:#0a1a0a;color:#4ade80;border:1px solid #4ade8040}
+.btn-success:hover{background:#0d2a0d;border-color:#4ade80}
+.btn-danger{background:#1a0505;color:#f85149;border:1px solid #f8514940}
+.btn-danger:hover{background:#2a0808;border-color:#f85149}
+.btn-warn{background:#1a1000;color:#f59e0b;border:1px solid #f59e0b40}
+.btn-warn:hover{background:#2a1800}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ── RAG TESTER ── */
+.query-input-row{display:flex;gap:10px;margin-bottom:16px}
+.query-input-row input{flex:1}
+.result-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;
+  padding:14px;margin-bottom:10px;transition:border-color .2s}
+.result-card.top{border-color:#7EC8F560}
+.rc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.rc-title{font-size:12px;font-weight:700;color:#e6edf3}
+.rc-score{font-size:11px;font-weight:700;color:#7EC8F5}
+.rc-cat{font-size:9px}
+.rc-preview{font-size:11px;color:#8b949e;line-height:1.7}
+.score-bar{height:4px;border-radius:2px;background:#21262d;margin-top:8px;overflow:hidden}
+.score-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#1a3a6a,#7EC8F5)}
+
+.prompt-preview{background:#0d1117;border:1px solid #21262d;border-left:3px solid #7EC8F5;
+  border-radius:6px;padding:14px;font-family:monospace;font-size:11px;color:#a78bfa;
+  line-height:1.8;white-space:pre-wrap;max-height:300px;overflow-y:auto}
+
+/* ── SETTINGS ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-row input[type=range]{flex:1;accent-color:#7EC8F5}
+.slider-val{font-size:13px;font-weight:700;color:#7EC8F5;min-width:40px;text-align:right}
+
+/* ── AUDIT TABLE ── */
+.audit-table{width:100%;border-collapse:collapse}
+.audit-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  color:#484f58;padding:8px 12px;border-bottom:2px solid #21262d;text-align:left}
+.audit-table td{padding:10px 12px;border-bottom:1px solid #161b22;font-size:11px;vertical-align:top}
+.audit-table tr:hover td{background:#1c2128}
+.audit-time{color:#484f58;font-size:10px;white-space:nowrap}
+.audit-query{color:#c9d1d9;font-weight:600}
+.audit-docs{display:flex;flex-direction:column;gap:3px}
+.audit-doc-tag{font-size:9px;padding:2px 8px;border-radius:6px;background:#0d1a2e;
+  color:#7EC8F5;border:1px solid #7EC8F520;display:inline-block}
+
+/* ── FEEDBACK ── */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;
+  font-size:12px;font-weight:700;z-index:999;display:none;animation:slideUp .3s ease}
+.toast.success{background:#0a2a0a;border:1px solid #4ade80;color:#4ade80}
+.toast.error{background:#2a0505;border:1px solid #f85149;color:#f85149}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.empty-state{text-align:center;padding:40px;color:#484f58;font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="tb-logo">RMD <span>Agent</span></div>
+    <div class="tb-badge">ADMIN</div>
+  </div>
+  <div class="tb-status">
+    <div class="status-dot" id="beStatus"></div>
+    <span id="beLabel">Checking...</span>
+    &nbsp;|&nbsp;
+    <div class="status-dot" id="llmStatus"></div>
+    <span id="llmLabel">Ollama</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="showTab('kb')">Knowledge Base</div>
+  <div class="tab" onclick="showTab('tester')">RAG Tester</div>
+  <div class="tab" onclick="showTab('settings')">LLM Settings</div>
+  <div class="tab" onclick="showTab('audit')">Audit Log</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 1 — DASHBOARD
+══════════════════════════════════════════════════════ -->
+<div class="content panel active" id="tab-dashboard">
+
+  <div class="stat-row" id="statRow">
+    <div class="stat-box"><div class="stat-num" id="s-docs">—</div><div class="stat-lbl">Knowledge Docs</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-terms">—</div><div class="stat-lbl">Unique Terms</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-model">—</div><div class="stat-lbl">Active Model</div></div>
+    <div class="stat-box"><div class="stat-num" id="s-temp">—</div><div class="stat-lbl">Temperature</div></div>
+  </div>
+
+  <div class="health-grid" id="healthGrid">
+    <div class="health-card" id="hc-backend">
+      <div class="hc-icon">⚙️</div>
+      <div class="hc-label">Backend</div>
+      <div class="hc-value" id="hcv-backend">Checking...</div>
+      <div class="hc-sub">localhost:8085</div>
+    </div>
+    <div class="health-card" id="hc-ollama">
+      <div class="hc-icon">🤖</div>
+      <div class="hc-label">Ollama LLM</div>
+      <div class="hc-value" id="hcv-ollama">Checking...</div>
+      <div class="hc-sub" id="hcsub-ollama">localhost:11434</div>
+    </div>
+    <div class="health-card" id="hc-rag">
+      <div class="hc-icon">🗄️</div>
+      <div class="hc-label">RAG Index</div>
+      <div class="hc-value" id="hcv-rag">Checking...</div>
+      <div class="hc-sub" id="hcsub-rag">In-memory · TF-IDF</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">Quick Actions</div>
+    <div class="btn-row">
+      <button class="btn btn-warn" onclick="rebuildIndex()">🔄 Rebuild RAG Index</button>
+      <button class="btn btn-primary" onclick="refreshHealth()">↺ Refresh Status</button>
+      <button class="btn btn-primary" onclick="showTab('kb')">📄 Manage Knowledge Base</button>
+      <button class="btn btn-primary" onclick="showTab('tester')">🔍 Test RAG Query</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Knowledge Base — Category Breakdown</div>
+    <div id="catBreakdown" style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="empty-state">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 2 — KNOWLEDGE BASE
+══════════════════════════════════════════════════════ -->
+<div class="content panel" id="tab-kb">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:700;color:#e6edf3">Knowledge Base Manager</div>
+    <div class="btn-row">
+      <button class="btn btn-success btn-sm" onclick="newDocument()">+ New Document</button>
+      <button class="btn btn-warn btn-sm" onclick="rebuildIndex()">🔄 Rebuild Index</button>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- LEFT: DOC LIST -->
+    <div>
+      <div class="doc-list" id="docList">
+        <div class="doc-list-header">
+          <span>Documents</span>
+          <span id="docCount" style="color:#7EC8F5;font-size:11px">—</span>
+        </div>
+        <div id="docListBody"><div class="empty-state">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: EDITOR -->
+    <div class="card" id="editorCard">
+      <div class="card-title" id="editorTitle">Select a document to edit</div>
+      <div id="editorBody">
+        <div class="empty-state" style="padding:60px">
+          ← Select a document from the list, or click <strong>+ New Document</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 3 — RAG TESTER
+══════════════════════════════════════════════════════ -->
+<div class="content panel" id="tab-tester">
+
+  <div class="card">
+    <div class="card-title">Test a RAG Query</div>
+    <div style="font-size:12px;color:#8b949e;margin-bottom:12px">
+      Type any question an FA or client might ask. See exactly which knowledge documents would be retrieved and what the augmented prompt looks like.
+    </div>
+    <div class="query-input-row">
+      <input type="text" id="testQuery" placeholder="e.g. client taking cash distribution — where should it land?"
+        onkeydown="if(event.key==='Enter') runTest()"/>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="margin:0;white-space:nowrap">Top K:</label>
+        <input type="number" id="testTopK" value="3" min="1" max="10" style="width:60px"/>
+        <button class="btn btn-primary" onclick="runTest()">▶ Run</button>
+      </div>
+    </div>
+
+    <!-- Quick test buttons -->
+    <div class="btn-row" style="margin-top:6px">
+      <span style="font-size:10px;color:#484f58">Quick tests:</span>
+      <button class="btn btn-sm" style="background:#0d1117;border:1px solid #21262d;color:#8b949e"
+        onclick="setAndRun('what is a QCD and when should a client use it?')">QCD</button>
+      <button class="btn btn-sm" style="background:#0d1117;border:1px solid #21262d;color:#8b949e"
+        onclick="setAndRun('client age 74 taking cash distribution landing account')">Cash Landing</button>
+      <button class="btn btn-sm" style="background:#0d1117;border:1px solid #21262d;color:#8b949e"
+        onclick="setAndRun('Roth conversion tax implications RMD reduction strategy')">Roth</button>
+      <button class="btn btn-sm" style="background:#0d1117;border:1px solid #21262d;color:#8b949e"
+        onclick="setAndRun('IRMAA Medicare surcharge income threshold')">IRMAA</button>
+    </div>
+  </div>
+
+  <div id="testResults" style="display:none">
+    <div style="font-size:11px;font-weight:700;color:#484f58;text-transform:uppercase;
+      letter-spacing:.5px;margin-bottom:10px">Retrieved Documents</div>
+    <div id="resultCards"></div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Augmented Prompt Preview</div>
+      <div style="font-size:11px;color:#8b949e;margin-bottom:10px">
+        This is what gets sent to Phi-3 when a user asks this question — your retrieved documents injected before the question.
+      </div>
+      <div class="prompt-preview" id="promptPreview"></div>
+    </div>
+  </div>
+
+  <div id="testEmpty" style="margin-top:20px">
+    <div class="empty-state">Enter a query above and click Run to test retrieval</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 4 — LLM SETTINGS
+══════════════════════════════════════════════════════ -->
+<div class="content panel" id="tab-settings">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <div class="card">
+      <div class="card-title">Model Configuration</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <div>
+          <label>Model Name</label>
+          <input type="text" id="cfg-model" placeholder="phi3"/>
+          <div style="font-size:10px;color:#484f58;margin-top:4px">
+            Available via Ollama: phi3, llama3.1, mistral, gemma2 — must be pulled first
+          </div>
+        </div>
+
+        <div>
+          <label>Temperature — <span style="color:#8b949e">Controls creativity vs precision</span></label>
+          <div class="slider-row">
+            <input type="range" id="cfg-temp" min="0" max="1" step="0.05"
+              oninput="document.getElementById('cfg-temp-val').textContent=this.value"/>
+            <div class="slider-val" id="cfg-temp-val">0.3</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#484f58;margin-top:2px">
+            <span>0.0 — Deterministic / factual</span>
+            <span>1.0 — Creative / varied</span>
+          </div>
+        </div>
+
+        <div>
+          <label>Top P — <span style="color:#8b949e">Nucleus sampling cutoff</span></label>
+          <div class="slider-row">
+            <input type="range" id="cfg-topp" min="0.1" max="1" step="0.05"
+              oninput="document.getElementById('cfg-topp-val').textContent=this.value"/>
+            <div class="slider-val" id="cfg-topp-val">0.9</div>
+          </div>
+          <div style="font-size:10px;color:#484f58;margin-top:2px">0.9 is a safe default. Lower = more conservative word choices.</div>
+        </div>
+
+        <div>
+          <label>Max Tokens (num_predict)</label>
+          <div class="slider-row">
+            <input type="range" id="cfg-tokens" min="64" max="512" step="32"
+              oninput="document.getElementById('cfg-tokens-val').textContent=this.value + ' (~' + Math.round(this.value*3.8) + ' chars)'"/>
+            <div class="slider-val" id="cfg-tokens-val" style="min-width:120px;font-size:11px">256 (~972 chars)</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-success" onclick="saveSettings()">✓ Save Settings</button>
+          <button class="btn btn-primary" onclick="loadSettings()">↺ Reload from Server</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What Each Setting Does</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:#7EC8F5;margin-bottom:4px">Temperature</div>
+          <div style="font-size:11px;color:#8b949e;line-height:1.7">
+            <strong style="color:#c9d1d9">0.1–0.3</strong> — Best for financial advice. Responses are consistent and factual.
+            Recommended for production.<br/>
+            <strong style="color:#c9d1d9">0.5–0.7</strong> — More variation in phrasing. Good for client-facing summaries.<br/>
+            <strong style="color:#c9d1d9">0.8+</strong> — Creative but may introduce inaccuracies. Avoid for financial content.
+          </div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:#7EC8F5;margin-bottom:4px">Max Tokens</div>
+          <div style="font-size:11px;color:#8b949e;line-height:1.7">
+            Controls how long the response can be. 256 tokens ≈ a short paragraph.
+            512 tokens ≈ 2 paragraphs. Higher means slower response time.
+          </div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:#7EC8F5;margin-bottom:4px">Model</div>
+          <div style="font-size:11px;color:#8b949e;line-height:1.7">
+            <strong style="color:#c9d1d9">phi3</strong> — Fast, runs on CPU, good for simple Q&A.<br/>
+            <strong style="color:#c9d1d9">llama3.1</strong> — Much better reasoning, needs GPU or fast CPU.<br/>
+            <strong style="color:#c9d1d9">mistral</strong> — Good balance of speed and quality.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB 5 — AUDIT LOG
+══════════════════════════════════════════════════════ -->
+<div class="content panel" id="tab-audit">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="card-title" style="margin:0">Recent RAG Queries</div>
+      <button class="btn btn-primary btn-sm" onclick="loadAudit()">↺ Refresh</button>
+    </div>
+    <div id="auditContent">
+      <div class="empty-state">Loading audit log...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8085';
+
+// ── TAB SWITCHING ──────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['dashboard','kb','tester','settings','audit'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'dashboard') refreshHealth();
+  if (name === 'kb')        loadDocuments();
+  if (name === 'settings')  loadSettings();
+  if (name === 'audit')     loadAudit();
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 2800);
+}
+
+// ── API HELPERS ────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// ── HEALTH ─────────────────────────────────────────────────────────
+async function refreshHealth() {
+  try {
+    const h = await api('GET', '/admin/health');
+
+    // topbar dots
+    document.getElementById('beStatus').className = 'status-dot up';
+    document.getElementById('beLabel').textContent = 'Backend UP';
+
+    const ollamaUp = h.llm.ollamaStatus === 'UP';
+    document.getElementById('llmStatus').className = 'status-dot ' + (ollamaUp ? 'up' : 'down');
+    document.getElementById('llmLabel').textContent = 'Ollama ' + h.llm.ollamaStatus;
+
+    // health cards
+    setCard('backend', 'UP', '#161b22', '#4ade8040', '#4ade80');
+    setCard('ollama', h.llm.ollamaStatus, '#161b22',
+      ollamaUp ? '#4ade8040' : '#f8514940', ollamaUp ? '#4ade80' : '#f85149');
+    const stats = h.ragIndex;
+    setCard('rag', stats.documentCount + ' docs indexed', '#161b22', '#7EC8F540', '#7EC8F5');
+    document.getElementById('hcsub-rag').textContent = stats.uniqueTerms + ' unique terms';
+    document.getElementById('hcsub-ollama').textContent = h.llm.model + ' · ' + h.llm.ollamaUrl.replace('/api/generate','');
+
+    // stats row
+    document.getElementById('s-docs').textContent = stats.documentCount;
+    document.getElementById('s-terms').textContent = stats.uniqueTerms;
+    document.getElementById('s-model').textContent = h.llm.model;
+    document.getElementById('s-temp').textContent = '—';
+
+    // category breakdown
+    const cats = stats.byCategory || {};
+    const catEl = document.getElementById('catBreakdown');
+    catEl.innerHTML = Object.entries(cats).map(([k,v]) =>
+      `<div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 18px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:#7EC8F5">${v}</div>
+        <div style="font-size:10px;color:#8b949e;margin-top:2px">${k}</div>
+       </div>`
+    ).join('');
+
+  } catch(e) {
+    document.getElementById('beStatus').className = 'status-dot down';
+    document.getElementById('beLabel').textContent = 'Backend DOWN';
+    setCard('backend','Cannot connect','#1a0505','#f8514940','#f85149');
+    setCard('ollama','Unknown','#161b22','#21262d','#484f58');
+    setCard('rag','Unknown','#161b22','#21262d','#484f58');
+  }
+}
+
+function setCard(id, value, bg, border, color) {
+  const c = document.getElementById('hc-'+id);
+  const v = document.getElementById('hcv-'+id);
+  c.style.background = bg;
+  c.style.borderColor = border.replace('40','').replace('30','') + '40';
+  v.style.color = color;
+  v.textContent = value;
+}
+
+// ── REBUILD INDEX ─────────────────────────────────────────────────
+async function rebuildIndex() {
+  try {
+    const r = await api('POST', '/admin/rag/rebuild');
+    toast('Index rebuilt — ' + r.indexStats.documentCount + ' docs, ' + r.indexStats.uniqueTerms + ' terms');
+    if (document.getElementById('tab-dashboard').classList.contains('active')) refreshHealth();
+  } catch(e) { toast('Rebuild failed: ' + e.message, 'error'); }
+}
+
+// ── DOCUMENTS ─────────────────────────────────────────────────────
+let allDocs = [];
+let selectedDocId = null;
+
+async function loadDocuments() {
+  try {
+    allDocs = await api('GET', '/admin/rag/documents');
+    renderDocList();
+  } catch(e) {
+    document.getElementById('docListBody').innerHTML =
+      '<div class="empty-state">Cannot load documents — is the backend running?</div>';
+  }
+}
+
+function renderDocList() {
+  document.getElementById('docCount').textContent = allDocs.length + ' docs';
+  const cats = ['irs-rules','strategies','products','policies','compliance'];
+  let html = '';
+  cats.forEach(cat => {
+    const docs = allDocs.filter(d => d.category === cat);
+    if (!docs.length) return;
+    html += `<div style="padding:6px 14px 4px;font-size:9px;font-weight:700;color:#484f58;
+      text-transform:uppercase;letter-spacing:.4px;background:#0d1117;border-bottom:1px solid #161b22">
+      ${cat}</div>`;
+    docs.forEach(d => {
+      const sel = d.id === selectedDocId ? ' selected' : '';
+      html += `<div class="doc-item${sel}" onclick="selectDoc('${d.id}')">
+        <div class="di-title">${d.title}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('docListBody').innerHTML = html || '<div class="empty-state">No documents</div>';
+}
+
+function selectDoc(id) {
+  selectedDocId = id;
+  renderDocList();
+  const doc = allDocs.find(d => d.id === id);
+  if (!doc) return;
+  renderEditor(doc);
+}
+
+function renderEditor(doc, isNew) {
+  document.getElementById('editorTitle').textContent = isNew ? 'New Document' : 'Edit Document';
+  document.getElementById('editorBody').innerHTML = `
+    <div class="editor-form">
+      <div class="form-row">
+        <div>
+          <label>Document ID</label>
+          <input type="text" id="ef-id" value="${doc.id||''}" ${isNew?'':'readonly style="opacity:.5"'}/>
+        </div>
+        <div>
+          <label>Category</label>
+          <select id="ef-cat">
+            ${['irs-rules','strategies','products','policies','compliance'].map(c =>
+              `<option value="${c}" ${doc.category===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Title</label>
+        <input type="text" id="ef-title" value="${(doc.title||'').replace(/"/g,'&quot;')}"/>
+      </div>
+      <div>
+        <label>Content — <span style="font-weight:400;color:#484f58">Replace [REPLACE ...] placeholders with your firm's actual data</span></label>
+        <textarea id="ef-content">${doc.content||''}</textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-success" onclick="${isNew?'saveNew()':'saveEdit()'}">✓ Save</button>
+        ${!isNew ? `<button class="btn btn-danger" onclick="deleteDoc('${doc.id}')">Delete</button>` : ''}
+        <button class="btn btn-primary" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </div>`;
+}
+
+function newDocument() {
+  selectedDocId = null;
+  renderDocList();
+  renderEditor({id:'', title:'', category:'products', content:''}, true);
+  document.getElementById('editorTitle').textContent = 'New Document';
+}
+
+function cancelEdit() {
+  selectedDocId = null;
+  renderDocList();
+  document.getElementById('editorTitle').textContent = 'Select a document to edit';
+  document.getElementById('editorBody').innerHTML =
+    '<div class="empty-state" style="padding:60px">← Select a document from the list, or click + New Document</div>';
+}
+
+async function saveEdit() {
+  const body = {
+    title:    document.getElementById('ef-title').value,
+    category: document.getElementById('ef-cat').value,
+    content:  document.getElementById('ef-content').value
+  };
+  try {
+    await api('PUT', '/admin/rag/documents/' + selectedDocId, body);
+    toast('Document saved and index rebuilt');
+    await loadDocuments();
+    const updated = allDocs.find(d => d.id === selectedDocId);
+    if (updated) renderEditor(updated);
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+async function saveNew() {
+  const body = {
+    id:       document.getElementById('ef-id').value || undefined,
+    title:    document.getElementById('ef-title').value,
+    category: document.getElementById('ef-cat').value,
+    content:  document.getElementById('ef-content').value
+  };
+  try {
+    const r = await api('POST', '/admin/rag/documents', body);
+    toast('Document added — id: ' + r.id);
+    selectedDocId = r.id;
+    await loadDocuments();
+    const added = allDocs.find(d => d.id === r.id);
+    if (added) renderEditor(added);
+  } catch(e) { toast('Add failed: ' + e.message, 'error'); }
+}
+
+async function deleteDoc(id) {
+  if (!confirm('Delete this document? The index will be rebuilt automatically.')) return;
+  try {
+    await api('DELETE', '/admin/rag/documents/' + id);
+    toast('Document deleted');
+    cancelEdit();
+    await loadDocuments();
+  } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
+}
+
+// ── RAG TESTER ────────────────────────────────────────────────────
+function setAndRun(q) {
+  document.getElementById('testQuery').value = q;
+  runTest();
+}
+
+async function runTest() {
+  const query = document.getElementById('testQuery').value.trim();
+  const topK  = parseInt(document.getElementById('testTopK').value) || 3;
+  if (!query) return;
+
+  document.getElementById('testEmpty').style.display = 'none';
+  document.getElementById('testResults').style.display = 'none';
+  document.getElementById('resultCards').innerHTML = '<div class="empty-state">Searching...</div>';
+  document.getElementById('testResults').style.display = 'block';
+
+  try {
+    const r = await api('POST', '/admin/rag/test', { query, topK });
+    const catClass = c => 'cat-' + (c||'').replace('-','');
+
+    document.getElementById('resultCards').innerHTML = r.results.length
+      ? r.results.map((res, i) => `
+          <div class="result-card ${i===0?'top':''}">
+            <div class="rc-header">
+              <div>
+                <div class="rc-title">${res.title}</div>
+                <div class="rc-cat"><span class="di-cat ${catClass(res.category)}">${res.category}</span></div>
+              </div>
+              <div class="rc-score">${(res.score*100).toFixed(1)}% match</div>
+            </div>
+            <div class="rc-preview">${res.preview}</div>
+            <div class="score-bar"><div class="score-fill" style="width:${res.score*100}%"></div></div>
+          </div>`)
+        .join('')
+      : '<div class="empty-state">No documents matched this query. Try different wording or add relevant documents.</div>';
+
+    document.getElementById('promptPreview').textContent = r.augmentedPromptPreview;
+  } catch(e) {
+    document.getElementById('resultCards').innerHTML =
+      '<div class="empty-state" style="color:#f85149">Error: ' + e.message + '</div>';
+  }
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────
+async function loadSettings() {
+  try {
+    const s = await api('GET', '/admin/settings');
+    document.getElementById('cfg-model').value  = s.model || 'phi3';
+    document.getElementById('cfg-temp').value   = s.temperature || 0.3;
+    document.getElementById('cfg-temp-val').textContent = s.temperature || 0.3;
+    document.getElementById('cfg-topp').value   = s.topP || 0.9;
+    document.getElementById('cfg-topp-val').textContent = s.topP || 0.9;
+    document.getElementById('cfg-tokens').value = s.numPredict || 256;
+    document.getElementById('cfg-tokens-val').textContent =
+      (s.numPredict||256) + ' (~' + Math.round((s.numPredict||256)*3.8) + ' chars)';
+    document.getElementById('s-temp').textContent = s.temperature || 0.3;
+    document.getElementById('s-model').textContent = s.model || 'phi3';
+  } catch(e) { /* backend may not be up yet */ }
+}
+
+async function saveSettings() {
+  const body = {
+    model:      document.getElementById('cfg-model').value,
+    temperature: parseFloat(document.getElementById('cfg-temp').value),
+    topP:        parseFloat(document.getElementById('cfg-topp').value),
+    numPredict:  parseInt(document.getElementById('cfg-tokens').value)
+  };
+  try {
+    await api('POST', '/admin/settings', body);
+    toast('Settings saved — effective immediately, no restart needed');
+    document.getElementById('s-temp').textContent  = body.temperature;
+    document.getElementById('s-model').textContent = body.model;
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+// ── AUDIT LOG ─────────────────────────────────────────────────────
+async function loadAudit() {
+  try {
+    const entries = await api('GET', '/admin/audit');
+    if (!entries.length) {
+      document.getElementById('auditContent').innerHTML =
+        '<div class="empty-state">No queries yet — send a chat message or run the RAG tester to see entries here.</div>';
+      return;
+    }
+    document.getElementById('auditContent').innerHTML = `
+      <table class="audit-table">
+        <thead><tr>
+          <th>Time</th><th>Query</th><th>Documents Retrieved</th>
+        </tr></thead>
+        <tbody>${entries.map(e => `
+          <tr>
+            <td class="audit-time">${new Date(e.timestamp).toLocaleTimeString()}</td>
+            <td class="audit-query">${e.query}</td>
+            <td class="audit-docs">${(e.retrieved||[]).map(d =>
+              `<span class="audit-doc-tag">${d}</span>`).join('')}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    document.getElementById('auditContent').innerHTML =
+      '<div class="empty-state" style="color:#f85149">Cannot load audit log — backend not reachable.</div>';
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+refreshHealth();
+</script>
+</body>
+</html>

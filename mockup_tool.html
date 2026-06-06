@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RMD Agent — How the Tool Works</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#0d1117;color:#e6edf3;
+  font-family:'Segoe UI',sans-serif;font-size:13px}
+
+/* ── TOPBAR ── */
+.topbar{height:48px;background:#161b22;border-bottom:1px solid #21262d;
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.tb-logo{font-size:14px;font-weight:800}.tb-logo span{color:#7EC8F5}
+.tb-badge{font-size:10px;font-weight:700;background:#0a1a0a;color:#4ade80;
+  border:1px solid #4ade8040;padding:3px 12px;border-radius:20px;letter-spacing:.5px}
+.tb-step{font-size:11px;color:#484f58}
+
+/* ── MAIN LAYOUT ── */
+.main{display:grid;grid-template-columns:55% 45%;
+  height:calc(100vh - 48px - 64px)}
+
+/* ── DIAGRAM PANE ── */
+.diagram-pane{padding:20px 16px 12px 20px;display:flex;flex-direction:column}
+.diagram-title{font-size:10px;font-weight:700;color:#484f58;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:12px}
+.svg-wrap{flex:1;display:flex;align-items:center;justify-content:center}
+svg{overflow:visible}
+
+/* ── STEP PANE ── */
+.step-pane{border-left:1px solid #21262d;padding:20px;display:flex;flex-direction:column;
+  overflow:hidden}
+.step-number{font-size:10px;font-weight:700;color:#484f58;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:6px}
+.step-title{font-size:16px;font-weight:800;color:#e6edf3;margin-bottom:4px;line-height:1.3}
+.step-sub{font-size:11px;color:#7EC8F5;margin-bottom:16px}
+.step-body{flex:1;overflow:hidden}
+
+/* ── MINI UI MOCKUPS ── */
+.mock-card{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;margin-bottom:10px}
+.mock-title{font-size:10px;font-weight:700;color:#484f58;text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.mock-row{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 10px;background:#0d1117;border-radius:5px;margin-bottom:5px;font-size:11px}
+.tag{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block}
+.tag-irs{background:#0d1a2e;color:#7EC8F5;border:1px solid #7EC8F530}
+.tag-strat{background:#0a1a0a;color:#4ade80;border:1px solid #4ade8030}
+.tag-prod{background:#1a0d2e;color:#a78bfa;border:1px solid #a78bfa30}
+.tag-pol{background:#1a1000;color:#f59e0b;border:1px solid #f59e0b30}
+.tag-comp{background:#1a050a;color:#f87171;border:1px solid #f8717130}
+.tag-scen{background:#001a14;color:#34d399;border:1px solid #34d39930}
+.client-chip{background:#0d1a2e;border:1px solid #7EC8F540;border-radius:6px;padding:10px 14px;
+  display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#1a3a6a;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#7EC8F5}
+.client-info .name{font-size:12px;font-weight:700;color:#e6edf3}
+.client-info .meta{font-size:10px;color:#484f58;margin-top:2px}
+.chat-bubble{background:#0d1a2e;border:1px solid #7EC8F540;border-radius:8px;
+  padding:10px 14px;font-size:11px;color:#c9d1d9;line-height:1.7;margin-bottom:8px}
+.token-row{display:flex;gap:5px;flex-wrap:wrap;padding:8px}
+.tok{padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;
+  background:#21262d;color:#8b949e}
+.tok.hi{background:#1a3a6a;color:#7EC8F5;border:1px solid #7EC8F540;
+  animation:tokPulse 1s ease infinite alternate}
+@keyframes tokPulse{from{opacity:.7}to{opacity:1}}
+.score-bar-row{margin-bottom:8px}
+.sb-header{display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px}
+.sb-title{color:#c9d1d9;font-weight:600}
+.sb-pct{color:#7EC8F5;font-weight:700}
+.sb-track{height:6px;background:#21262d;border-radius:3px;overflow:hidden}
+.sb-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1a3a6a,#7EC8F5);transition:width 1.2s ease}
+.sb-cat{font-size:9px;margin-top:2px}
+.prompt-box{background:#0d1117;border:1px solid #21262d;border-left:3px solid #7EC8F5;
+  border-radius:5px;padding:10px;font-family:monospace;font-size:10px;line-height:1.8;
+  color:#8b949e;white-space:pre-wrap;max-height:180px;overflow:hidden}
+.prompt-box .hl-ctx{color:#a78bfa}
+.prompt-box .hl-q{color:#7EC8F5}
+.prompt-box .hl-sys{color:#4ade80}
+.processing-dots{display:flex;align-items:center;gap:8px;padding:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:#7EC8F5;
+  animation:bounce 1.2s ease infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-8px);opacity:1}}
+.answer-box{background:#0d1a2e;border:1px solid #7EC8F540;border-radius:8px;padding:12px;
+  font-size:11px;color:#c9d1d9;line-height:1.8}
+.citation{display:inline-block;font-size:9px;font-weight:700;padding:1px 7px;
+  background:#161b22;border:1px solid #7EC8F540;border-radius:4px;color:#7EC8F5;margin:2px}
+.audit-row{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;
+  background:#0d1117;border-radius:5px;margin-bottom:4px;font-size:10px}
+.audit-time{color:#484f58;white-space:nowrap}
+.audit-q{color:#c9d1d9;font-weight:600;flex:1}
+.stat-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sm-box{background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:10px;text-align:center}
+.sm-num{font-size:18px;font-weight:800;color:#7EC8F5}
+.sm-lbl{font-size:9px;color:#484f58;margin-top:2px}
+.code-block{background:#010409;border:1px solid #21262d;border-radius:6px;
+  padding:10px;font-family:monospace;font-size:10px;line-height:1.8;
+  color:#8b949e;overflow:hidden}
+.kw{color:#f97316}.fn{color:#7EC8F5}.str{color:#a3e635}.cmt{color:#484f58}
+.health-row{display:flex;gap:8px;margin-bottom:8px}
+.hchip{flex:1;background:#0d1117;border:1px solid #21262d;border-radius:6px;
+  padding:8px;text-align:center;font-size:10px}
+.hchip .dot-g{width:7px;height:7px;border-radius:50%;background:#4ade80;
+  margin:0 auto 4px;box-shadow:0 0 6px #4ade8060}
+.hchip .lbl{color:#8b949e}
+.hchip .val{font-weight:700;color:#4ade80;margin-top:2px}
+
+/* ── CONTROLS ── */
+.controls{height:64px;background:#161b22;border-top:1px solid #21262d;
+  display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.btn{border:none;border-radius:6px;font-size:11px;font-weight:700;padding:7px 16px;
+  cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-primary{background:#1a3a6a;color:#7EC8F5;border:1px solid #7EC8F540}
+.btn-primary:hover{background:#1e4580}
+.btn-play{background:#0a2a0a;color:#4ade80;border:1px solid #4ade8040;min-width:80px}
+.btn-play:hover{background:#0d3a0d}
+.dots{display:flex;gap:8px;align-items:center}
+.progress-dot{width:9px;height:9px;border-radius:50%;background:#21262d;cursor:pointer;
+  border:1px solid #21262d;transition:all .2s}
+.progress-dot.done{background:#484f58}
+.progress-dot.active{background:#7EC8F5;box-shadow:0 0 6px #7EC8F580;border-color:#7EC8F5;
+  width:22px;border-radius:5px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="tb-logo">RMD <span>Agent</span></div>
+    <div class="tb-badge">SYSTEM WALKTHROUGH</div>
+  </div>
+  <div class="tb-step" id="tbStep">Step 1 of 9</div>
+</div>
+
+<div class="main">
+  <!-- LEFT: SVG DIAGRAM -->
+  <div class="diagram-pane">
+    <div class="diagram-title">Live System Architecture · localhost:8085</div>
+    <div class="svg-wrap">
+      <svg id="diagram" viewBox="0 0 600 260" width="580" height="250">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#21262d"/>
+          </marker>
+          <marker id="arr-active" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#7EC8F5"/>
+          </marker>
+          <marker id="arr-green" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#4ade80"/>
+          </marker>
+          <filter id="glow-blue">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-green">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-purple">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- ── EDGES ── -->
+        <!-- FA → Spring (row 1 forward) -->
+        <path id="e-fa-spring" d="M115,36 L155,36"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Spring → RAG -->
+        <path id="e-spring-rag" d="M265,36 L305,36"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- RAG → KB -->
+        <path id="e-rag-kb" d="M415,36 L455,36"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- KB → RAG (return) -->
+        <path id="e-kb-rag" d="M455,46 L415,46"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- RAG → Ollama (vertical down) -->
+        <path id="e-rag-ollama" d="M360,58 L360,198"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Ollama → Spring (return arc) -->
+        <path id="e-ollama-spring" d="M340,216 C200,200 200,80 210,58"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Spring → FA (return) -->
+        <path id="e-spring-fa" d="M155,46 L115,46"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Spring → Audit (vertical down) -->
+        <path id="e-spring-audit" d="M210,58 L210,198"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Audit → Admin -->
+        <path id="e-audit-admin" d="M155,216 L115,216"
+          fill="none" stroke="#21262d" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Admin → KB (curved top) -->
+        <path id="e-admin-kb" d="M65,18 C65,-30 535,-30 535,18"
+          fill="none" stroke="#21262d" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+
+        <!-- ── NODES ── -->
+        <!-- FA App -->
+        <g id="n-fa">
+          <rect x="5" y="14" width="110" height="44" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="60" y="32" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">FA DASHBOARD</text>
+          <text x="60" y="46" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">Main App · :4500</text>
+          <text x="15" y="52" fill="#484f58" font-size="14">💼</text>
+        </g>
+        <!-- Spring Boot -->
+        <g id="n-spring">
+          <rect x="155" y="14" width="110" height="44" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="210" y="32" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">SPRING BOOT API</text>
+          <text x="210" y="46" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">localhost:8085</text>
+          <text x="165" y="52" fill="#484f58" font-size="14">⚙️</text>
+        </g>
+        <!-- RagService -->
+        <g id="n-rag">
+          <rect x="305" y="14" width="110" height="44" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="360" y="32" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">RAG SERVICE</text>
+          <text x="360" y="46" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">TF-IDF · cosine sim</text>
+          <text x="315" y="52" fill="#484f58" font-size="14">🔍</text>
+        </g>
+        <!-- Knowledge Base -->
+        <g id="n-kb">
+          <rect x="455" y="14" width="140" height="44" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="525" y="32" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">KNOWLEDGE BASE</text>
+          <text x="525" y="46" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">28 documents · 6 categories</text>
+          <text x="465" y="52" fill="#484f58" font-size="14">🗄️</text>
+        </g>
+        <!-- OllamaLLM -->
+        <g id="n-ollama">
+          <rect x="305" y="196" width="110" height="50" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="360" y="214" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">OllamaLLM</text>
+          <text x="360" y="228" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">Phi-3 · localhost:11434</text>
+          <text x="315" y="236" fill="#484f58" font-size="14">🤖</text>
+        </g>
+        <!-- Audit Log -->
+        <g id="n-audit">
+          <rect x="155" y="196" width="110" height="50" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="210" y="214" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">AUDIT LOG</text>
+          <text x="210" y="228" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">last 50 queries · ring buffer</text>
+          <text x="165" y="236" fill="#484f58" font-size="14">📋</text>
+        </g>
+        <!-- Admin UI -->
+        <g id="n-admin">
+          <rect x="5" y="196" width="110" height="50" rx="8"
+            fill="#161b22" stroke="#21262d" stroke-width="1.5" class="nrect"/>
+          <text x="60" y="214" text-anchor="middle" fill="#8b949e" font-size="9" font-weight="700" font-family="Segoe UI">ADMIN UI</text>
+          <text x="60" y="228" text-anchor="middle" fill="#484f58" font-size="8" font-family="Segoe UI">/admin.html · Spring static</text>
+          <text x="15" y="236" fill="#484f58" font-size="14">🛠️</text>
+        </g>
+
+        <!-- ── LABELS ON EDGES ── -->
+        <text x="133" y="30" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">query</text>
+        <text x="283" y="30" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">route</text>
+        <text x="433" y="30" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">lookup</text>
+        <text x="353" y="135" text-anchor="end" fill="#21262d" font-size="8" font-family="Segoe UI">augmented</text>
+        <text x="353" y="144" text-anchor="end" fill="#21262d" font-size="8" font-family="Segoe UI">prompt</text>
+        <text x="133" y="60" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">answer</text>
+        <text x="215" y="135" text-anchor="start" fill="#21262d" font-size="8" font-family="Segoe UI">log</text>
+        <text x="133" y="213" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">review</text>
+        <text x="300" y="-10" text-anchor="middle" fill="#21262d" font-size="8" font-family="Segoe UI">BA adds/updates docs</text>
+
+        <!-- ── ANIMATED PACKETS ── -->
+        <circle id="pkt1" r="5" fill="#a78bfa" opacity="0">
+          <animateMotion id="am1" dur="1.8s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-admin-kb"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt2" r="5" fill="#7EC8F5" opacity="0">
+          <animateMotion id="am2" dur="0.9s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-fa-spring"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt3" r="5" fill="#7EC8F5" opacity="0">
+          <animateMotion id="am3" dur="0.9s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-spring-rag"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt4a" r="4" fill="#4ade80" opacity="0">
+          <animateMotion id="am4a" dur="0.7s" begin="indefinite" repeatCount="indefinite">
+            <mpath href="#e-rag-kb"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt4b" r="4" fill="#4ade80" opacity="0">
+          <animateMotion id="am4b" dur="0.7s" begin="indefinite" repeatCount="indefinite">
+            <mpath href="#e-kb-rag"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt5" r="5" fill="#f59e0b" opacity="0">
+          <animateMotion id="am5" dur="0.8s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-kb-rag"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt6" r="5" fill="#7EC8F5" opacity="0">
+          <animateMotion id="am6" dur="1.4s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-rag-ollama"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt7" r="5" fill="#4ade80" opacity="0">
+          <animateMotion id="am7" dur="1.2s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-ollama-spring"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt8" r="5" fill="#4ade80" opacity="0">
+          <animateMotion id="am8" dur="0.7s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-spring-fa"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt9" r="4" fill="#484f58" opacity="0">
+          <animateMotion id="am9" dur="1.0s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-spring-audit"/>
+          </animateMotion>
+        </circle>
+        <circle id="pkt10" r="4" fill="#484f58" opacity="0">
+          <animateMotion id="am10" dur="0.7s" begin="indefinite" fill="freeze" repeatCount="1">
+            <mpath href="#e-audit-admin"/>
+          </animateMotion>
+        </circle>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RIGHT: STEP CONTENT -->
+  <div class="step-pane">
+    <div class="step-number" id="stepNum">Step 1 of 9</div>
+    <div class="step-title" id="stepTitle">Loading…</div>
+    <div class="step-sub" id="stepSub"></div>
+    <div class="step-body" id="stepBody"></div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="btn btn-primary" id="btnPrev" onclick="prev()">◀ Prev</button>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div class="dots" id="dots"></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-play" id="btnPlay" onclick="togglePlay()">▶ Play</button>
+    <button class="btn btn-primary" id="btnNext" onclick="next()">Next ▶</button>
+  </div>
+</div>
+
+<script>
+// ── STEP DEFINITIONS ─────────────────────────────────────────────────────────
+
+const STEPS = [
+  {
+    title: "BA Loads the Knowledge Base",
+    sub: "Admin UI → InstitutionalKnowledgeBase.java",
+    activeNodes: ["admin","kb"],
+    edges: ["e-admin-kb"],
+    packets: ["pkt1"],
+    anims: ["am1"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Admin UI · Knowledge Base Tab</div>
+        <div class="stat-mini" style="margin-bottom:10px">
+          <div class="sm-box"><div class="sm-num">28</div><div class="sm-lbl">Documents</div></div>
+          <div class="sm-box"><div class="sm-num">6</div><div class="sm-lbl">Categories</div></div>
+          <div class="sm-box"><div class="sm-num">847</div><div class="sm-lbl">Unique Terms</div></div>
+        </div>
+        <div class="mock-row"><span>RMD Calculation Method</span><span class="tag tag-irs">irs-rules</span></div>
+        <div class="mock-row"><span>QCD — Charitable Distribution</span><span class="tag tag-irs">irs-rules</span></div>
+        <div class="mock-row"><span>SECURE Act 2.0 Changes</span><span class="tag tag-irs">irs-rules</span></div>
+        <div class="mock-row"><span>In-Kind Transfer Strategy</span><span class="tag tag-strat">strategies</span></div>
+        <div class="mock-row"><span>Apex Prime Money Market (APMXX)</span><span class="tag tag-prod">products</span></div>
+        <div class="mock-row"><span>IRMAA Medicare Thresholds</span><span class="tag tag-comp">compliance</span></div>
+        <div class="mock-row"><span>Volatile Market — In-Kind Scenario</span><span class="tag tag-scen">scenarios</span></div>
+      </div>
+      <div style="font-size:10px;color:#484f58;padding:4px 0">
+        TF-IDF index builds automatically on startup via <code style="color:#7EC8F5">@PostConstruct buildIndex()</code> — no manual step needed.
+      </div>`,
+    edgeColor: "#a78bfa"
+  },
+  {
+    title: "FA Selects a Client",
+    sub: "Main App Dashboard — Client Context Loaded",
+    activeNodes: ["fa"],
+    edges: [],
+    packets: [],
+    anims: [],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">FA Dashboard · Client Selected</div>
+        <div class="client-chip">
+          <div class="avatar">JS</div>
+          <div class="client-info">
+            <div class="name">John & Mary Smith</div>
+            <div class="meta">Age 75 · Conservative · 3 IRA Accounts</div>
+          </div>
+        </div>
+        <div class="mock-row"><span>IRA — Fidelity</span><span style="color:#4ade80;font-weight:700">$285,000</span></div>
+        <div class="mock-row"><span>IRA — Vanguard</span><span style="color:#4ade80;font-weight:700">$142,000</span></div>
+        <div class="mock-row"><span>IRA — Rollover</span><span style="color:#4ade80;font-weight:700">$58,000</span></div>
+        <div style="margin-top:10px;padding:8px 10px;background:#0d1117;border-radius:5px;font-size:11px">
+          <span style="color:#484f58">RMD Due 2024:</span>
+          <span style="color:#7EC8F5;font-weight:700;margin-left:8px">$19,715</span>
+          <span style="color:#484f58;margin-left:12px">Factor:</span>
+          <span style="color:#8b949e;margin-left:4px">24.6 (age 75)</span>
+        </div>
+      </div>
+      <div class="mock-card" style="padding:10px 14px">
+        <div class="mock-title">Advisory Intelligence</div>
+        <div style="font-size:11px;color:#f59e0b;line-height:1.7">
+          ⚠ Markets down 14% YTD — consider in-kind transfer to avoid selling at depressed prices
+        </div>
+      </div>`,
+    edgeColor: null
+  },
+  {
+    title: "FA Asks the AI a Question",
+    sub: "FA App → Spring Boot API (POST /chat)",
+    activeNodes: ["fa","spring"],
+    edges: ["e-fa-spring"],
+    packets: ["pkt2"],
+    anims: ["am2"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">AI Chat Interface</div>
+        <div class="chat-bubble">
+          "My client is 75, markets are down, they need to take their $19,715 RMD — what is the best strategy?"
+        </div>
+        <div style="height:4px;background:#21262d;border-radius:2px;overflow:hidden;margin-top:6px">
+          <div style="height:100%;width:60%;background:#7EC8F5;animation:pulse 1s ease infinite alternate;border-radius:2px"></div>
+        </div>
+        <div style="font-size:9px;color:#484f58;margin-top:4px">Sending to backend…</div>
+      </div>
+      <div class="mock-card">
+        <div class="mock-title">HTTP Request</div>
+        <div class="code-block"><span class="kw">POST</span> http://localhost:<span class="fn">8085</span>/chat
+Content-Type: application/json
+
+{
+  <span class="str">"message"</span>: <span class="str">"...client is 75, markets are down..."</span>,
+  <span class="str">"clientAge"</span>: <span class="fn">75</span>,
+  <span class="str">"rmdAmount"</span>: <span class="fn">19715</span>
+}</div>
+      </div>`,
+    edgeColor: "#7EC8F5"
+  },
+  {
+    title: "Query Routed to RagService",
+    sub: "Spring Boot routes to RagService.retrieveAsContext()",
+    activeNodes: ["spring","rag"],
+    edges: ["e-spring-rag"],
+    packets: ["pkt3"],
+    anims: ["am3"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Query Tokenized</div>
+        <div class="token-row">
+          <span class="tok hi">client</span>
+          <span class="tok hi">age</span>
+          <span class="tok hi">75</span>
+          <span class="tok">markets</span>
+          <span class="tok hi">down</span>
+          <span class="tok">need</span>
+          <span class="tok hi">rmd</span>
+          <span class="tok hi">19715</span>
+          <span class="tok hi">best</span>
+          <span class="tok hi">strategy</span>
+          <span class="tok">take</span>
+          <span class="tok">volatile</span>
+        </div>
+        <div style="font-size:10px;color:#484f58;margin-top:6px;padding:0 8px">
+          Stop words removed (the, and, is…) · Terms under 3 chars filtered · Result: 8 meaningful tokens
+        </div>
+      </div>
+      <div class="mock-card">
+        <div class="mock-title">RagService.java — Called Method</div>
+        <div class="code-block"><span class="kw">public</span> <span class="fn">String</span> retrieveAsContext(<span class="fn">String</span> query) {
+  List&lt;Map&gt; scored = <span class="fn">retrieveScored</span>(query, <span class="fn">3</span>);
+  <span class="cmt">// builds TF-IDF vector for query</span>
+  <span class="cmt">// computes cosine similarity vs 28 docs</span>
+  <span class="cmt">// returns top-3 as structured context</span>
+}</div>
+      </div>`,
+    edgeColor: "#7EC8F5"
+  },
+  {
+    title: "TF-IDF Scores All 28 Documents",
+    sub: "Cosine similarity computed against every document in the index",
+    activeNodes: ["rag","kb"],
+    edges: ["e-rag-kb","e-kb-rag"],
+    packets: ["pkt4a","pkt4b"],
+    anims: ["am4a","am4b"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Similarity Scoring in Progress</div>
+        <div style="font-size:11px;color:#8b949e;margin-bottom:8px">
+          For each of the 28 documents, compute: <span style="color:#a78bfa;font-family:monospace">dot(query_vec, doc_vec) / (|query_vec| × |doc_vec|)</span>
+        </div>
+        ${[
+          ['In-Kind Transfer Strategy','strategies','.892'],
+          ['Volatile Market Scenario','scenarios','.847'],
+          ['RMD Calculation Method','irs-rules','.713'],
+          ['Cash Distribution Strategy','strategies','.641'],
+          ['Tax-Loss Harvesting','strategies','.588'],
+          ['IRMAA Thresholds','compliance','.312'],
+        ].map(([t,c,s])=>`
+        <div class="score-bar-row">
+          <div class="sb-header">
+            <span class="sb-title">${t}</span>
+            <span class="sb-pct">${s}</span>
+          </div>
+          <div class="sb-track"><div class="sb-fill" style="width:${Math.round(parseFloat(s)*100)}%"></div></div>
+        </div>`).join('')}
+        <div style="font-size:9px;color:#484f58;margin-top:6px">22 other documents score below threshold (0.3) — not retrieved</div>
+      </div>`,
+    edgeColor: "#4ade80"
+  },
+  {
+    title: "Top 3 Documents Retrieved",
+    sub: "Knowledge Base → RagService — best matches returned",
+    activeNodes: ["kb"],
+    edges: ["e-kb-rag"],
+    packets: ["pkt5"],
+    anims: ["am5"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Retrieved Context Documents</div>
+        <div style="background:#0d1117;border:1px solid #7EC8F560;border-radius:6px;padding:10px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;color:#e6edf3">In-Kind Transfer Strategy</span>
+            <span style="font-size:11px;font-weight:700;color:#7EC8F5">89.2%</span>
+          </div>
+          <div class="sb-track" style="margin-bottom:6px"><div class="sb-fill" style="width:89%"></div></div>
+          <span class="tag tag-strat">strategies</span>
+          <div style="font-size:10px;color:#8b949e;margin-top:6px">
+            An in-kind distribution transfers securities from the IRA to a taxable brokerage without selling. Client retains full market exposure…
+          </div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:10px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;color:#c9d1d9">Volatile Market Scenario</span>
+            <span style="font-size:11px;font-weight:700;color:#7EC8F5">84.7%</span>
+          </div>
+          <div class="sb-track" style="margin-bottom:6px"><div class="sb-fill" style="width:84%"></div></div>
+          <span class="tag tag-scen">scenarios</span>
+          <div style="font-size:10px;color:#8b949e;margin-top:6px">
+            Client age 74, IRA balance $1.2M, equity markets down 15% YTD. Client strongly prefers not to sell…
+          </div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:10px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;color:#c9d1d9">RMD Calculation Method</span>
+            <span style="font-size:11px;font-weight:700;color:#7EC8F5">71.3%</span>
+          </div>
+          <div class="sb-track" style="margin-bottom:6px"><div class="sb-fill" style="width:71%"></div></div>
+          <span class="tag tag-irs">irs-rules</span>
+          <div style="font-size:10px;color:#8b949e;margin-top:6px">
+            Age 75 = factor 24.6. $485,000 / 24.6 = $19,715. First RMD deadline April 1 next year…
+          </div>
+        </div>
+      </div>`,
+    edgeColor: "#f59e0b"
+  },
+  {
+    title: "Augmented Prompt Sent to Phi-3",
+    sub: "OllamaLLM.java assembles context + question → Ollama API",
+    activeNodes: ["rag","ollama"],
+    edges: ["e-rag-ollama"],
+    packets: ["pkt6"],
+    anims: ["am6"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Augmented Prompt (what Phi-3 receives)</div>
+        <div class="prompt-box"><span class="hl-sys">You are a helpful IRA RMD financial assistant.
+
+Relevant institutional knowledge:</span>
+
+<span class="hl-ctx">[In-Kind Transfer Strategy]
+An in-kind distribution transfers actual securities from the IRA to a taxable brokerage account without selling them. Client retains full market exposure...
+
+[Volatile Market Scenario]
+Client age 74, equity markets down 15% YTD. Client strongly prefers not to sell at depressed prices. Recommended: in-kind transfer of ETF shares...
+
+[RMD Calculation Method]
+Age 75 = factor 24.6. $485,000 / 24.6 = $19,715...</span>
+
+<span class="hl-sys">Client context: age 75, RMD $19,715, volatile market</span>
+
+<span class="hl-q">Answer clearly in 2-3 sentences: My client is 75, markets are down — best RMD strategy?</span></div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <div style="background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:6px 10px;font-size:10px">
+            <span style="color:#484f58">model</span><br/><span style="color:#7EC8F5;font-weight:700">phi3</span>
+          </div>
+          <div style="background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:6px 10px;font-size:10px">
+            <span style="color:#484f58">temperature</span><br/><span style="color:#7EC8F5;font-weight:700">0.3</span>
+          </div>
+          <div style="background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:6px 10px;font-size:10px">
+            <span style="color:#484f58">max tokens</span><br/><span style="color:#7EC8F5;font-weight:700">256</span>
+          </div>
+          <div style="background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:6px 10px;font-size:10px">
+            <span style="color:#484f58">top_p</span><br/><span style="color:#7EC8F5;font-weight:700">0.9</span>
+          </div>
+        </div>
+      </div>`,
+    edgeColor: "#7EC8F5"
+  },
+  {
+    title: "Phi-3 Generates the Answer",
+    sub: "Local AI model · runs entirely on your machine — no data leaves",
+    activeNodes: ["ollama"],
+    edges: [],
+    packets: [],
+    anims: [],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">Phi-3 Processing (localhost:11434)</div>
+        <div class="processing-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <span style="font-size:10px;color:#484f58;margin-left:4px">Generating response…</span>
+        </div>
+        <div style="background:#0d1117;border:1px solid #21262d;border-radius:5px;padding:8px 12px;margin:6px 0;font-size:10px">
+          <div style="color:#484f58;margin-bottom:4px">Model capabilities</div>
+          <div style="display:flex;gap:10px">
+            <span style="color:#4ade80">✓ Runs on CPU</span>
+            <span style="color:#4ade80">✓ Offline — no API key</span>
+            <span style="color:#4ade80">✓ HIPAA-friendly</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#8b949e;line-height:1.7;margin-top:8px">
+          Phi-3 is a 3.8B parameter small language model optimized for reasoning tasks.
+          Running via Ollama's local inference server — average response time 3-8 seconds on CPU.
+          <br/><br/>
+          The RAG context anchors the model's response to your firm's actual knowledge documents,
+          reducing hallucination and ensuring advice reflects institutional policy.
+        </div>
+      </div>
+      <div class="mock-card" style="padding:10px 14px">
+        <div class="mock-title">Admin UI — Tune at Runtime</div>
+        <div style="font-size:11px;color:#8b949e">
+          BA/FA can change temperature (0.3 = precise, 0.8 = creative), model, or max tokens
+          via Admin UI → LLM Settings. Changes take effect instantly — <strong style="color:#c9d1d9">no restart needed.</strong>
+        </div>
+      </div>`,
+    edgeColor: null
+  },
+  {
+    title: "Answer Delivered · Audit Loop Closed",
+    sub: "FA gets answer with citations · Audit Log updated · BA can review",
+    activeNodes: ["ollama","spring","fa","audit","admin"],
+    edges: ["e-ollama-spring","e-spring-fa","e-spring-audit","e-audit-admin"],
+    packets: ["pkt7","pkt8","pkt9","pkt10"],
+    anims: ["am7","am8","am9","am10"],
+    body: () => `
+      <div class="mock-card">
+        <div class="mock-title">FA Dashboard · AI Response</div>
+        <div class="answer-box">
+          Given that equity markets are down significantly this year, the recommended strategy for your client
+          is an <strong>in-kind transfer</strong> — move $19,715 worth of ETF shares directly from the IRA
+          to their Apex taxable brokerage account without selling, preserving full market exposure
+          and satisfying the RMD requirement.
+          <br/><br/>
+          The shares receive a new cost basis at today's depressed price, so any future recovery
+          will be taxed at favorable long-term capital gains rates rather than ordinary income.
+          <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+            <span class="citation">In-Kind Transfer Strategy</span>
+            <span class="citation">Volatile Market Scenario</span>
+            <span class="citation">RMD Calculation Method</span>
+          </div>
+        </div>
+      </div>
+      <div class="mock-card">
+        <div class="mock-title">Audit Log · BA Review</div>
+        <div class="audit-row">
+          <span class="audit-time">10:42:17</span>
+          <span class="audit-q">Client 75 markets down RMD strategy</span>
+        </div>
+        <div style="padding:4px 8px 4px 48px;font-size:10px;color:#7EC8F5">
+          Retrieved: In-Kind Transfer Strategy (0.892) · Volatile Market Scenario (0.847) · RMD Calculation (0.713)
+        </div>
+        <div style="font-size:10px;color:#484f58;margin-top:6px;padding:0 8px">
+          BA can review all queries in Admin UI → Audit Log tab, then add new documents or tune settings if a query retrieved weak results.
+        </div>
+      </div>`,
+    edgeColor: "#4ade80"
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let current = 0;
+let playing = false;
+let playTimer = null;
+const NODES = ["fa","spring","rag","kb","ollama","audit","admin"];
+
+// ── RENDER STEP ───────────────────────────────────────────────────────────────
+function renderStep(i) {
+  const s = STEPS[i];
+  document.getElementById('tbStep').textContent = `Step ${i+1} of ${STEPS.length}`;
+  document.getElementById('stepNum').textContent = `Step ${i+1} of ${STEPS.length}`;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepSub').textContent = s.sub;
+  document.getElementById('stepBody').innerHTML = s.body();
+
+  // Animate score bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.sb-fill').forEach(el => {
+      const w = el.style.width; el.style.width = '0';
+      setTimeout(() => el.style.width = w, 50);
+    });
+  }, 100);
+
+  // Reset all nodes
+  NODES.forEach(nId => {
+    const g = document.getElementById('n-'+nId);
+    if (!g) return;
+    const rect = g.querySelector('.nrect');
+    rect.style.stroke = '#21262d';
+    rect.style.filter = 'none';
+    g.querySelectorAll('text').forEach(t => t.style.fill = '');
+  });
+
+  // Activate nodes for this step
+  const color = s.edgeColor || '#7EC8F5';
+  s.activeNodes.forEach(nId => {
+    const g = document.getElementById('n-'+nId);
+    if (!g) return;
+    const rect = g.querySelector('.nrect');
+    rect.style.stroke = color;
+    rect.style.filter = `drop-shadow(0 0 8px ${color}60)`;
+    g.querySelectorAll('text:first-of-type').forEach(t => t.style.fill = color);
+  });
+
+  // Reset all edges
+  document.querySelectorAll('[id^="e-"]').forEach(el => {
+    el.style.stroke = '#21262d';
+    el.setAttribute('marker-end','url(#arr)');
+  });
+
+  // Highlight active edges
+  s.edges.forEach(eId => {
+    const el = document.getElementById(eId);
+    if (!el) return;
+    el.style.stroke = color;
+    el.style.strokeWidth = '2';
+    const mId = color === '#4ade80' ? 'arr-green' : 'arr-active';
+    el.setAttribute('marker-end', `url(#${mId})`);
+  });
+
+  // Stop all packets
+  document.querySelectorAll('[id^="pkt"]').forEach(p => {
+    p.setAttribute('opacity','0');
+    // stop indefinite animations
+    p.querySelectorAll('animateMotion').forEach(am => {
+      try { am.endElement(); } catch(e){}
+    });
+  });
+
+  // Trigger packet animations
+  s.packets.forEach((pId, idx) => {
+    const pkt = document.getElementById(pId);
+    if (!pkt) return;
+    pkt.setAttribute('opacity','1');
+    pkt.setAttribute('fill', color);
+    const am = pkt.querySelector('animateMotion');
+    if (am) {
+      try { am.beginElement(); } catch(e) {}
+    }
+  });
+
+  // Update progress dots
+  document.querySelectorAll('.progress-dot').forEach((d,j) => {
+    d.className = 'progress-dot' + (j < i ? ' done' : j === i ? ' active' : '');
+  });
+
+  document.getElementById('btnPrev').disabled = i === 0;
+  document.getElementById('btnNext').disabled = i === STEPS.length - 1;
+}
+
+// ── BUILD DOTS ────────────────────────────────────────────────────────────────
+function buildDots() {
+  const c = document.getElementById('dots');
+  c.innerHTML = '';
+  STEPS.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'progress-dot';
+    d.title = STEPS[i].title;
+    d.onclick = () => { stopPlay(); current = i; renderStep(i); };
+    c.appendChild(d);
+  });
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function next() {
+  if (current < STEPS.length - 1) { current++; renderStep(current); }
+  else stopPlay();
+}
+function prev() {
+  if (current > 0) { current--; renderStep(current); }
+}
+
+// ── AUTO-PLAY ─────────────────────────────────────────────────────────────────
+function togglePlay() {
+  if (playing) stopPlay();
+  else startPlay();
+}
+function startPlay() {
+  playing = true;
+  document.getElementById('btnPlay').textContent = '⏸ Pause';
+  document.getElementById('btnPlay').style.background = '#1a0505';
+  document.getElementById('btnPlay').style.color = '#f85149';
+  document.getElementById('btnPlay').style.borderColor = '#f8514940';
+  scheduleNext();
+}
+function stopPlay() {
+  playing = false;
+  clearTimeout(playTimer);
+  document.getElementById('btnPlay').textContent = '▶ Play';
+  document.getElementById('btnPlay').style.background = '#0a2a0a';
+  document.getElementById('btnPlay').style.color = '#4ade80';
+  document.getElementById('btnPlay').style.borderColor = '#4ade8040';
+}
+function scheduleNext() {
+  if (!playing) return;
+  playTimer = setTimeout(() => {
+    if (current < STEPS.length - 1) { current++; renderStep(current); scheduleNext(); }
+    else stopPlay();
+  }, 3200);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+buildDots();
+renderStep(0);
+</script>
+
+<style>
+/* pulse for loading bar */
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
+</style>
+</body>
+</html>

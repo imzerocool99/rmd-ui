@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RMD Multi-Strategy Optimizer — Mockup</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#0d1117; color:#e6edf3; font-family:'Segoe UI',sans-serif; padding:24px; font-size:13px; line-height:1.5; }
+
+/* ── LAYOUT ── */
+.page { display:grid; grid-template-columns:360px 1fr; gap:16px; max-width:1500px; }
+.left  { display:flex; flex-direction:column; gap:12px; }
+.right { display:flex; flex-direction:column; gap:12px; }
+.panel { background:#161b22; border:1px solid #21262d; border-radius:10px; padding:16px 18px; }
+.panel-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#7EC8F5; margin-bottom:12px; }
+
+/* ── ACCOUNT CHIPS ── */
+.acct-chip { display:flex; align-items:center; gap:10px; background:#0d1117; border:1.5px solid #7EC8F5; border-radius:8px; padding:9px 12px; margin-bottom:6px; cursor:pointer; }
+.acct-check { width:15px;height:15px;border-radius:3px;background:#7EC8F5;color:#0d1117;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.acct-name  { font-size:12px;font-weight:700;color:#7EC8F5;flex:1; }
+.acct-sub   { font-size:9px;color:#8b949e; }
+.acct-rmd   { font-size:13px;font-weight:800;color:#e6edf3; }
+
+/* ── TOTAL BAR ── */
+.total-bar { background:linear-gradient(135deg,#0d1a2e,#0d1117); border:1px solid #7EC8F580; border-radius:10px; padding:16px 18px; }
+.total-lbl  { font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px; }
+.total-amt  { font-size:34px;font-weight:800;color:#7EC8F5;line-height:1.1;margin:4px 0; }
+.total-sub  { font-size:11px;color:#8b949e; }
+.prog-bar   { height:8px;background:#21262d;border-radius:4px;overflow:hidden;margin:10px 0 6px; display:flex; }
+.prog-seg   { height:100%; transition:width .8s ease; }
+.seg-qcd    { background:#4ade80; }
+.seg-inkind { background:#7EC8F5; }
+.seg-cash   { background:#4AAEE0; }
+.seg-empty  { background:#21262d; flex:1; }
+.prog-legend { display:flex;gap:10px;flex-wrap:wrap; }
+.prog-item  { font-size:10px;display:flex;align-items:center;gap:4px; }
+.prog-dot   { width:7px;height:7px;border-radius:50%; }
+
+/* ── AI OPTIMIZER CARD ── */
+.optimizer-card {
+  background:linear-gradient(135deg,#0a1628,#0d1117);
+  border:1.5px solid #7EC8F5;
+  border-radius:10px; padding:16px 18px;
+}
+.opt-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+.opt-title  { font-size:13px;font-weight:800;color:#e6edf3;display:flex;align-items:center;gap:8px; }
+.opt-badge  { font-size:9px;font-weight:700;background:#7EC8F5;color:#0d1117;padding:2px 8px;border-radius:10px; }
+.btn-reopt  { font-size:10px;font-weight:700;padding:5px 12px;background:#0d1a2e;color:#7EC8F5;border:1px solid #7EC8F550;border-radius:6px;cursor:pointer; }
+.btn-reopt:hover { background:#1a3a5a;border-color:#7EC8F5; }
+
+.opt-goals  { display:flex;flex-direction:column;gap:6px;margin-bottom:12px; }
+.opt-goal   { display:flex;align-items:center;gap:8px;font-size:11px;color:#8b949e; }
+.opt-goal-dot { width:6px;height:6px;border-radius:50%;background:#7EC8F5;flex-shrink:0; }
+.opt-goal em { color:#c9d1d9;font-style:normal; }
+
+/* Comparison table */
+.compare-table { width:100%;border-collapse:collapse;margin-top:8px; }
+.compare-table th { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#484f58;padding:5px 8px;border-bottom:1px solid #21262d;text-align:left; }
+.compare-table td { font-size:11px;padding:7px 8px;border-bottom:1px solid #161b22;color:#c9d1d9; }
+.compare-table tr:last-child td { border-bottom:none; }
+.compare-table .highlight { background:#0d1a2e; }
+.compare-table .highlight td { color:#e6edf3; }
+.val-good  { color:#4ade80;font-weight:700; }
+.val-bad   { color:#f85149;font-weight:700; }
+.val-blue  { color:#7EC8F5;font-weight:700; }
+.best-tag  { font-size:8px;font-weight:700;background:#7EC8F5;color:#0d1117;padding:1px 6px;border-radius:8px;margin-left:4px; }
+
+/* ── AI INSIGHT ── */
+.insight-box { background:#0d1a2e;border:1px solid #7EC8F540;border-left:3px solid #7EC8F5;border-radius:8px;padding:12px 14px; }
+.insight-hdr { font-size:10px;font-weight:700;color:#7EC8F5;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px; }
+.insight-line { font-size:11px;color:#8b949e;margin-bottom:5px;line-height:1.6;padding-left:12px;position:relative; }
+.insight-line::before { content:'→';position:absolute;left:0;color:#7EC8F5;font-weight:700; }
+.insight-line em { color:#c9d1d9;font-style:normal; }
+
+/* WARN */
+.warn-box { background:#1a0505;border:1px solid #f8514940;border-left:3px solid #f85149;border-radius:8px;padding:10px 14px;font-size:11px;color:#c9d1d9; }
+.warn-box strong { color:#f85149; }
+
+/* ── ASSET TABLE ── */
+.asset-table { width:100%;border-collapse:collapse; }
+.asset-table th { font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#484f58;padding:7px 10px;border-bottom:1px solid #21262d;text-align:left;white-space:nowrap; }
+.asset-row { border-bottom:1px solid #161b22;transition:background .1s; }
+.asset-row:hover { background:#1c2128; }
+.asset-row td { padding:9px 10px;vertical-align:middle; }
+.border-qcd    { border-left:3px solid #4ade80; }
+.border-inkind { border-left:3px solid #7EC8F5; }
+.border-cash   { border-left:3px solid #4AAEE0; }
+.border-hold   { border-left:3px solid #484f58; }
+.border-warn   { border-left:3px solid #f59e0b; }
+
+.ticker-sym  { font-size:12px;font-weight:800;color:#e6edf3; }
+.ticker-name { font-size:10px;color:#8b949e;margin-top:1px; }
+.ticker-acct { font-size:9px;color:#484f58; }
+.ai-badge    { font-size:8px;font-weight:700;background:#0d1a2e;border:1px solid #7EC8F540;color:#7EC8F5;padding:1px 5px;border-radius:6px;margin-left:4px;vertical-align:middle; }
+
+.val-price   { font-size:12px;font-weight:700;color:#e6edf3; }
+.val-chg     { font-size:10px;margin-top:2px; }
+.pos { color:#3fb950; } .neg { color:#f85149; }
+
+/* Amount field */
+.amt-wrap { display:flex;align-items:center;gap:4px; }
+.amt-field { width:85px;background:#0d1117;border:1px solid #30363d;border-radius:5px;color:#e6edf3;font-size:12px;font-weight:700;padding:5px 7px;outline:none; }
+.amt-field:focus { border-color:#7EC8F5; }
+.amt-field:disabled { opacity:.4;cursor:not-allowed; }
+.amt-max { font-size:9px;color:#7EC8F5;cursor:pointer;text-decoration:underline; }
+
+/* Multi-action pills — THE KEY UI */
+.actions-wrap { display:flex;flex-direction:column;gap:4px; }
+.actions-row  { display:flex;gap:4px;flex-wrap:wrap; }
+.act {
+  font-size:10px;font-weight:600;padding:4px 9px;border-radius:12px;
+  border:1px solid;cursor:pointer;transition:all .12s ease;white-space:nowrap;
+}
+.act.cash   { border-color:#4AAEE060;color:#7EC8F5;background:#0d1a2e; }
+.act.inkind { border-color:#A8DFFB50;color:#A8DFFB;background:#0d1428; }
+.act.qcd    { border-color:#4ade8050;color:#4ade80;background:#0a1a0a; }
+.act.hold   { border-color:#30363d;  color:#8b949e;background:#161b22; }
+.act.roth   { border-color:#a78bfa50;color:#a78bfa;background:#1a0d2e; }
+.act.sel    { font-weight:800; }
+.act.cash.sel   { background:#1a3a5a;border-color:#7EC8F5;box-shadow:0 0 8px #7EC8F530; }
+.act.inkind.sel { background:#0d1a38;border-color:#A8DFFB;box-shadow:0 0 8px #A8DFFB30; }
+.act.qcd.sel    { background:#0a2a0a;border-color:#4ade80;box-shadow:0 0 8px #4ade8030; }
+.act.hold.sel   { background:#21262d;border-color:#8b949e; }
+.act.roth.sel   { background:#2a1a3e;border-color:#a78bfa;box-shadow:0 0 8px #a78bfa30; }
+.act:hover      { transform:translateY(-1px);opacity:.85; }
+.act-split-lbl  { font-size:9px;color:#484f58;padding-left:2px; }
+
+/* Split indicator */
+.split-badge { font-size:9px;font-weight:700;background:#1a0d2e;border:1px solid #a78bfa50;color:#a78bfa;padding:1px 7px;border-radius:8px; }
+
+/* Tax col */
+.tax-val   { font-size:12px;font-weight:700; }
+.tax-sub   { font-size:9px;color:#8b949e;margin-top:2px; }
+.t-saved   { color:#4ade80; }
+.t-owed    { color:#f85149; }
+.t-neutral { color:#8b949e; }
+.t-warn    { color:#f59e0b; }
+
+/* Footer */
+.exec-footer { display:flex;align-items:center;justify-content:space-between;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px 16px;flex-wrap:wrap;gap:10px; }
+.exec-stats  { display:flex;gap:20px;flex-wrap:wrap; }
+.exec-stat   { text-align:center; }
+.exec-stat-val   { font-size:16px;font-weight:800; }
+.exec-stat-label { font-size:9px;color:#8b949e;text-transform:uppercase;letter-spacing:.4px; }
+.exec-btns   { display:flex;gap:8px; }
+.btn-e { padding:9px 20px;font-size:12px;font-weight:700;border-radius:6px;cursor:pointer;border:1px solid;transition:all .15s; }
+.btn-prev { background:#0d1a2e;color:#7EC8F5;border-color:#7EC8F550; }
+.btn-prev:hover { background:#1a3a5a;border-color:#7EC8F5; }
+.btn-conf { background:#2d3748;color:#fff;border-color:#4a5568; }
+.btn-conf:hover { background:#374151; }
+
+/* section dividers */
+.tbl-section-hdr td { background:#0d1117;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#484f58;padding:6px 10px; }
+</style>
+</head>
+<body>
+
+<div style="margin-bottom:16px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+  <div>
+    <div style="font-size:20px;font-weight:800;color:#e6edf3;">RMD Multi-Strategy Optimizer</div>
+    <div style="font-size:11px;color:#8b949e;margin-top:3px;">Robert Martinez · Age 74 · 3 IRA Accounts · Tax Year 2026 · Bracket: 24%</div>
+  </div>
+  <div style="font-size:10px;color:#8b949e;background:#161b22;border:1px solid #21262d;border-radius:6px;padding:6px 12px;">
+    💡 Each holding can use a <strong style="color:#7EC8F5">different strategy</strong> — AI optimizes the mix
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ════════════════ LEFT ════════════════ -->
+<div class="left">
+
+  <!-- Accounts -->
+  <div class="panel">
+    <div class="panel-title">Accounts</div>
+    <div class="acct-chip"><div class="acct-check">✓</div><div style="flex:1"><div class="acct-name">Traditional IRA — IRA-001</div><div class="acct-sub">$485,100 · 12 holdings</div></div><div style="text-align:right"><div class="acct-rmd">$19,024</div><div class="acct-sub">RMD share</div></div></div>
+    <div class="acct-chip"><div class="acct-check">✓</div><div style="flex:1"><div class="acct-name">Rollover IRA — IRA-002</div><div class="acct-sub">$312,240 · 8 holdings</div></div><div style="text-align:right"><div class="acct-rmd">$12,245</div><div class="acct-sub">RMD share</div></div></div>
+    <div class="acct-chip"><div class="acct-check">✓</div><div style="flex:1"><div class="acct-name">SEP IRA — IRA-003</div><div class="acct-sub">$198,660 · 6 holdings</div></div><div style="text-align:right"><div class="acct-rmd">$7,790</div><div class="acct-sub">RMD share</div></div></div>
+  </div>
+
+  <!-- Total + Stacked progress -->
+  <div class="total-bar">
+    <div class="total-lbl">Total RMD Required — 2026</div>
+    <div class="total-amt">$46,820</div>
+    <div class="total-sub">Allocated: $46,820 · $0 remaining ✓</div>
+    <div class="prog-bar">
+      <div class="prog-seg seg-qcd"    style="width:18%"></div>
+      <div class="prog-seg seg-inkind" style="width:39%"></div>
+      <div class="prog-seg seg-cash"   style="width:43%"></div>
+    </div>
+    <div class="prog-legend">
+      <div class="prog-item"><div class="prog-dot" style="background:#4ade80"></div>QCD $8,400</div>
+      <div class="prog-item"><div class="prog-dot" style="background:#7EC8F5"></div>In-Kind $18,260</div>
+      <div class="prog-item"><div class="prog-dot" style="background:#4AAEE0"></div>Cash $20,160</div>
+    </div>
+  </div>
+
+  <!-- AI Optimizer -->
+  <div class="optimizer-card">
+    <div class="opt-header">
+      <div class="opt-title">🧠 AI Optimizer <span class="opt-badge">AUTO</span></div>
+      <button class="btn-reopt">↺ Re-Optimize</button>
+    </div>
+    <div class="opt-goals">
+      <div class="opt-goal"><div class="opt-goal-dot"></div>Minimize total federal tax on $46,820 distribution</div>
+      <div class="opt-goal"><div class="opt-goal-dot"></div>Maximize QCD usage (client age 74, eligible)</div>
+      <div class="opt-goal"><div class="opt-goal-dot"></div>Stay under <em>$206K IRMAA Medicare threshold</em></div>
+      <div class="opt-goal"><div class="opt-goal-dot"></div>Sell worst performers first, keep growth positions</div>
+      <div class="opt-goal"><div class="opt-goal-dot"></div>Use in-kind for highly appreciated holdings</div>
+    </div>
+
+    <!-- Comparison -->
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Fed Tax</th>
+          <th>Net to Client</th>
+          <th>IRMAA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>All Cash</td>
+          <td class="val-bad">$11,237</td>
+          <td>$35,583</td>
+          <td class="val-bad">At Risk</td>
+        </tr>
+        <tr>
+          <td>All In-Kind</td>
+          <td class="val-bad">$11,237</td>
+          <td>$35,583</td>
+          <td class="val-bad">At Risk</td>
+        </tr>
+        <tr class="highlight">
+          <td><strong>AI Optimized Mix</strong> <span class="best-tag">BEST</span></td>
+          <td class="val-good">$5,318</td>
+          <td class="val-blue">$41,502</td>
+          <td class="val-good">Safe ✓</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:10px;color:#4ade80;margin-top:8px;font-weight:700;">↑ AI mix saves $5,919 vs all-cash</div>
+  </div>
+
+  <!-- Insight -->
+  <div class="insight-box">
+    <div class="insight-hdr">🧠 Per-Holding Rationale</div>
+    <div class="insight-line"><em>VBTLX → QCD:</em> Bond fund, low growth — best candidate for charitable donation, saves $2,016 tax.</div>
+    <div class="insight-line"><em>MSFT + AAPL → In-Kind:</em> Highly appreciated — avoid realizing gain inside IRA, step-up basis outside.</div>
+    <div class="insight-line"><em>INTC → Cash:</em> Down 28% — liquidate first, offset with taxable losses.</div>
+    <div class="insight-line"><em>VTI split:</em> $8,000 in-kind + $4,000 cash to hit exact RMD without over-distributing.</div>
+    <div class="insight-line"><em>BRK.B → Hold:</em> Strong performer, defer to 2027 when bracket may be lower.</div>
+  </div>
+
+  <!-- Warning -->
+  <div class="warn-box">⚠️ <strong>Miss RMD = $11,705 IRS penalty</strong> (25%). Current plan fully allocated — deadline Dec 31, 2026.</div>
+
+</div>
+
+<!-- ════════════════ RIGHT ════════════════ -->
+<div class="right">
+  <div class="panel" style="padding-bottom:4px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:12px;font-weight:700;color:#e6edf3;">
+        Holdings — Per-Asset Action
+        <span style="font-size:10px;font-weight:400;color:#8b949e;margin-left:8px;">AI pre-selected · override any row · split across strategies</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <div style="font-size:10px;padding:3px 10px;border:1px solid #21262d;border-radius:10px;color:#8b949e;cursor:pointer;">All</div>
+        <div style="font-size:10px;padding:3px 10px;border:1px solid #4AAEE060;border-radius:10px;color:#7EC8F5;cursor:pointer;">💵 Cash</div>
+        <div style="font-size:10px;padding:3px 10px;border:1px solid #7EC8F550;border-radius:10px;color:#A8DFFB;cursor:pointer;">📦 In-Kind</div>
+        <div style="font-size:10px;padding:3px 10px;border:1px solid #4ade8050;border-radius:10px;color:#4ade80;cursor:pointer;">🎗️ QCD</div>
+        <div style="font-size:10px;padding:3px 10px;border:1px solid #30363d;border-radius:10px;color:#8b949e;cursor:pointer;">⏸️ Hold</div>
+      </div>
+    </div>
+
+    <table class="asset-table">
+      <thead>
+        <tr>
+          <th>Holding / Account</th>
+          <th>Market Value</th>
+          <th>Amount ($)</th>
+          <th>Action — Select One or Split</th>
+          <th>Est. Tax Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- IRA-001 section -->
+        <tr class="tbl-section-hdr"><td colspan="5">IRA-001 — Traditional IRA &nbsp;·&nbsp; RMD Share $19,024</td></tr>
+
+        <!-- VBTLX: QCD -->
+        <tr class="asset-row">
+          <td class="border-qcd">
+            <div class="ticker-sym">VBTLX <span class="ai-badge">AI ✦</span></div>
+            <div class="ticker-name">Vanguard Total Bond Mkt</div>
+            <div class="ticker-acct">Bond Fund · IRA-001</div>
+          </td>
+          <td><div class="val-price">$42,800</div><div class="val-chg pos">+$4,200 +10.9%</div></td>
+          <td><div class="amt-wrap"><span style="font-size:11px;color:#8b949e">$</span><input class="amt-field" value="8,400"/><span class="amt-max">MAX</span></div></td>
+          <td>
+            <div class="actions-wrap">
+              <div class="actions-row">
+                <div class="act qcd sel">🎗️ QCD Donate</div>
+                <div class="act cash">💵 Cash</div>
+                <div class="act inkind">📦 In-Kind</div>
+                <div class="act hold">⏸️ Hold</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="tax-val t-saved">$0 tax</div><div class="tax-sub">Saves $2,016 vs cash</div></td>
+        </tr>
+
+        <!-- MSFT: In-Kind -->
+        <tr class="asset-row">
+          <td class="border-inkind">
+            <div class="ticker-sym">MSFT <span class="ai-badge">AI ✦</span></div>
+            <div class="ticker-name">Microsoft Corp</div>
+            <div class="ticker-acct">Large Cap Tech · IRA-001</div>
+          </td>
+          <td><div class="val-price">$28,640</div><div class="val-chg pos">+$13,040 +83%</div></td>
+          <td><div class="amt-wrap"><span style="font-size:11px;color:#8b949e">$</span><input class="amt-field" value="10,624"/><span class="amt-max">MAX</span></div></td>
+          <td>
+            <div class="actions-wrap">
+              <div class="actions-row">
+                <div class="act inkind sel">📦 In-Kind</div>
+                <div class="act cash">💵 Cash</div>
+                <div class="act qcd">🎗️ QCD</div>
+                <div class="act hold">⏸️ Hold</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="tax-val t-owed">$2,550 tax</div><div class="tax-sub">FMV · cap gains advantage later</div></td>
+        </tr>
+
+        <!-- INTC: Cash (loss) -->
+        <tr class="asset-row">
+          <td class="border-cash">
+            <div class="ticker-sym">INTC <span class="ai-badge">AI ✦</span></div>
+            <div class="ticker-name">Intel Corp</div>
+            <div class="ticker-acct">Semiconductor · IRA-001</div>
+          </td>
+          <td><div class="val-price">$9,840</div><div class="val-chg neg">-$3,820 -28%</div></td>
+          <td><div class="amt-wrap"><span style="font-size:11px;color:#8b949e">$</span><input class="amt-field" value="9,840"/><span class="amt-max">MAX</span></div></td>
+          <td>
+            <div class="actions-wrap">
+              <div class="actions-row">
+                <div class="act cash sel">💵 Cash</div>
+                <div class="act inkind">📦 In-Kind</div>
+                <div class="act qcd">🎗️ QCD</div>
+                <div class="act hold">⏸️ Hold</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="tax-val t-owed">$2,362 tax</div><div class="tax-sub">Sell first — worst performer</div></td>
+        </tr>
+
+        <!-- IRA-002 section -->
+        <tr class="tbl-section-hdr"><td colspan="5">IRA-002 — Rollover IRA &nbsp;·&nbsp; RMD Share $12,245</td></tr>
+
+        <!-- VTI: SPLIT — In-Kind + Cash -->
+        <tr class="asset-row">
+          <td class="border-inkind">
+            <div class="ticker-sym">VTI <span class="ai-badge">AI ✦</span> <span class="split-badge">SPLIT</span></div>
+            <div class="ticker-name">Vanguard Total Stock Mkt ETF</div>
+            <div class="ticker-acct">US Equity ETF · IRA-002</div>
+          </td>
+          <td><div class="val-price">$54,200</div><div class="val-chg pos">+$18,400 +51%</div></td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div class="amt-wrap"><span style="font-size:9px;color:#A8DFFB">In-Kind $</span><input class="amt-field" value="8,000" style="border-color:#A8DFFB40;width:75px"/></div>
+              <div class="amt-wrap"><span style="font-size:9px;color:#7EC8F5">Cash &nbsp;&nbsp;&nbsp;&nbsp;$</span><input class="amt-field" value="4,245" style="border-color:#7EC8F540;width:75px"/></div>
+            </div>
+          </td>
+          <td>
+            <div class="actions-wrap">
+              <div class="act-split-lbl">Split across two strategies:</div>
+              <div class="actions-row" style="margin-top:4px;">
+                <div class="act inkind sel">📦 In-Kind $8,000</div>
+                <div class="act cash sel">💵 Cash $4,245</div>
+              </div>
+              <div class="actions-row" style="margin-top:4px;">
+                <div class="act qcd">🎗️ QCD</div>
+                <div class="act hold">⏸️ Hold</div>
+                <div class="act roth">🔄 Roth Convert</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tax-val t-owed">$1,019 tax</div>
+            <div class="tax-sub">Cash portion only · in-kind deferred</div>
+          </td>
+        </tr>
+
+        <!-- AAPL: In-Kind -->
+        <tr class="asset-row">
+          <td class="border-inkind">
+            <div class="ticker-sym">AAPL</div>
+            <div class="ticker-name">Apple Inc</div>
+            <div class="ticker-acct">Large Cap Tech · IRA-002</div>
+          </td>
+          <td><div class="val-price">$31,500</div><div class="val-chg pos">+$19,200 +156%</div></td>
+          <td><div class="amt-wrap"><span style="font-size:11px;color:#8b949e">$</span><input class="amt-field" value="0"/><span class="amt-max">MAX</span></div></td>
+          <td>
+            <div class="actions-wrap">
+              <div class="actions-row">
+                <div class="act hold sel">⏸️ Hold</div>
+                <div class="act inkind">📦 In-Kind</div>
+                <div class="act cash">💵 Cash</div>
+                <div class="act qcd">🎗️ QCD</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="tax-val t-neutral">$0</div><div class="tax-sub">Held — highest appreciation, defer</div></td>
+        </tr>
+
+        <!-- IRA-003 section -->
+        <tr class="tbl-section-hdr"><td colspan="5">IRA-003 — SEP IRA &nbsp;·&nbsp; RMD Share $7,790</td></tr>
+
+        <!-- BRK.B: Hold -->
+        <tr class="asset-row">
+          <td class="border-hold">
+            <div class="ticker-sym">BRK.B</div>
+            <div class="ticker-name">Berkshire Hathaway B</div>
+            <div class="ticker-acct">Conglomerate · IRA-003</div>
+          </td>
+          <td><div class="val-price">$22,100</div><div class="val-chg pos">+$6,100 +38%</div></td>
+          <td><div class="amt-wrap"><span style="font-size:11px;color:#8b949e">$</span><input class="amt-field" value="0" disabled/></div></td>
+          <td>
+            <div class="actions-wrap">
+              <div class="actions-row">
+                <div class="act hold sel">⏸️ Hold</div>
+                <div class="act cash">💵 Cash</div>
+                <div class="act inkind">📦 In-Kind</div>
+                <div class="act qcd">🎗️ QCD</div>
+              </div>
+            </div>
+          </td>
+          <td><div class="tax-val t-neutral">$0</div><div class="tax-sub">Defer to 2027 — lower bracket expected</div></td>
+        </tr>
+
+        <!-- GOOGL: Cash + QCD split -->
+        <tr class="asset-row">
+          <td class="border-cash">
+            <div class="ticker-sym">GOOGL <span class="split-badge">SPLIT</span></div>
+            <div class="ticker-name">Alphabet Inc</div>
+            <div class="ticker-acct">Large Cap Tech · IRA-003</div>
+          </td>
+          <td><div class="val-price">$18,900</div><div class="val-chg pos">+$7,240 +62%</div></td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div class="amt-wrap"><span style="font-size:9px;color:#4ade80">QCD &nbsp;&nbsp;&nbsp;&nbsp;$</span><input class="amt-field" value="3,545" style="border-color:#4ade8040;width:75px"/></div>
+              <div class="amt-wrap"><span style="font-size:9px;color:#7EC8F5">Cash &nbsp;&nbsp;&nbsp;&nbsp;$</span><input class="amt-field" value="3,790" style="border-color:#7EC8F540;width:75px"/></div>
+            </div>
+          </td>
+          <td>
+            <div class="actions-wrap">
+              <div class="act-split-lbl">Split across two strategies:</div>
+              <div class="actions-row" style="margin-top:4px;">
+                <div class="act qcd sel">🎗️ QCD $3,545</div>
+                <div class="act cash sel">💵 Cash $3,790</div>
+              </div>
+              <div class="actions-row" style="margin-top:4px;">
+                <div class="act inkind">📦 In-Kind</div>
+                <div class="act hold">⏸️ Hold</div>
+                <div class="act roth">🔄 Roth Convert</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="tax-val t-owed">$910 tax</div>
+            <div class="tax-sub">Cash portion · QCD portion $0 tax</div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="exec-footer">
+    <div class="exec-stats">
+      <div class="exec-stat"><div class="exec-stat-val val-blue">$46,820</div><div class="exec-stat-label">Total Allocated</div></div>
+      <div class="exec-stat"><div class="exec-stat-val" style="color:#f85149">$5,318</div><div class="exec-stat-label">Est. Fed Tax</div></div>
+      <div class="exec-stat"><div class="exec-stat-val" style="color:#4ade80">$5,919</div><div class="exec-stat-label">Saved vs All-Cash</div></div>
+      <div class="exec-stat"><div class="exec-stat-val" style="color:#4ade80">$11,945</div><div class="exec-stat-label">QCD Tax-Free</div></div>
+      <div class="exec-stat"><div class="exec-stat-val" style="color:#a78bfa">2</div><div class="exec-stat-label">Split Holdings</div></div>
+      <div class="exec-stat"><div class="exec-stat-val" style="color:#8b949e">$0</div><div class="exec-stat-label">Unallocated</div></div>
+    </div>
+    <div class="exec-btns">
+      <button class="btn-e btn-prev">📄 Preview Tax Summary</button>
+      <button class="btn-e btn-conf">✓ Confirm & Execute</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</body>
+</html>
