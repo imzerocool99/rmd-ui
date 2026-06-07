@@ -3333,6 +3333,26 @@ function togglePanel(panelId, chevronId) {
   if (chevron) chevron.textContent = open ? '▶' : '▼';
 }
 
+const REQ_SECTIONS = [
+  ['bpBody','bpChev'],['specBody','specChev'],['soBody','soChev'],
+  ['archBody','archChev'],['techBody','techChev'],
+  ['ragBody','ragChev'],['scaleBody','scaleChev']
+];
+function toggleReqPanel(panelId, chevronId) {
+  const isOpen = document.getElementById(panelId).style.display !== 'none';
+  REQ_SECTIONS.forEach(([pid, cid]) => {
+    const p = document.getElementById(pid);
+    const c = document.getElementById(cid);
+    if (p) p.style.display = 'none';
+    if (c) c.textContent = '▶';
+  });
+  if (!isOpen) {
+    document.getElementById(panelId).style.display = 'block';
+    const chev = document.getElementById(chevronId);
+    if (chev) chev.textContent = '▼';
+  }
+}
+
 // ── Floating Bot ──────────────────────────────────────────────────────
 function toggleBot() {
   const panel = document.getElementById('botPanel');

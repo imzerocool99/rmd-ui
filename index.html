@@ -1193,51 +1193,55 @@
             <div class="team-card">
               <div class="team-avatar-wrap">
                 <img class="team-photo" src="team/member1.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
-                <div class="team-initials" style="display:none">TM</div>
+                <div class="team-initials" style="display:none">AA</div>
               </div>
-              <div class="team-name">Team Member 1</div>
+              <div class="team-name">Abhijit Ashtikar</div>
               <div class="team-role">Role / Title</div>
-              <div class="team-bio">Short bio or area of contribution.</div>
             </div>
 
             <div class="team-card">
               <div class="team-avatar-wrap">
                 <img class="team-photo" src="team/member2.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
-                <div class="team-initials" style="display:none">TM</div>
+                <div class="team-initials" style="display:none">SL</div>
               </div>
-              <div class="team-name">Team Member 2</div>
-              <div class="team-role">Role / Title</div>
-              <div class="team-bio">Short bio or area of contribution.</div>
+              <div class="team-name">Sandeep Lachhwani</div>
+              <div class="team-role">AI Solution Architect / Lead Developer</div>
             </div>
 
             <div class="team-card">
               <div class="team-avatar-wrap">
                 <img class="team-photo" src="team/member3.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
-                <div class="team-initials" style="display:none">TM</div>
+                <div class="team-initials" style="display:none">YM</div>
               </div>
-              <div class="team-name">Team Member 3</div>
+              <div class="team-name">Yuvraj Manivanna</div>
               <div class="team-role">Role / Title</div>
-              <div class="team-bio">Short bio or area of contribution.</div>
             </div>
 
             <div class="team-card">
               <div class="team-avatar-wrap">
                 <img class="team-photo" src="team/member4.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
-                <div class="team-initials" style="display:none">TM</div>
+                <div class="team-initials" style="display:none">SN</div>
               </div>
-              <div class="team-name">Team Member 4</div>
+              <div class="team-name">Sai Nimmagadda</div>
               <div class="team-role">Role / Title</div>
-              <div class="team-bio">Short bio or area of contribution.</div>
             </div>
 
             <div class="team-card">
               <div class="team-avatar-wrap">
                 <img class="team-photo" src="team/member5.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
-                <div class="team-initials" style="display:none">TM</div>
+                <div class="team-initials" style="display:none">RD</div>
               </div>
-              <div class="team-name">Team Member 5</div>
+              <div class="team-name">Roopesh Dwivedi</div>
               <div class="team-role">Role / Title</div>
-              <div class="team-bio">Short bio or area of contribution.</div>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar-wrap">
+                <img class="team-photo" src="team/member6.jpg" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+                <div class="team-initials" style="display:none">YM</div>
+              </div>
+              <div class="team-name">Yasowant Mohanty</div>
+              <div class="team-role">Role / Title</div>
             </div>
 
           </div>
@@ -1257,77 +1261,95 @@
 
             <!-- Business Problem -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('bpBody','bpChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-                <span>🔴 Business Problem</span>
-                <span id="bpChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('bpBody','bpChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+                <span>Business Problem</span>
+                <span id="bpChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="bpBody">
+              <div id="bpBody" style="display:none">
                 <ul class="req-list">
-                  <li>IRS mandates annual RMDs after age 73 — failure triggers a <strong>25% excise tax</strong> on the undistributed amount.</li>
-                  <li>Poor asset selection generates unnecessary capital gains and tax drag — advisors typically pick randomly or by account size.</li>
-                  <li>Operations teams spend hours per account on manual calculations, trade tickets, and compliance documentation.</li>
-                  <li>Clients lack transparency — they don't know <em>why</em> specific assets were chosen for liquidation.</li>
-                  <li>RMD cash sitting in a checking account earns nothing — no reinvestment guidance is typically provided.</li>
-                  <li>The process does not scale without proportional staffing increases.</li>
+                  <li>The IRS mandates annual Required Minimum Distributions (RMDs) from IRA accounts starting at age 73 — missing the deadline triggers a <strong>25% excise tax</strong> on the undistributed amount.</li>
+                  <li>Advisors manually select which assets to liquidate — typically by account size or convenience — leaving <strong>$2,220 or more in avoidable taxes</strong> per client per year through suboptimal asset selection.</li>
+                  <li>No intelligent strategy is applied across distribution methods — Cash, In-Kind Transfer, and Qualified Charitable Distribution (QCD) each carry different tax implications that most advisors don't optimize simultaneously.</li>
+                  <li>Clients receive no explanation for why specific assets were chosen — creating distrust and compliance exposure when decisions can't be traced back to a documented rationale.</li>
+                  <li>After the RMD is distributed, cash typically sits idle in a bank account — advisors lack a fast, structured way to recommend reinvestment aligned to the client's age, risk profile, and income needs.</li>
+                  <li>The end-to-end RMD process — calculation, asset selection, trade execution, documentation, and client communication — is entirely manual and does not scale as AUM and client count grow.</li>
                 </ul>
               </div>
             </div>
 
             <!-- Spec-Driven Development -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('specBody','specChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('specBody','specChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>📐 Spec-Driven Development</span>
-                <span id="specChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="specChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="specBody">
-                <p class="req-text" style="margin-bottom:14px">This solution was built end-to-end using a <strong>Spec-Driven Development</strong> methodology — every feature was defined as a formal written specification before a single line of code was written. Requirements, architecture, API contracts, and user stories were all documented upfront, then implemented using <strong>Claude Code</strong> (Anthropic's AI coding agent) as the primary development tool.</p>
+              <div id="specBody" style="display:none">
+                <p class="req-text" style="margin-bottom:14px">This solution was built end-to-end using a <strong>Spec-Driven Development</strong> methodology — every feature was defined as a formal written specification before a single line of code was written. Requirements, architecture, API contracts, and user stories were all documented upfront, then implemented using <strong>Claude Code</strong> (Anthropic's AI coding agents) — floating multiple skilled agents including Architect, Frontend Developer, Backend Developer, QA, and BA — as the primary development tool.</p>
                 <div class="arch-mods-grid" style="margin-bottom:14px">
                   <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">📋</div><div class="arch-mod-name">Requirements Spec</div><div class="arch-mod-sub">FR / NFR / REG requirements defined upfront with priority, acceptance criteria, and P1/P2 classification</div></div>
                   <div class="arch-mod arch-mod-teal"><div class="arch-mod-icon">🏗️</div><div class="arch-mod-name">Architecture Spec</div><div class="arch-mod-sub">Layer diagram, API contracts, data models, and service boundaries fully documented before coding began</div></div>
                   <div class="arch-mod arch-mod-green"><div class="arch-mod-icon">🧪</div><div class="arch-mod-name">Behaviour Spec</div><div class="arch-mod-sub">User stories and acceptance tests defined per feature — agent run, advisor override, execute, log, reinvest</div></div>
-                  <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Claude Code</div><div class="arch-mod-sub">Anthropic's AI coding agent — implemented the full stack from spec in days, not months</div></div>
+                  <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Claude Code</div><div class="arch-mod-sub">Anthropic's AI coding agents — implemented the full stack from spec in days, not months by floating multiple skilled agents: Architect, Frontend Developer, Backend Developer, QA, BA, and more</div></div>
                 </div>
                 <ul class="req-list" style="margin-bottom:12px">
                   <li><strong>Traceability:</strong> Every feature maps to a named requirement — FR-01 → RMDService.java, FR-05 → human-in-loop dropdowns, FR-08 → AI explanation with source citations.</li>
-                  <li><strong>Claude Code:</strong> The entire Spring Boot backend, Vanilla JS frontend, and this dashboard were built spec-first using Claude Code as the AI development partner — dramatically accelerating delivery while maintaining production-quality output.</li>
+                  <li><strong>Claude Code:</strong> The entire Spring Boot backend, Vanilla JS frontend, and this dashboard were built spec-first using Claude Code's multi-agent system — Architect, Frontend Developer, Backend Developer, QA, and BA agents working in parallel — dramatically accelerating delivery while maintaining production-quality output.</li>
                   <li><strong>Change control:</strong> Every new feature (Advisory Intelligence strip, live recalculation, RAG planning) was added as a spec item first, then implemented — no undocumented scope creep.</li>
                   <li><strong>Handover-ready:</strong> A new developer can read the spec and understand exactly what every service does and why — without reverse-engineering the code.</li>
                   <li><strong>Enterprise alignment:</strong> The same spec serves as input to security review, compliance sign-off, and client-facing documentation.</li>
                 </ul>
-                <div class="req-highlight">Built with <strong>Claude Code (Anthropic)</strong> · Full-stack delivery in days using AI-assisted spec-driven development · Backend + Frontend + Documentation generated from formal specs</div>
+                <div class="req-highlight">Built with <strong>Claude Code (Anthropic)</strong> · Full-stack delivery in days using multi-agent spec-driven development · Architect · Frontend Developer · Backend Developer · QA · BA — all AI agents, all from spec</div>
               </div>
             </div>
 
             <!-- Solution Overview -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('soBody','soChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('soBody','soChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>✅ Solution Overview</span>
-                <span id="soChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="soChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="soBody">
+              <div id="soBody" style="display:none">
                 <ol class="req-list">
-                  <li>Calculates the IRS-mandated RMD amount using the Uniform Lifetime Table for the client's age and prior year-end balance.</li>
-                  <li>Analyzes the full portfolio across 10 asset classes — scores each asset for tax efficiency, gain/loss, and concentration risk.</li>
-                  <li>Selects assets with losses or underperformance first to minimize tax impact (<strong>tax-loss harvesting</strong>). Shows side-by-side savings vs naive random selection.</li>
-                  <li>Two execution modes: <strong>Cash Distribution</strong> (sell assets → transfer proceeds to client's bank) and <strong>In-Kind Transfer</strong> (move shares to taxable brokerage at FMV — no immediate sale).</li>
-                  <li><strong>Human-in-the-Loop:</strong> Advisor reviews every asset recommendation via Action Select dropdown (Sell / Transfer / Hold). Live RMD coverage and tax impact recalculate instantly on each change before submission.</li>
-                  <li>AI explanation panel with <strong>per-line IRS / Investopedia source citations</strong> (🌱💹💰📋 icons) for every selected and protected asset.</li>
-                  <li><strong>Advisory Intelligence strip</strong> below each panel — real-time market catalysts, AI signals, and firm product recommendations to support advisor decision-making.</li>
-                  <li>Reinvestment engine suggests 7 product types (HYSA, CD, T-Bills, Muni Bonds, Dividend ETF, Fixed Annuity, Money Market) with yield, risk, institution options, and annual income projection.</li>
-                  <li>Context-aware AI chatbot — reads the active tab and injects relevant context. 💬 Discuss buttons on asset rows pre-load that asset's rationale into the bot.</li>
-                  <li>Full audit trail: every agent run, advisor override, and execution action is timestamped and logged.</li>
+                  <li>Calculates the IRS-mandated RMD amount using the <strong>Uniform Lifetime Table</strong> for the client's age and prior year-end IRA balance — fully automated, no manual lookup.</li>
+                  <li>Analyzes the full portfolio, scores every asset for unrealized gain/loss, tax efficiency, and concentration risk — then selects the optimal liquidation set using a <strong>loss-first strategy</strong>, saving clients like Robert Chen <strong>$2,220 in avoidable taxes</strong> vs. naive selection.</li>
+                  <li>Supports <strong>four distribution methods per asset</strong> — Cash (sell and transfer to bank), In-Kind Transfer (move shares to taxable brokerage at FMV), Qualified Charitable Distribution / QCD (direct to charity, tax-free for clients 70½+), and Hold — each assigned intelligently based on gain/loss profile.</li>
+                  <li><strong>Human-in-the-Loop:</strong> Advisor reviews every asset recommendation via action pills (Cash / In-Kind / QCD / Hold). RMD coverage, Distribution Mix, and Tax Impact recalculate live on every change — before a single trade is submitted.</li>
+                  <li>AI Explanation panel shows a <strong>per-asset rationale</strong> with clickable IRS / Investopedia source citations (💹🌱💰📋 icons) for every selected and protected asset — no black-box decisions.</li>
+                  <li><strong>Advisory Intelligence strip</strong> appears below every panel — real-time market catalysts, AI signals, and firm product recommendations surfaced in context to support advisor judgment.</li>
+                  <li>Reinvestment engine recommends 7 product types — HYSA, CD, T-Bills, Muni Bonds, Dividend ETF, Fixed Annuity, Money Market — with yield, risk rating, institution options, and projected annual income. Advisor selects and deploys via a guided wizard.</li>
+                  <li>Context-aware AI chatbot reads the active tab and injects relevant client and portfolio context automatically. Per-asset <strong>💬 Discuss</strong> buttons pre-load that asset's rationale directly into the bot.</li>
+                  <li>Full audit trail — every agent run, advisor override, and trade action is timestamped, logged, and viewable in the Admin panel.</li>
                 </ol>
               </div>
             </div>
 
             <!-- High-Level Architecture -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('archBody','archChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('archBody','archChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>🏗️ High-Level Architecture</span>
-                <span id="archChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="archChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="archBody">
-                <div class="arch-diag">
+              <div id="archBody" style="display:none">
+
+                <!-- ── GOVERNANCE OUTER BOX ── -->
+                <div style="border:2px solid #3fb950;border-radius:14px;padding:16px;background:#0d1f0d20;position:relative">
+
+                  <!-- Governance title badge -->
+                  <div style="text-align:center;margin-bottom:14px">
+                    <span style="background:#0d1117;border:1px solid #3fb950;border-radius:20px;padding:5px 18px;font-size:11px;font-weight:700;color:#3fb950;letter-spacing:0.8px">🛡️ ENTERPRISE GUARDRAILS — SECURITY · COMPLIANCE · RESILIENCE</span>
+                  </div>
+
+                <div style="display:flex;gap:10px;align-items:stretch">
+
+                  <!-- LEFT 4 governance items -->
+                  <div style="display:flex;flex-direction:column;gap:8px;width:150px;flex-shrink:0">
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">🔐</div><div class="arch-gov-name">Data Privacy</div><div class="arch-gov-sub">All AI on-premises · no client data leaves the network</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">📜</div><div class="arch-gov-name">Regulatory Compliance</div><div class="arch-gov-sub">Traceable to IRS Pub. 590-B · SEC / FINRA audit-ready</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">🧑‍⚖️</div><div class="arch-gov-name">Human-in-the-Loop</div><div class="arch-gov-sub">No trade executes without advisor approval</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">🔑</div><div class="arch-gov-name">Access Control</div><div class="arch-gov-sub">Client data scoped by clientId · no cross-tenant exposure</div></div>
+                  </div>
+
+                <div class="arch-diag" style="flex:1;border:2px solid #4AAEE0;border-radius:10px;padding:12px;background:#0d1f2e40;margin-bottom:0">
 
                   <!-- CLIENT LAYER -->
                   <div class="arch-diag-layer arch-dl-client">
@@ -1338,12 +1360,8 @@
                     <div class="arch-tab-chips">
                       <span class="arch-tc">📊 Dashboard</span>
                       <span class="arch-tc">📁 Portfolio</span>
-                      <span class="arch-tc">🎯 Agent Results</span>
+                      <span class="arch-tc">🎯 RMD Advice</span>
                       <span class="arch-tc">💡 Reinvestment</span>
-                      <span class="arch-tc">📈 Business Value</span>
-                      <span class="arch-tc">🎤 Demo Guide</span>
-                      <span class="arch-tc">❓ FAQ</span>
-                      <span class="arch-tc">👥 About Us</span>
                     </div>
                     <div class="arch-chatbot-bar">🤖 Floating AI Chatbot — tab-aware context · 💬 per-asset Discuss buttons · quick-question chips</div>
                   </div>
@@ -1369,21 +1387,71 @@
                   <div class="arch-diag-layer arch-dl-orch">
                     <div class="arch-diag-lhdr">
                       <span class="arch-diag-ldot"></span>
-                      <span class="arch-diag-lname">ORCHESTRATION LAYER — Master Agent</span>
+                      <span class="arch-diag-lname">ORCHESTRATION LAYER</span>
                     </div>
+
+                    <!-- Master Agent -->
+                    <div style="background:linear-gradient(135deg,#0d2340,#0a1628);border:2px solid #4AAEE0;border-radius:10px;padding:12px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <span style="font-size:22px">🧠</span>
+                        <div>
+                          <div style="font-size:13px;font-weight:700;color:#7EC8F5">Master Agent — RMD Advisor Orchestrator</div>
+                          <div style="font-size:11px;color:#8b949e;margin-top:2px">Coordinates all sub-agents · dispatches tasks · aggregates results → single JSON response to UI</div>
+                        </div>
+                      </div>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:4px;padding:2px 8px;font-size:10px;color:#58a6ff">SENSE</span>
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:4px;padding:2px 8px;font-size:10px;color:#58a6ff">THINK</span>
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:4px;padding:2px 8px;font-size:10px;color:#58a6ff">PLAN</span>
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:4px;padding:2px 8px;font-size:10px;color:#58a6ff">ACT</span>
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:4px;padding:2px 8px;font-size:10px;color:#58a6ff">REPORT</span>
+                      </div>
+                    </div>
+
+                    <!-- Master → Sub-agent protocol connector -->
+                    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px">
+                      <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,#4AAEE060)"></div>
+                      <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                        <span style="font-size:10px;color:#4AAEE0">▼ dispatches to sub-agents ▼</span>
+                        <span style="background:#0d2340;border:1px solid #4AAEE050;border-radius:12px;padding:2px 10px;font-size:10px;color:#8b949e">Agent-to-Agent Protocol · in-process · synchronous dispatch</span>
+                        <span style="font-size:10px;color:#4AAEE0">▲ returns typed result objects ▲</span>
+                      </div>
+                      <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,#4AAEE060)"></div>
+                    </div>
+
+                    <!-- Floated specialist agents label -->
+                    <div style="font-size:10px;font-weight:600;color:#3fb950;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">⚡ Floated Specialist Agents — run in parallel on each RMD Advisor call</div>
+
+                    <!-- Floated agents grid -->
+                    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">
+                      <div class="arch-mod arch-mod-orange" style="border-color:#f0a50060"><div class="arch-mod-icon">💰</div><div class="arch-mod-name">Tax &amp; Gain Analysis Agent</div><div class="arch-mod-sub">Scores assets by unrealized gain/loss · quantifies tax savings vs naive</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-red" style="border-color:#f8514960"><div class="arch-mod-icon">🛡️</div><div class="arch-mod-name">Risk &amp; IRMAA Guard Agent</div><div class="arch-mod-sub">Concentration risk check · IRMAA bracket protection · suitability guard</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-teal" style="border-color:#39d35360"><div class="arch-mod-icon">🎗️</div><div class="arch-mod-name">QCD Optimization Agent</div><div class="arch-mod-sub">Identifies lowest positive-gain assets for charitable distribution · tax-free for 70½+</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-blue" style="border-color:#4AAEE060"><div class="arch-mod-icon">🔀</div><div class="arch-mod-name">In-Kind Transfer Agent</div><div class="arch-mod-sub">Selects appreciated assets for brokerage transfer · defers tax event · no immediate sale</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-green" style="border-color:#3fb95060"><div class="arch-mod-icon">💵</div><div class="arch-mod-name">Cash Flow Agent</div><div class="arch-mod-sub">Assigns loss assets for cash liquidation · maximises RMD coverage · minimises tax drag</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                    </div>
+
+                    <!-- Supporting services label -->
+                    <div style="font-size:10px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Supporting Services</div>
+
+                    <!-- Supporting services grid -->
                     <div class="arch-mods-grid">
-                      <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">📊</div><div class="arch-mod-name">RMD Engine</div><div class="arch-mod-sub">IRS Uniform Lifetime Table · age-based factor</div></div>
-                      <div class="arch-mod arch-mod-green"><div class="arch-mod-icon">📈</div><div class="arch-mod-name">Asset Ranker</div><div class="arch-mod-sub">Loss-first · tax scoring · concentration check</div></div>
-                      <div class="arch-mod arch-mod-orange"><div class="arch-mod-icon">💰</div><div class="arch-mod-name">Tax Optimizer</div><div class="arch-mod-sub">Naive vs smart · quantified savings</div></div>
-                      <div class="arch-mod arch-mod-teal"><div class="arch-mod-icon">💡</div><div class="arch-mod-name">Reinvestment Engine</div><div class="arch-mod-sub">7 product types · institution options</div></div>
-                      <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🧠</div><div class="arch-mod-name">Memory Service</div><div class="arch-mod-sub">Client history · decision audit trail</div></div>
-                      <div class="arch-mod arch-mod-gray"><div class="arch-mod-icon">📋</div><div class="arch-mod-name">Monitor / Logs</div><div class="arch-mod-sub">Timestamped agent actions · compliance log</div></div>
-                      <div class="arch-mod arch-mod-gold"><div class="arch-mod-icon">🔄</div><div class="arch-mod-name">Alpaca MCP</div><div class="arch-mod-sub">Trade execution · paper trading API</div></div>
-                      <div class="arch-mod arch-mod-red"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Ollama Chat</div><div class="arch-mod-sub">phi3 local AI · chat &amp; reinvest advice</div></div>
+                      <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">📊</div><div class="arch-mod-name">RMD Engine</div><div class="arch-mod-sub">IRS Uniform Lifetime Table · age-based factor · prior year balance</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">💡</div><div class="arch-mod-name">Reinvestment Engine</div><div class="arch-mod-sub">7 product types · institution options · annual income projection</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-gray"><div class="arch-mod-icon">📋</div><div class="arch-mod-name">Audit Logger</div><div class="arch-mod-sub">Timestamped agent actions · compliance log · admin viewer</div><div style="margin-top:6px;font-size:9px;color:#4AAEE0;border-top:1px solid #21262d;padding-top:5px">Agent-to-Master · sync</div></div>
+                      <div class="arch-mod arch-mod-gold"><div class="arch-mod-icon">🔄</div><div class="arch-mod-name">Alpaca Brokerage</div><div class="arch-mod-sub">Trade execution · paper trading · 3 IRA accounts</div><div style="margin-top:6px;font-size:9px;color:#f0a500;border-top:1px solid #21262d;padding-top:5px">MCP Server · tool call</div></div>
+                      <div class="arch-mod arch-mod-red"><div class="arch-mod-icon">🤖</div><div class="arch-mod-name">Ollama / Phi-3</div><div class="arch-mod-sub">Local AI · chat, reinvest &amp; advisory intelligence</div><div style="margin-top:6px;font-size:9px;color:#f85149;border-top:1px solid #21262d;padding-top:5px">HTTP POST · localhost:11434 · async + fallback</div></div>
+                    </div>
+
+                    <!-- Protocol legend -->
+                    <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+                      <span style="font-size:10px;color:#8b949e"><span style="color:#4AAEE0">●</span> Agent-to-Agent Protocol — in-process synchronous dispatch</span>
+                      <span style="font-size:10px;color:#f0a500">●</span><span style="font-size:10px;color:#8b949e"> MCP Servers — standardised tool calls to external systems (Alpaca, market data, etc.)</span>
+                      <span style="font-size:10px;color:#f85149">●</span><span style="font-size:10px;color:#8b949e"> HTTP POST — local Ollama async with rule-based fallback</span>
                     </div>
                   </div>
 
-                  <!-- CONNECTOR EXTERNAL APIs -->
+                  <!-- CONNECTOR MCP SERVER -->
                   <div class="arch-diag-conn">
                     <div class="arch-conn-track arch-conn-up">
                       <div class="arch-conn-dot" style="animation-delay:0.15s"></div>
@@ -1391,7 +1459,7 @@
                     </div>
                     <div class="arch-conn-mid">
                       <div class="arch-conn-arrow arch-arr-up">▲</div>
-                      <div class="arch-conn-pill">External APIs</div>
+                      <div class="arch-conn-pill" style="background:#0d2340;border-color:#f0a500;color:#f0a500">MCP Servers</div>
                       <div class="arch-conn-arrow arch-arr-dn">▼</div>
                     </div>
                     <div class="arch-conn-track arch-conn-dn">
@@ -1404,7 +1472,7 @@
                   <div class="arch-diag-layer arch-dl-integ">
                     <div class="arch-diag-lhdr">
                       <span class="arch-diag-ldot"></span>
-                      <span class="arch-diag-lname">INTEGRATION LAYER</span>
+                      <span class="arch-diag-lname">INTEGRATION LAYER — connected via MCP Servers</span>
                     </div>
                     <div class="arch-integ-row">
                       <div class="arch-integ-item"><div class="arch-integ-icon">📈</div><div class="arch-integ-name">Alpaca Paper Trading</div><div class="arch-integ-sub">Simulated trades · 3 IRA accounts</div></div>
@@ -1414,86 +1482,28 @@
                     </div>
                   </div>
 
-                  <!-- GOVERNANCE & SECURITY LAYER -->
-                  <div class="arch-gov-bar">
-                    <div class="arch-gov-title">
-                      <span class="arch-gov-dot"></span>
-                      🛡️ GOVERNANCE, SECURITY &amp; RESILIENCE GUARDRAILS
-                      <span style="font-size:10px;font-weight:500;color:#86efac;margin-left:8px">— applied across all layers</span>
-                    </div>
-                    <div class="arch-gov-grid">
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">🔐</div>
-                        <div class="arch-gov-name">Data Privacy</div>
-                        <div class="arch-gov-sub">All AI runs on-premises · no client data leaves the network · zero external API calls</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">📜</div>
-                        <div class="arch-gov-name">Regulatory Compliance</div>
-                        <div class="arch-gov-sub">Every decision traceable to IRS Pub. 590-B · SEC / FINRA audit-ready logs</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">🧑‍⚖️</div>
-                        <div class="arch-gov-name">Human-in-the-Loop</div>
-                        <div class="arch-gov-sub">No trade executes without advisor approval · override at any point before submission</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">🔑</div>
-                        <div class="arch-gov-name">Access Control</div>
-                        <div class="arch-gov-sub">API authentication on all endpoints · client data scoped by clientId · no cross-tenant exposure</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">📋</div>
-                        <div class="arch-gov-name">Audit Trail</div>
-                        <div class="arch-gov-sub">Timestamped log of every agent run, advisor override, and trade action · immutable records</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">⚡</div>
-                        <div class="arch-gov-name">Resilience</div>
-                        <div class="arch-gov-sub">Ollama AI timeout with instant rule-based fallback · stateless API · no single point of failure</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">🧩</div>
-                        <div class="arch-gov-name">Explainability</div>
-                        <div class="arch-gov-sub">Every asset decision backed by a clickable IRS / Investopedia citation · no black-box outcomes</div>
-                      </div>
-                      <div class="arch-gov-item">
-                        <div class="arch-gov-icon">📡</div>
-                        <div class="arch-gov-name">Observability</div>
-                        <div class="arch-gov-sub">Spring Boot Actuator health endpoints · real-time agent log viewer · prod path: Prometheus + Grafana</div>
-                      </div>
-                    </div>
+                </div><!-- end inner arch-diag -->
+
+                  <!-- RIGHT 4 governance items -->
+                  <div style="display:flex;flex-direction:column;gap:8px;width:150px;flex-shrink:0">
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">📋</div><div class="arch-gov-name">Audit Trail</div><div class="arch-gov-sub">Timestamped log of every agent run, override, and trade action</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">⚡</div><div class="arch-gov-name">Resilience</div><div class="arch-gov-sub">Instant rule-based fallback · stateless API · no single point of failure</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">🧩</div><div class="arch-gov-name">Explainability</div><div class="arch-gov-sub">Every decision backed by clickable IRS / Investopedia citation</div></div>
+                    <div class="arch-gov-item" style="flex:1"><div class="arch-gov-icon">📡</div><div class="arch-gov-name">Observability</div><div class="arch-gov-sub">Real-time log viewer · health endpoints · Prometheus + Grafana</div></div>
                   </div>
 
-                </div>
-              </div>
-            </div>
-
-            <!-- Agent Execution Flow -->
-            <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('flowBody','flowChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-                <span>⚙️ Agent Execution Flow — SENSE → THINK → PLAN → ACT → REPORT</span>
-                <span id="flowChev" style="font-size:11px;transition:transform 0.2s">▼</span>
-              </div>
-              <div id="flowBody">
-                <div class="req-flow">
-                  <div class="req-flow-step"><span class="req-step-num">1</span><div><strong>SENSE</strong> — Reads client age, IRA balance, portfolio (13 assets / 10 classes), market prediction, and advisor mode preference (cash / in-kind).</div></div>
-                  <div class="req-flow-step"><span class="req-step-num">2</span><div><strong>THINK</strong> — Calculates RMD via IRS Uniform Lifetime Table. Scores every asset: losses first, then underperformers, then concentrated positions. Generates analyst intelligence signals per asset.</div></div>
-                  <div class="req-flow-step"><span class="req-step-num">3</span><div><strong>PLAN</strong> — Allocates exact quantities to match the RMD. Runs naive vs optimised tax comparison. Generates 7 reinvestment suggestions and AI explanation with IRS source citations. All in parallel.</div></div>
-                  <div class="req-flow-step"><span class="req-step-num">4</span><div><strong>ACT (Human-in-the-Loop)</strong> — Advisor reviews per-asset recommendations, adjusts Action Select dropdowns, sees RMD coverage and tax impact update live, then approves. Agent executes via Alpaca Paper Trading API.</div></div>
-                  <div class="req-flow-step"><span class="req-step-num">5</span><div><strong>REPORT</strong> — Displays results across all tabs. Logs every action with timestamps. Injects full context into the floating AI chatbot for follow-up questions.</div></div>
-                </div>
-                <div class="req-highlight">Total runtime: ~4 seconds &nbsp;|&nbsp; Rule-based logic (RMD, tax, trade): &lt; 0.1s &nbsp;|&nbsp; Ollama AI advice (async, phi3): ~4s with instant rule-based fallback</div>
+                </div><!-- end flex row -->
+                </div><!-- end governance outer box -->
               </div>
             </div>
 
             <!-- Technology Stack -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('techBody','techChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('techBody','techChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>🛠️ Technology Stack</span>
-                <span id="techChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="techChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="techBody">
+              <div id="techBody" style="display:none">
                 <table class="req-table">
                   <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
                   <tbody>
@@ -1514,72 +1524,90 @@
 
             <!-- RAG & Organizational Tuning -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('ragBody','ragChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('ragBody','ragChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>🔍 RAG — Organizational Knowledge Tuning</span>
-                <span id="ragChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="ragChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="ragBody">
-                <p class="req-text" style="margin-bottom:12px">The current agent uses <strong>Ollama / Phi-3</strong> as its base language model — a general-purpose LLM. <strong>Retrieval-Augmented Generation (RAG)</strong> is the next evolution: it wraps the LLM with your firm's own knowledge base so every AI answer is grounded in your specific policies, products, and compliance rules — not generic internet knowledge.</p>
-                <div class="arch-diag" style="margin-bottom:14px">
-                  <div class="arch-diag-layer arch-dl-client" style="padding:12px 16px">
-                    <div style="font-size:12px;font-weight:700;color:#79c0ff;margin-bottom:8px">1 — Advisor asks a question</div>
-                    <div style="font-size:12px;color:#c9d1d9">"What is our firm's recommendation for TSLA given the client's age and risk profile?"</div>
+              <div id="ragBody" style="display:none">
+                <p class="req-text" style="margin-bottom:14px">The platform uses a <strong>two-stage RAG approach</strong> — a custom built engine today, with a clear upgrade path to enterprise vector search. Both stages run fully on-premises: no cloud dependency, no external vendor, no client data leaving the network.</p>
+
+                <!-- Stage 1: Built Now -->
+                <div style="border:1px solid #3fb950;border-radius:8px;padding:12px 14px;margin-bottom:12px;background:#0a1a0820">
+                  <div style="font-size:12px;font-weight:700;color:#3fb950;margin-bottom:8px">✅ Stage 1 — Built &amp; Running Today: Custom TF-IDF RAG</div>
+                  <p class="req-text" style="margin-bottom:10px">A custom <strong>TF-IDF cosine similarity</strong> engine searches an in-memory institutional knowledge base to retrieve the most relevant firm knowledge for every AI response — no external framework, no pip install, runs inside the JAR.</p>
+                  <div style="background:#0d1117;border:1px solid #21262d;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:#8b949e;line-height:1.6">
+                    <span style="color:#4AAEE0;font-weight:600">What is TF-IDF?</span> &nbsp;
+                    <strong style="color:#c9d1d9">TF</strong> (Term Frequency) scores how often a keyword appears in a document.
+                    <strong style="color:#c9d1d9">IDF</strong> (Inverse Document Frequency) down-weights common words and boosts rare, meaningful ones.
+                    Combined, TF-IDF ranks every document by relevance to the query — then <strong style="color:#c9d1d9">cosine similarity</strong> picks the closest match.
+                    <span style="color:#3fb950">Result: the right firm knowledge surfaces for every advisor question, with zero cloud dependency.</span>
                   </div>
-                  <div class="arch-diag-conn" style="height:36px">
+                  <div class="arch-integ-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+                    <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📑</div><div class="arch-integ-name" style="font-size:11px">Investment Policy</div><div class="arch-integ-sub">Asset allocation guidelines · suitability rules</div></div>
+                    <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">🏦</div><div class="arch-integ-name" style="font-size:11px">Product Catalog</div><div class="arch-integ-sub">Firm's reinvestment products · yield &amp; risk ratings</div></div>
+                    <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">⚖️</div><div class="arch-integ-name" style="font-size:11px">Compliance Rules</div><div class="arch-integ-sub">IRS regulations · FINRA obligations · suitability</div></div>
+                    <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📊</div><div class="arch-integ-name" style="font-size:11px">Research &amp; Signals</div><div class="arch-integ-sub">Analyst ratings · market catalysts · asset signals</div></div>
+                  </div>
+                  <div class="req-highlight" style="margin:0">Custom TF-IDF · cosine similarity · fully on-premises · zero external dependencies · enterprise-ready out of the box</div>
+                </div>
+
+                <!-- How it works diagram -->
+                <div style="font-size:11px;font-weight:600;color:#8b949e;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">How it works</div>
+                <div class="arch-diag" style="margin-bottom:14px;border:1px solid #21262d;border-radius:8px;padding:10px">
+                  <div class="arch-diag-layer arch-dl-client" style="padding:10px 14px">
+                    <div style="font-size:12px;font-weight:700;color:#79c0ff;margin-bottom:6px">1 — Advisor or agent asks a question</div>
+                    <div style="font-size:12px;color:#c9d1d9">"Why should Robert hold GLD given his age and current market conditions?"</div>
+                  </div>
+                  <div class="arch-diag-conn" style="height:32px">
                     <div class="arch-conn-track arch-conn-dn" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0s"></div></div>
-                    <div class="arch-conn-mid"><div class="arch-conn-pill">Embed query → vector search</div></div>
+                    <div class="arch-conn-mid"><div class="arch-conn-pill">TF-IDF cosine similarity search → top-K documents</div></div>
                     <div class="arch-conn-track arch-conn-dn" style="height:100%"></div>
                   </div>
-                  <div class="arch-diag-layer arch-dl-orch" style="padding:12px 16px">
-                    <div style="font-size:12px;font-weight:700;color:#3fb950;margin-bottom:8px">2 — RAG Layer retrieves relevant firm documents</div>
-                    <div class="arch-integ-row" style="grid-template-columns:repeat(4,1fr)">
-                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📑</div><div class="arch-integ-name" style="font-size:11px">Investment Policy</div></div>
-                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">🏦</div><div class="arch-integ-name" style="font-size:11px">Product Catalog</div></div>
-                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">⚖️</div><div class="arch-integ-name" style="font-size:11px">Compliance Rules</div></div>
-                      <div class="arch-integ-item" style="background:#0a1a08;border-color:#3fb95050"><div class="arch-integ-icon">📊</div><div class="arch-integ-name" style="font-size:11px">Research Reports</div></div>
-                    </div>
+                  <div class="arch-diag-layer arch-dl-orch" style="padding:10px 14px">
+                    <div style="font-size:12px;font-weight:700;color:#3fb950;margin-bottom:6px">2 — RAG retrieves relevant firm knowledge</div>
+                    <div style="font-size:12px;color:#c9d1d9">Investment policy (age 75 → conservative allocation) + compliance rule (concentration &lt;5%) + market signal (inflation hedge)</div>
                   </div>
-                  <div class="arch-diag-conn" style="height:36px">
+                  <div class="arch-diag-conn" style="height:32px">
                     <div class="arch-conn-track arch-conn-dn" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0.3s"></div></div>
-                    <div class="arch-conn-mid"><div class="arch-conn-pill">Inject context → Phi-3</div></div>
+                    <div class="arch-conn-mid"><div class="arch-conn-pill">Inject retrieved context → Ollama / Phi-3</div></div>
                     <div class="arch-conn-track arch-conn-up" style="height:100%"><div class="arch-conn-dot" style="animation-delay:0s"></div></div>
                   </div>
-                  <div class="arch-diag-layer arch-dl-integ" style="padding:12px 16px">
+                  <div class="arch-diag-layer arch-dl-integ" style="padding:10px 14px">
                     <div style="font-size:12px;font-weight:700;color:#d29922;margin-bottom:6px">3 — Firm-grounded AI answer</div>
-                    <div style="font-size:12px;color:#c9d1d9">"Per our Q2 2026 equity research note, TSLA is rated Neutral with a 12-month target of $240. Given Robert's age 75 and conservative profile, our policy recommends limiting concentration to &lt;5% — the agent's Hold recommendation aligns with this."</div>
+                    <div style="font-size:12px;color:#c9d1d9">"Per firm policy, Robert's conservative profile limits equity concentration to &lt;5%. GLD's inflation-hedge signal supports a Hold — selling now would increase cash drag without improving tax efficiency."</div>
                   </div>
                 </div>
-                <table class="req-table">
-                  <thead><tr><th>Knowledge Source</th><th>What RAG Enables</th></tr></thead>
-                  <tbody>
-                    <tr><td>Firm Investment Policy</td><td>AI answers cite your firm's asset allocation guidelines, not generic financial advice</td></tr>
-                    <tr><td>Proprietary Product Catalog</td><td>Reinvestment suggestions prioritize your firm's managed products over generic alternatives</td></tr>
-                    <tr><td>Compliance Rule Book</td><td>Agent flags suitability issues based on your specific regulatory obligations and client agreements</td></tr>
-                    <tr><td>Analyst Research Reports</td><td>Per-asset AI rationale references your internal analyst ratings, not public consensus</td></tr>
-                    <tr><td>Historical Client Decisions</td><td>Agent learns from past advisor overrides to improve future recommendations per client</td></tr>
-                  </tbody>
-                </table>
-                <div class="req-highlight" style="margin-top:10px">RAG stack: <strong>ChromaDB / Pinecone</strong> (vector store) · <strong>sentence-transformers</strong> (embedding model) · <strong>LangChain4j</strong> (Java RAG pipeline) — all can run fully on-premises alongside the existing Spring Boot backend.</div>
+
+                <!-- Stage 2: Roadmap -->
+                <div style="border:1px solid #4AAEE060;border-radius:8px;padding:12px 14px;background:#0d1f2e20">
+                  <div style="font-size:12px;font-weight:700;color:#4AAEE0;margin-bottom:8px">🚀 Stage 2 — Roadmap: Enterprise Vector RAG</div>
+                  <p class="req-text" style="margin-bottom:10px">Same architecture, upgraded retrieval — swap TF-IDF for dense vector embeddings. No change to the agent logic or API contracts.</p>
+                  <div class="arch-mods-grid" style="margin-bottom:10px">
+                    <div class="arch-mod arch-mod-blue"><div class="arch-mod-icon">🗄️</div><div class="arch-mod-name">Vector Store</div><div class="arch-mod-sub">ChromaDB (on-premises) or Pinecone (cloud) — stores embedded firm documents</div></div>
+                    <div class="arch-mod arch-mod-teal"><div class="arch-mod-icon">🔢</div><div class="arch-mod-name">Embedding Model</div><div class="arch-mod-sub">sentence-transformers — converts queries and documents to dense vectors</div></div>
+                    <div class="arch-mod arch-mod-green"><div class="arch-mod-icon">🔗</div><div class="arch-mod-name">RAG Pipeline</div><div class="arch-mod-sub">LangChain4j — Java-native RAG orchestration, plugs into existing backend</div></div>
+                    <div class="arch-mod arch-mod-purple"><div class="arch-mod-icon">🧠</div><div class="arch-mod-name">Upgraded LLM</div><div class="arch-mod-sub">Swap Phi-3 for Claude API or Azure OpenAI — zero code change via interface abstraction</div></div>
+                  </div>
+                  <div class="req-highlight" style="margin:0">All stages run fully on-premises · no client data leaves the network · upgrade path requires no architectural rework</div>
+                </div>
               </div>
             </div>
 
             <!-- Scalability -->
             <div class="req-section">
-              <div class="req-section-title collapsible-title" onclick="togglePanel('scaleBody','scaleChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+              <div class="req-section-title collapsible-title" onclick="toggleReqPanel('scaleBody','scaleChev')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
                 <span>📡 Scalability &amp; Production Architecture</span>
-                <span id="scaleChev" style="font-size:11px;transition:transform 0.2s">▼</span>
+                <span id="scaleChev" style="font-size:11px;transition:transform 0.2s">▶</span>
               </div>
-              <div id="scaleBody">
+              <div id="scaleBody" style="display:none">
                 <table class="req-table" style="margin-bottom:12px">
                   <thead><tr><th>Capability</th><th>Current State</th><th>Production Path</th></tr></thead>
                   <tbody>
-                    <tr><td>API Design</td><td>Stateless REST — each request is fully self-contained</td><td>Horizontal scale behind load balancer (NGINX / AWS ALB) — no shared state conflicts</td></tr>
                     <tr><td>Async Processing</td><td>Ollama AI runs in CompletableFuture async thread in parallel with tax analysis</td><td>Apache Kafka / RabbitMQ for batch nightly RMD runs across all accounts simultaneously</td></tr>
                     <tr><td>Data Persistence</td><td>In-memory MemoryService</td><td>PostgreSQL for audit trail + Redis cache for portfolio state — multi-tenant with client isolation</td></tr>
                     <tr><td>AI Layer</td><td>Single local Ollama / Phi-3 instance</td><td>Ollama cluster or swap model to Claude API / Azure OpenAI for higher throughput — zero code change (interface-based)</td></tr>
                     <tr><td>Deployment</td><td>Single Windows machine, JAR + http-server</td><td>Docker containers + Kubernetes for orchestration — one Helm chart deploys the full stack</td></tr>
-                    <tr><td>Multi-Tenancy</td><td>3 accounts, 2 clients (demo data)</td><td>Firm-level tenant isolation — each client's data scoped by clientId in every service call</td></tr>
-                    <tr><td>Scheduling</td><td>Manual trigger (advisor runs agent)</td><td>Spring @Scheduled — auto-run RMD analysis for all eligible accounts on Dec 1 each year; email alerts for deadline risk</td></tr>
+                    <tr><td>Multi-Tenancy</td><td>Assets are sitting in Alpaca platform (Paper Trading)</td><td>Firm-level tenant isolation — each client's data scoped by clientId in every service call</td></tr>
                     <tr><td>Monitoring</td><td>Agent log endpoint /agent/logs</td><td>Prometheus metrics + Grafana dashboards — alert on failed executions, RMD shortfalls, API errors</td></tr>
                   </tbody>
                 </table>
