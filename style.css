@@ -51,7 +51,7 @@
   color: #0d1117; flex-shrink: 0;
 }
 .scb-name { font-size: 13px; font-weight: 700; color: #e6edf3; }
-.scb-meta { font-size: 10px; color: #8b949e; margin-top: 2px; }
+.scb-meta { font-size: 10px; color: #ffffff; margin-top: 2px; }
 .scb-acct-count { color: #f59e0b; font-weight: 700; }
 
 /* ── ACCOUNT PICKER ── */
@@ -86,7 +86,7 @@
   border-radius: 8px; margin-left: 6px; vertical-align: middle;
 }
 .multi-badge {
-  background: #1e3a5f; color: #7EC8F5;
+  background: #1e3a5f; color: #ffffff;
   font-size: 9px; font-weight: 700; padding: 1px 5px;
   border-radius: 8px; margin-left: 4px;
 }
@@ -139,13 +139,14 @@ header {
 }
 .logo {
   font-size: 18px;
-  font-weight: 700;
-  color: #7EC8F5;
+  font-weight: 900;
+  color: #ffffff;
   letter-spacing: 0.5px;
 }
 .tagline {
   font-size: 12px;
-  color: #7EC8F5;
+  font-weight: 700;
+  color: #ffffff;
   margin-left: 0;
 }
 .header-right {
@@ -181,8 +182,9 @@ header {
 }
 .sidebar h3 {
   font-size: 11px;
+  font-weight: 900;
   text-transform: uppercase;
-  color: #8b949e;
+  color: #ffffff;
   letter-spacing: 1px;
   margin-bottom: 14px;
 }
@@ -192,7 +194,8 @@ header {
 .form-group label {
   display: block;
   font-size: 12px;
-  color: #8b949e;
+  font-weight: 700;
+  color: #ffffff;
   margin-bottom: 5px;
 }
 .form-group input,
@@ -210,6 +213,10 @@ header {
 .form-group input:focus,
 .form-group select:focus {
   border-color: #7EC8F5;
+}
+.form-group input::placeholder {
+  color: #ffffff;
+  opacity: 1;
 }
 /* ── EXPLANATION TABLE (inline sources + discuss) ── */
 .exp-table {
@@ -312,7 +319,7 @@ header {
   0%,100% { opacity: 1; } 50% { opacity: 0.4; }
 }
 .intel-header-title { font-size: 12px; font-weight: 700; color: #e6edf3; }
-.intel-header-sub   { font-size: 10px; color: #484f58; }
+.intel-header-sub   { font-size: 10px; color: #ffffff; }
 .intel-timestamp    { font-size: 10px; color: #484f58; font-family: 'Consolas', monospace; }
 
 .intel-lanes {
@@ -325,8 +332,8 @@ header {
 }
 .intel-lane:last-child { border-right: none; }
 .intel-lane-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1.2px; color: #484f58; margin-bottom: 10px;
+  font-size: 10px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 1.2px; color: #ffffff; margin-bottom: 10px;
 }
 
 /* Catalyst cards */
@@ -496,9 +503,9 @@ header {
   background: linear-gradient(180deg, #1a2030 0%, #0f1520 100%);
   border: 1px solid #2a3040;
   border-radius: 6px;
-  color: #7EC8F5;
+  color: #ffffff;
   padding: 9px 12px;
-  font-size: 12px; font-weight: 500;
+  font-size: 12px; font-weight: 700;
   cursor: pointer; text-align: left;
   text-decoration: none;
   transition: all 0.18s ease;
@@ -515,7 +522,8 @@ header {
 .nav-tab-btn.nav-tab-admin {
   background: linear-gradient(180deg, #1a1a28 0%, #10101e 100%);
   border-color: #3a3060;
-  color: #a78bfa;
+  color: #ffffff;
+  font-weight: 700;
 }
 .nav-tab-btn.nav-tab-admin:hover {
   background: linear-gradient(180deg, #221e38 0%, #14102a 100%);
@@ -538,8 +546,9 @@ hr { border-color: #21262d; margin: 16px 0; }
   background: #0d1117;
   border: 1px solid #30363d;
   border-radius: 4px;
-  color: #7EC8F5;
+  color: #ffffff;
   font-size: 12px;
+  font-weight: 700;
   padding: 6px 8px;
   cursor: pointer;
   text-align: left;
@@ -655,7 +664,7 @@ hr { border-color: #21262d; margin: 16px 0; }
 /* Holdings Highlights */
 .holdings-highlights-sub {
   font-size: 10px;
-  color: #484f58;
+  color: #ffffff;
   margin-bottom: 14px;
   margin-top: -6px;
 }
@@ -681,7 +690,7 @@ hr { border-color: #21262d; margin: 16px 0; }
 .hc-rank {
   font-size: 11px;
   font-weight: 800;
-  color: #484f58;
+  color: #ffffff;
   width: 20px;
   flex-shrink: 0;
   text-align: center;
@@ -749,10 +758,10 @@ hr { border-color: #21262d; margin: 16px 0; }
 }
 .fa-panel-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #7EC8F5;
+  color: #ffffff;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -798,7 +807,7 @@ hr { border-color: #21262d; margin: 16px 0; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #000;
+  color: #ffffff;
   font-weight: 900;
   line-height: 1.2;
   text-align: center;
@@ -1904,7 +1913,7 @@ tr.cls-row-hidden { display: none; }
 .r-as-cash { background:#0d1a2e; color:#7EC8F5; border:1px solid #7EC8F540; }
 .r-as-ik   { background:#0d1428; color:#A8DFFB; border:1px solid #A8DFFB40; }
 .r-as-hold { background:#1c2128; color:#8b949e; border:1px solid #30363d; }
-.r-override-chip { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.6px; color:#f59e0b; background:#2d1b0050; border:1px solid #f59e0b80; border-radius:3px; padding:1px 5px; text-transform:uppercase; }
+.r-override-chip { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.6px; color:#f59e0b; background:#2d1b0050; border:1px solid #f59e0b80; border-radius:3px; padding:1px 5px; text-transform:uppercase; }
 .r-qty-sell { font-size:12px; font-weight:700; color:#e6edf3; }
 .r-qty-held { font-size:9px; color:#6e7681; }
 .r-price { font-size:12px; font-weight:700; color:#ffffff; text-align:right; }
@@ -1979,4 +1988,46 @@ tr.cls-row-hidden { display: none; }
 .ov-agent.ov-done    .ova-status { color: #4ade80; }
 .ov-agent.ov-orch.ov-running .ova-status { color: #a78bfa; }
 .ov-agent.ov-orch.ov-done    .ova-status { color: #a78bfa; }
+
+/* ── GLOBAL WHITE TEXT OVERRIDE ─────────────────────────────────────────── */
+/* Force all body text to white; preserve semantic colors (green/red/gold/blue status) */
+body, .tab-content, .tab-content *,
+.sidebar, .sidebar *,
+.panel, .panel *,
+.fa-panel, .fa-panel *,
+.main-content, .main-content * {
+  color: inherit;
+}
+body {
+  color: #ffffff;
+}
+/* Preserve semantic / status colors */
+.kv-g, [class*="kv-g"] { color: #4ade80 !important; }
+.kv-r, [class*="kv-r"] { color: #f87171 !important; }
+.kv-b, [class*="kv-b"] { color: #7EC8F5 !important; }
+.kv-p, [class*="kv-p"] { color: #a78bfa !important; }
+.kv-o, [class*="kv-o"] { color: #f59e0b !important; }
+.status-up   { color: #4ade80 !important; }
+.status-down { color: #f87171 !important; }
+.ov-agent.ov-running .ova-status { color: #7EC8F5 !important; }
+.ov-agent.ov-done    .ova-status { color: #4ade80 !important; }
+.field-error { color: #f87171 !important; }
+/* Action pill colours — restored to original */
+.r-a.r-cash          { color: #7EC8F5  !important; }
+.r-a.r-ik            { color: #A8DFFB  !important; }
+.r-a.r-hold          { color: #8b949e  !important; }
+.r-a.r-qcd           { color: #4ade80  !important; }
+.r-a.r-cash.r-sel    { color: #7EC8F5  !important; }
+.r-a.r-ik.r-sel      { color: #A8DFFB  !important; }
+.r-a.r-hold.r-sel    { color: #8b949e  !important; }
+.r-a.r-qcd.r-sel     { color: #4ade80  !important; }
+
+/* Analyst rating badge colours — restored to original */
+.r-ar-sb { color: #4ade80 !important; font-size: 10px !important; font-weight: 800 !important; }
+.r-ar-b  { color: #34d399 !important; font-size: 10px !important; font-weight: 800 !important; }
+.r-ar-n  { color: #f59e0b !important; font-size: 10px !important; font-weight: 800 !important; }
+.r-ar-s  { color: #f85149 !important; font-size: 10px !important; font-weight: 800 !important; }
+
+/* Override chip — amber, preserved */
+.r-override-chip { color: #f59e0b !important; font-size: 10px !important; font-weight: 800 !important; }
 .ova-time   { font-size: 10px; color: #8b949e; flex-shrink: 0; font-family: monospace; }
