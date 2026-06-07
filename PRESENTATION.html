@@ -343,6 +343,7 @@ nav {
     <div class="badge-pill">🤖 Agentic AI</div>
     <div class="badge-pill">⚡ <span>4s</span> response time</div>
     <div class="badge-pill">💰 Tax-efficient liquidation</div>
+    <div class="badge-pill">🎗️ Cash · In-Kind · QCD · Hold</div>
     <div class="badge-pill">📈 Reinvestment engine</div>
     <div class="badge-pill">🔒 Fully on-premises</div>
   </div>
@@ -425,9 +426,12 @@ nav {
     <div class="flow-node"><div class="flow-node-icon">📈</div><div class="flow-node-title">Reinvest Cash</div><div class="flow-node-sub">7 products</div></div>
   </div>
   <div class="solution-cards">
-    <div class="sol-card"><div class="sol-card-icon">💵</div><div class="sol-card-title">Cash Distribution</div><div class="sol-card-desc">Sells selected assets, transfers cash to client's bank account. Agent suggests where to reinvest immediately.</div></div>
-    <div class="sol-card"><div class="sol-card-icon">🔄</div><div class="sol-card-title">In-Kind Transfer</div><div class="sol-card-desc">Moves shares from IRA to taxable brokerage. Client retains market exposure while satisfying the RMD requirement.</div></div>
-    <div class="sol-card"><div class="sol-card-icon">🤖</div><div class="sol-card-title">AI Explanation</div><div class="sol-card-desc">Every decision explained in plain English. Client understands exactly why each asset was selected or protected.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">💵</div><div class="sol-card-title">Cash Distribution</div><div class="sol-card-desc">Sells selected assets, transfers cash to client's bank. Advisor selects reinvestment products — income updates live. Deploy Funds wizard collects digital authorization.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">📦</div><div class="sol-card-title">In-Kind Transfer</div><div class="sol-card-desc">Moves shares from IRA to taxable brokerage at FMV per IRS Pub. 590-B. Client stays invested while satisfying the RMD requirement.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">🎗️</div><div class="sol-card-title">QCD Donate</div><div class="sol-card-desc">Transfers assets tax-free directly from IRA to charity. $0 income recognized — most tax-efficient strategy for charitably inclined clients aged 70½+.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">⏸</div><div class="sol-card-title">Hold</div><div class="sol-card-desc">Excludes an asset from this RMD cycle. Remaining holdings cover the full RMD. Advisor can hold high-conviction positions without disrupting the plan.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">🤖</div><div class="sol-card-title">AI Explanation</div><div class="sol-card-desc">Every decision explained in plain English with clickable IRS source citations. Client understands exactly why each asset was selected or protected.</div></div>
+    <div class="sol-card"><div class="sol-card-icon">✍️</div><div class="sol-card-title">Digital Authorization</div><div class="sol-card-desc">Execute Plan wizard collects client name, consent, and account details (bank/brokerage/charity) before any action is submitted — full compliance trail.</div></div>
   </div>
 </section>
 
@@ -460,7 +464,7 @@ nav {
       <div class="step-num">4</div>
       <div class="step-icon">⚡</div>
       <div class="step-title">ACT</div>
-      <div class="step-desc">Executes trades via Alpaca API. Generates reinvestment plan</div>
+      <div class="step-desc">Execute Plan wizard: digital auth → account details → submit. Deploy Funds for reinvestment products</div>
     </div>
     <div class="step-box">
       <div class="step-num">5</div>
@@ -518,11 +522,11 @@ nav {
   <div class="slide-title">Keep the Money Working</div>
   <div class="slide-divider"></div>
   <div class="reinvest-flow-big">
-    <div class="rfb ira"><span class="rfb-icon">🏦</span>IRA Account<span class="rfb-val">$500,000</span></div>
+    <div class="rfb ira"><span class="rfb-icon">🏦</span>Total Allocated RMD<span class="rfb-val">$33,333</span></div>
     <div class="rfb-arrow">→</div>
-    <div class="rfb bank"><span class="rfb-icon">🏛️</span>Same Bank Account<span class="rfb-val">$20,325</span></div>
+    <div class="rfb bank"><span class="rfb-icon">💵</span>Cash Distribution<span class="rfb-val">~$23,244</span></div>
     <div class="rfb-arrow">→</div>
-    <div class="rfb invest"><span class="rfb-icon">📈</span>Reinvested Products<span class="rfb-val">$862/yr income</span></div>
+    <div class="rfb invest"><span class="rfb-icon">📈</span>Reinvested Products<span class="rfb-val">Live income / yr</span></div>
   </div>
   <div class="products-grid">
     <div class="prod-card"><div class="prod-name">High-Yield Savings</div><div class="prod-yield">4.5%</div><div class="prod-risk">Low Risk · Same Bank</div></div>
@@ -533,9 +537,9 @@ nav {
     <div class="prod-card"><div class="prod-name">Fixed Annuity</div><div class="prod-yield">5.2%</div><div class="prod-risk">Very Low · Guaranteed</div></div>
     <div class="prod-card"><div class="prod-name">Money Market Fund</div><div class="prod-yield">4.1%</div><div class="prod-risk">Very Low · Liquid</div></div>
     <div class="prod-card" style="border-color:var(--gold);background:linear-gradient(135deg,#2a2a1a,var(--card))">
-      <div class="prod-name" style="color:var(--gold)">Total Annual Income</div>
-      <div class="prod-yield" style="color:var(--gold)">$862</div>
-      <div class="prod-risk">RMD working for Robert</div>
+      <div class="prod-name" style="color:var(--gold)">Projected Annual Income</div>
+      <div class="prod-yield" style="color:var(--gold)">Live</div>
+      <div class="prod-risk">Updates with product selection</div>
     </div>
   </div>
 </section>
@@ -548,7 +552,7 @@ nav {
   <div class="slide-divider"></div>
   <div class="value-grid">
     <div class="value-card"><div class="value-icon">⚖️</div><div class="value-title">Regulatory Compliance</div><div class="value-desc">100% on-time RMD execution, IRS penalty eliminated, full audit trail for every decision.</div><div class="value-tag">Zero penalty incidents</div></div>
-    <div class="value-card"><div class="value-icon">😊</div><div class="value-title">Client Experience</div><div class="value-desc">Plain-English AI explanations, cash or in-kind flexibility, 24/7 chat assistant for any question.</div><div class="value-tag">Higher retention & trust</div></div>
+    <div class="value-card"><div class="value-icon">😊</div><div class="value-title">Client Experience</div><div class="value-desc">4-strategy flexibility (Cash / In-Kind / QCD / Hold), plain-English AI explanations, digital authorization wizard, PDF report + email to client, 24/7 chat assistant.</div><div class="value-tag">Higher retention & trust</div></div>
     <div class="value-card"><div class="value-icon">💰</div><div class="value-title">Tax Efficiency</div><div class="value-desc">Loss-first liquidation saves Robert $1,211/yr. At 1,000 clients → $1.2M in client tax savings annually.</div><div class="value-tag">$1,211 saved per client/yr</div></div>
     <div class="value-card"><div class="value-icon">⚡</div><div class="value-title">Operational Savings</div><div class="value-desc">3 hours of manual work per client reduced to 4 seconds. Staff redeployed to high-value activities.</div><div class="value-tag">3 hrs → 4 seconds</div></div>
     <div class="value-card"><div class="value-icon">📈</div><div class="value-title">Revenue Protection</div><div class="value-desc">Reinvestment engine keeps distributed cash in firm-managed products. AUM stays within the firm.</div><div class="value-tag">Protects AUM outflow</div></div>
@@ -588,7 +592,7 @@ nav {
     <div class="kpi-box"><div class="kpi-box-val">$20,325</div><div class="kpi-box-label">RMD Calculated</div></div>
     <div class="kpi-box"><div class="kpi-box-val">$1,211</div><div class="kpi-box-label">Tax Saved</div></div>
     <div class="kpi-box"><div class="kpi-box-val">4s</div><div class="kpi-box-label">Agent Runtime</div></div>
-    <div class="kpi-box"><div class="kpi-box-val">$862</div><div class="kpi-box-label">Annual Reinvestment Income</div></div>
+    <div class="kpi-box"><div class="kpi-box-val">4</div><div class="kpi-box-label">Distribution Strategies</div></div>
     <div class="kpi-box"><div class="kpi-box-val">On-Prem</div><div class="kpi-box-label">No Cloud Dependency</div></div>
   </div>
   <a class="cta-link" href="http://localhost:4500" target="_blank">▶ Open Live Demo</a>
