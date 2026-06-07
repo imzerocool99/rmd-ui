@@ -544,12 +544,13 @@
             <ul class="bv-list good">
               <li>Agent auto-identifies eligible accounts and calculates RMD via IRS Uniform Lifetime Table</li>
               <li>AI scores assets across 10 classes — sells losers first to minimize tax drag</li>
-              <li>Supports Cash Distribution and In-Kind Transfer to Taxable Brokerage (IRS Pub. 590-B)</li>
-              <li>Human-in-the-loop: advisor reviews Action Select (Sell / Transfer / Hold) before execution</li>
-              <li>RMD Coverage and Tax Savings recalculate live as advisor overrides selections</li>
+              <li>Supports Cash Distribution, In-Kind Transfer (IRS Pub. 590-B), and QCD tax-free charitable giving directly from IRA</li>
+              <li>Human-in-the-loop: advisor reviews 4-action pill (Cash / In-Kind / QCD / Hold) before execution</li>
+              <li>RMD Coverage, Distribution Mix, and Tax Savings recalculate live as advisor overrides selections</li>
               <li>Every decision backed by IRS regulatory citations and professional source links</li>
               <li>Analyst ratings, 12-month targets, and market catalysts shown per asset</li>
-              <li>Proceeds reinvested across 7 products with Same Bank and alternative options</li>
+              <li>Proceeds reinvested across 7 products — advisor selects products, deploys via digital authorization</li>
+              <li>Export PDF report, email to client, and Execute Plan wizard with digital client authorization</li>
               <li>Zero missed deadlines — scheduled agent runs year-round</li>
               <li>Scales to thousands of accounts with no added staff</li>
             </ul>
@@ -569,7 +570,7 @@
           <div class="bv-card">
             <div class="bv-icon">🤝</div>
             <div class="bv-title">Human-in-the-Loop Advisor Control</div>
-            <div class="bv-desc">Agent recommends, advisor decides. Each asset has an Action Select dropdown (Sell — Cash Distribution / In-Kind Transfer to Brokerage / Hold). RMD Coverage and Tax Savings update live as the advisor overrides — so they see the impact before submitting.</div>
+            <div class="bv-desc">Agent recommends, advisor decides. Each asset has a 4-action pill: Cash Distribution, In-Kind Transfer, QCD Donate, or Hold. Distribution Mix, Tax Savings, and Reinvestment income update live as the advisor overrides — so they see the full impact before submitting.</div>
             <div class="bv-value">Advisor confidence · No black-box automation · Full override capability</div>
           </div>
 
@@ -582,9 +583,9 @@
 
           <div class="bv-card">
             <div class="bv-icon">🔄</div>
-            <div class="bv-title">Cash &amp; In-Kind Distribution Flexibility</div>
-            <div class="bv-desc">Supports both IRS-recognized distribution methods: Sell (cash proceeds to bank account) and In-Kind Transfer (shares move unsold to taxable brokerage at FMV, per IRS Pub. 590-B). Default action is pre-set based on the agent's strategy recommendation.</div>
-            <div class="bv-value">Client flexibility · IRS-compliant · No forced liquidation</div>
+            <div class="bv-title">4-Strategy Distribution Flexibility</div>
+            <div class="bv-desc">Supports all IRS-recognized methods: Cash Distribution (proceeds to bank), In-Kind Transfer (shares to taxable brokerage at FMV, IRS Pub. 590-B), QCD Donate (tax-free direct to charity, up to IRS annual limit), and Hold (defer to next cycle). Each strategy is pre-set by AI and overridable by the advisor.</div>
+            <div class="bv-value">Client flexibility · IRS-compliant · Cash / In-Kind / QCD / Hold</div>
           </div>
 
           <div class="bv-card">
@@ -604,8 +605,8 @@
           <div class="bv-card">
             <div class="bv-icon">📈</div>
             <div class="bv-title">Reinvestment &amp; AUM Retention</div>
-            <div class="bv-desc">Proceeds are immediately allocated across 7 product types (T-Bills, CDs, Dividend ETFs, Muni Bonds, MMFs). Each product card shows Same Bank option (highlighted with relationship benefit) plus 2 alternative institutions — keeping assets within the firm's ecosystem.</div>
-            <div class="bv-value">Stable AUM · Same-bank stickiness · $862/yr projected income</div>
+            <div class="bv-desc">Cash proceeds are allocated across 7 product types (T-Bills, CDs, Dividend ETFs, Muni Bonds, MMFs). Advisor selects products via checkboxes — income updates live. Deploy Funds wizard collects digital client authorization before execution. Each product shows preferred institution options, keeping assets within the firm's ecosystem.</div>
+            <div class="bv-value">Stable AUM · Firm product stickiness · Live projected income</div>
           </div>
 
           <div class="bv-card">
@@ -631,15 +632,15 @@
             </div>
             <div class="loop-step">
               <div class="loop-num">3</div>
-              <div class="loop-body"><strong>PLAN</strong><span>Tax optimizer selects exact share quantities. Ollama/Phi-3 determines Cash Distribution vs In-Kind Transfer strategy per IRS Pub. 590-B. Reinvestment engine allocates proceeds across 7 product types with institution options.</span></div>
+              <div class="loop-body"><strong>PLAN</strong><span>Tax optimizer selects exact share quantities. Ollama/Phi-3 assigns each asset a strategy — Cash Distribution, In-Kind Transfer (IRS Pub. 590-B), QCD Donate, or Hold — based on gain/loss profile and client preference. Reinvestment engine allocates cash proceeds across 7 product types.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">4</div>
-              <div class="loop-body"><strong>RECOMMEND</strong><span>Presents recommendations with Action Select dropdowns (Sell / Transfer / Hold). RMD Coverage and Tax Efficiency panels update live as the advisor overrides any selection — before anything is executed.</span></div>
+              <div class="loop-body"><strong>RECOMMEND</strong><span>Presents recommendations with 4-action pills (Cash / In-Kind / QCD / Hold). Distribution Mix, Tax Impact, and Reinvestment income update live as the advisor overrides any selection — before anything is executed.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">5</div>
-              <div class="loop-body"><strong>ACT</strong><span>Advisor clicks Execute to submit approved actions. Sell orders and In-Kind transfers route via Alpaca paper trading API. Holds are excluded from this RMD cycle automatically.</span></div>
+              <div class="loop-body"><strong>ACT</strong><span>Advisor clicks Execute Plan — a 4-step wizard collects digital client authorization, bank/brokerage/charity account details, then submits. Cash proceeds are deployed to reinvestment products via the Deploy Funds wizard. PDF report and client email generated automatically.</span></div>
             </div>
             <div class="loop-step">
               <div class="loop-num">6</div>
@@ -657,11 +658,11 @@
             <div class="kpi-card"><div class="kpi-val">$1,211</div><div class="kpi-label">Tax Saved vs Naive Approach</div></div>
             <div class="kpi-card"><div class="kpi-val">31</div><div class="kpi-label">Assets Analysed Per Run</div></div>
             <div class="kpi-card"><div class="kpi-val">10</div><div class="kpi-label">Asset Classes Covered</div></div>
-            <div class="kpi-card"><div class="kpi-val">3</div><div class="kpi-label">Distribution Strategies (Sell / Transfer / Hold)</div></div>
+            <div class="kpi-card"><div class="kpi-val">4</div><div class="kpi-label">Distribution Strategies (Cash / In-Kind / QCD / Hold)</div></div>
             <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Regulatory Source Citations</div></div>
             <div class="kpi-card"><div class="kpi-val">7</div><div class="kpi-label">Reinvestment Products</div></div>
             <div class="kpi-card"><div class="kpi-val">3</div><div class="kpi-label">Institution Options Per Product</div></div>
-            <div class="kpi-card"><div class="kpi-val">$862</div><div class="kpi-label">Projected Annual Income from Reinvestment</div></div>
+            <div class="kpi-card"><div class="kpi-val">Live</div><div class="kpi-label">Projected Income Updates with Product Selection</div></div>
             <div class="kpi-card"><div class="kpi-val">Live</div><div class="kpi-label">RMD &amp; Tax Recalculation on Advisor Override</div></div>
             <div class="kpi-card"><div class="kpi-val">&lt;5s</div><div class="kpi-label">End-to-End Agent Runtime</div></div>
           </div>
@@ -1761,6 +1762,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260607l"></script>
+  <script src="app.js?v=20260607m"></script>
 </body>
 </html>
