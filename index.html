@@ -688,13 +688,13 @@
           </div>
         </div>
 
-        <!-- Two-mode intro -->
+        <!-- Three-mode intro -->
         <div class="demo-modes-bar">
           <div class="demo-mode-card mode-cash">
             <div class="demo-mode-icon">🔴</div>
             <div class="demo-mode-label">Demo Mode A</div>
             <div class="demo-mode-name">Cash Distribution</div>
-            <div class="demo-mode-desc">Traditional IRA (IRA-001-A) · Age 75 · $500K · Preference: <strong>sell</strong><br/>Shares are sold, cash proceeds sent to client's bank account</div>
+            <div class="demo-mode-desc">Traditional IRA (IRA-001-A) · Age 75 · $500K · Preference: <strong>sell</strong><br/>Shares sold, cash proceeds sent to client's bank · Advisor selects reinvestment products · Deploy Funds wizard</div>
           </div>
           <div class="demo-mode-vs">VS</div>
           <div class="demo-mode-card mode-inkind">
@@ -702,6 +702,13 @@
             <div class="demo-mode-label">Demo Mode B</div>
             <div class="demo-mode-name">In-Kind Transfer</div>
             <div class="demo-mode-desc">Rollover IRA (IRA-001-B) · Age 75 · $320K · Preference: <strong>in_kind</strong><br/>Actual shares move unsold to taxable brokerage at FMV (IRS Pub. 590-B)</div>
+          </div>
+          <div class="demo-mode-vs">+</div>
+          <div class="demo-mode-card" style="border-color:#4ade80;background:linear-gradient(135deg,#0a1f0a,#0d1117)">
+            <div class="demo-mode-icon">🎗️</div>
+            <div class="demo-mode-label" style="color:#4ade80">Demo Mode C</div>
+            <div class="demo-mode-name" style="color:#4ade80">QCD Donate</div>
+            <div class="demo-mode-desc">Any account · Override any asset to QCD<br/>Tax-free charitable donation directly from IRA · $0 income recognized · IRS Pub. 590-B · Age 70½+ eligible</div>
           </div>
         </div>
 
@@ -711,7 +718,7 @@
           <div class="demo-problem-grid">
             <div class="demo-problem-item">Advisor manually calculates RMD each year — takes 2–3 hours per client</div>
             <div class="demo-problem-item">Random asset selection triggered a $5,000+ capital gains tax last year</div>
-            <div class="demo-problem-item">No distinction between Cash Distribution vs In-Kind Transfer — client loses optionality</div>
+            <div class="demo-problem-item">No distinction between Cash, In-Kind Transfer, or QCD Donate — client loses all optionality</div>
             <div class="demo-problem-item">Advisor has no analyst context when choosing which assets to sell</div>
             <div class="demo-problem-item">Distributed cash sits idle — no reinvestment plan, no income</div>
             <div class="demo-problem-item">No explanation given to client on why specific assets were liquidated</div>
@@ -780,13 +787,14 @@
             <div class="demo-step-num">5</div>
             <div class="demo-step-body">
               <div class="demo-step-title">Agent Results — Human-in-the-Loop Approval <span class="demo-where">← Agent Results Tab</span></div>
-              <div class="demo-step-desc">Show the <strong>Assets Selected for RMD Liquidation</strong> table. Say: <em>"The agent recommends, but the advisor decides. Each asset has an Action Select dropdown. Watch what happens when I change one to Hold."</em> Change TSLA from Sell to Hold — both the RMD Coverage and Tax Efficiency panels update instantly.</div>
+              <div class="demo-step-desc">Show the <strong>Assets Selected for RMD Liquidation</strong> table. Say: <em>"The agent recommends, but the advisor decides. Each asset has a 4-action pill. Watch what happens when I change TSLA to Hold — every panel updates instantly."</em> Change TSLA to Hold, then try switching GLD to QCD.</div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
-                <li>🔴 Sell — Cash Distribution: shares sold, cash wired to client's bank account</li>
-                <li>🟡 Hold: excluded from this cycle, RMD covered by other assets</li>
-                <li>RMD Coverage chart updates live — shows shortfall immediately if you hold too much</li>
-                <li>Tax Efficiency panel updates live — holding TSLA (a loss) reduces the tax savings</li>
-                <li>Advisor sees the financial impact of their override BEFORE submitting</li>
+                <li>💵 Cash: shares sold, cash proceeds wired to client's bank account</li>
+                <li>📦 In-Kind: shares move unsold to taxable brokerage at FMV</li>
+                <li>🎗️ QCD Donate: transferred tax-free to charity — $0 income recognized (powerful for charitably inclined clients)</li>
+                <li>⏸ Hold: excluded from this cycle, other assets cover the RMD</li>
+                <li>Distribution Mix, Tax Impact, and Reinvestment income all update live on every pill change</li>
+                <li>Advisor sees the full financial impact of their override BEFORE submitting</li>
               </ul></div>
             </div>
           </div>
@@ -809,11 +817,13 @@
             <div class="demo-step-num">7</div>
             <div class="demo-step-body">
               <div class="demo-step-title">Execute Advisor Decision <span class="demo-where">← Execute Plan button</span></div>
-              <div class="demo-step-desc">Reset actions back to agent defaults, then click <strong>Execute Plan</strong>. Say: <em>"The advisor is satisfied. One click submits all decisions. The agent records each action — Sell or Hold — with a timestamp for the compliance audit trail."</em></div>
+              <div class="demo-step-desc">Click <strong>▶ Execute Plan</strong>. Say: <em>"Instead of a simple submit button, the advisor walks through a 4-step wizard — the agent collects everything needed for execution."</em> Walk through each step of the wizard.</div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
-                <li>Confirmation panel shows every decision: symbol, qty, action, status</li>
-                <li>Dropdowns lock — submitted state is frozen for the audit trail</li>
-                <li>RMD Coverage auto-expands to confirm final coverage after submission</li>
+                <li>Step 1 — Plan Review: full summary of every action before committing</li>
+                <li>Step 2 — Digital Authorization: client name + 2 consent checkboxes (not just advisor clicking submit)</li>
+                <li>Step 3 — Account Details: conditional — Cash asks for bank account, IK asks for brokerage, QCD asks for charity name/EIN/address</li>
+                <li>Step 4 — Confirm &amp; Submit: final review, 1-click execution with timestamp for audit trail</li>
+                <li>Also: ⬇ Export PDF generates a real downloadable report · 📧 Send Report emails client directly</li>
               </ul></div>
             </div>
           </div>
@@ -822,12 +832,14 @@
             <div class="demo-step-num">8</div>
             <div class="demo-step-body">
               <div class="demo-step-title">Reinvestment — Cash Put to Work <span class="demo-where">← Reinvestment Tab</span></div>
-              <div class="demo-step-desc">Show the flow diagram and product table. Say: <em>"Robert's $20,325 cash doesn't sit idle. The agent immediately recommends 7 products generating $862/year in income. Click any product icon to understand what it is."</em> Click the 🏦 icon on High-Yield Savings.</div>
+              <div class="demo-step-desc">Show the Reinvestment tab. Say: <em>"Robert's cash distribution doesn't sit idle. The system allocates proceeds across 7 products — income updates live as you check or uncheck products. When Robert agrees, click Deploy Funds to authorize."</em> Uncheck one product and watch the income and advice text update.</div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
-                <li>⭐ Same Bank option highlighted — no transfer required, keeps AUM within the firm</li>
-                <li>2 alternative institutions shown per product for client choice</li>
-                <li>T-Bills, CDs, Dividend ETFs, Municipal Bonds — different risk levels</li>
-                <li>Municipal Bonds especially valuable: Robert just took a taxable RMD — tax-exempt income offsets it</li>
+                <li>Flow shows: Total Allocated RMD → 💵 Cash Distribution → 📈 Reinvested Products (live income)</li>
+                <li>All products pre-selected — uncheck any to exclude it, income recalculates instantly</li>
+                <li>Pie chart and weight table also update with selection</li>
+                <li>▶ Deploy Funds wizard: 3-step digital authorization (Plan Review → Client Auth → Confirm &amp; Deploy)</li>
+                <li>Municipal Bonds especially valuable — tax-exempt income offsets the taxable RMD Robert just took</li>
+                <li>2 institution options per product — keeps AUM within the firm's ecosystem</li>
               </ul></div>
             </div>
           </div>
@@ -868,12 +880,13 @@
             <div class="demo-step-num">3</div>
             <div class="demo-step-body">
               <div class="demo-step-title">Agent Results — Dropdowns Default to Transfer <span class="demo-where">← Agent Results Tab</span></div>
-              <div class="demo-step-desc">Show the selected assets table. Say: <em>"Notice all Action dropdowns default to 🔵 In-Kind Transfer to Brokerage — the agent pre-sets the most appropriate action for this account. But the advisor can override any single row."</em> Change one row to 🔴 Sell — Cash Distribution.</div>
+              <div class="demo-step-desc">Show the selected assets table. Say: <em>"Notice all pills default to 📦 In-Kind — the agent pre-sets the most appropriate action for this account. But the advisor can override any single row."</em> Change one row to 💵 Cash, then try one to 🎗️ QCD.</div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
-                <li>🔵 In-Kind Transfer to Brokerage = shares move unsold, client retains the investment</li>
-                <li>🔴 Sell — Cash Distribution = available as an override on any individual asset</li>
-                <li>🟡 Hold = exclude from this RMD cycle; other assets cover the shortfall</li>
-                <li>Watch RMD Coverage recalculate live when any action changes</li>
+                <li>📦 In-Kind: shares move unsold, client stays invested — default for this account</li>
+                <li>💵 Cash: override to sell a specific asset and receive cash instead</li>
+                <li>🎗️ QCD: override to donate a gain asset directly to charity — $0 tax on the gain</li>
+                <li>⏸ Hold: exclude from this cycle; other assets cover the shortfall</li>
+                <li>Distribution Mix, Tax Impact, and Reinvestment income all update live on every pill change</li>
               </ul></div>
             </div>
           </div>
@@ -895,11 +908,11 @@
             <div class="demo-step-num">5</div>
             <div class="demo-step-body">
               <div class="demo-step-title">Execute &amp; Confirm Transfer <span class="demo-where">← Execute Plan</span></div>
-              <div class="demo-step-desc">Click Execute. Show the confirmation panel. Say: <em>"Each row now shows 'Transfer Initiated' instead of 'Order Submitted' — the agent knows the difference between a sell and a transfer, and records it correctly for the audit trail."</em></div>
+              <div class="demo-step-desc">Click <strong>▶ Execute Plan</strong>. Walk through the wizard. Say: <em>"The wizard adapts to the mix of actions — if any asset is In-Kind, it asks for the brokerage account. If QCD, it asks for the charity name and EIN. Everything captured in one flow."</em></div>
               <div class="demo-step-talk"><strong>Talking Points:</strong><ul>
-                <li>Confirmation clearly distinguishes Transfer vs Sell vs Hold per asset</li>
-                <li>RMD Coverage panel opens automatically — confirms coverage post-submission</li>
-                <li>All decisions locked and timestamped for compliance</li>
+                <li>Step 3 (Account Details) is conditional per the plan mix — shows bank / brokerage / charity sections only as needed</li>
+                <li>Digital client authorization collected before anything executes</li>
+                <li>All decisions timestamped for compliance — distinguishes Transfer vs Cash vs QCD vs Hold per asset</li>
               </ul></div>
             </div>
           </div>
@@ -957,11 +970,11 @@
           <div class="cheat-grid">
             <div class="cheat-card"><div class="cheat-val">$20,325</div><div class="cheat-label">Robert's Annual RMD — Traditional IRA (age 75, $500K)</div></div>
             <div class="cheat-card"><div class="cheat-val">$1,211</div><div class="cheat-label">Tax saved vs naive asset selection (24% bracket)</div></div>
-            <div class="cheat-card"><div class="cheat-val">$862</div><div class="cheat-label">Projected annual income from reinvestment plan</div></div>
-            <div class="cheat-card"><div class="cheat-val">2 modes</div><div class="cheat-label">Cash Distribution + In-Kind Transfer to Brokerage</div></div>
-            <div class="cheat-card"><div class="cheat-val">Live</div><div class="cheat-label">RMD Coverage &amp; Tax recalculates on every advisor override</div></div>
+            <div class="cheat-card"><div class="cheat-val">Live</div><div class="cheat-label">Projected income updates as advisor selects reinvestment products</div></div>
+            <div class="cheat-card"><div class="cheat-val">4</div><div class="cheat-label">Distribution strategies: Cash · In-Kind · QCD Donate · Hold</div></div>
+            <div class="cheat-card"><div class="cheat-val">Live</div><div class="cheat-label">Distribution Mix, Tax &amp; Reinvestment recalculate on every pill change</div></div>
             <div class="cheat-card"><div class="cheat-val">7</div><div class="cheat-label">IRS regulatory source citations — all clickable</div></div>
-            <div class="cheat-card"><div class="cheat-val">3</div><div class="cheat-label">Institution options per reinvestment product (incl. Same Bank)</div></div>
+            <div class="cheat-card"><div class="cheat-val">4-step</div><div class="cheat-label">Execute Plan wizard with digital client authorization</div></div>
             <div class="cheat-card"><div class="cheat-val">&lt;5s</div><div class="cheat-label">Full agent pipeline (vs 2–3 hrs manual per client)</div></div>
             <div class="cheat-card"><div class="cheat-val">On-Prem</div><div class="cheat-label">Fully local — no cloud, no external API keys, no data transfer</div></div>
           </div>
@@ -1762,6 +1775,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260607m"></script>
+  <script src="app.js?v=20260607n"></script>
 </body>
 </html>
