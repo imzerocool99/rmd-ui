@@ -41,17 +41,17 @@ const DEMO_DATA = {
     { symbol:'VMFXX', assetClass:'Money Market',         qty:100, price:  1,  gain:    0 }
   ],
   selectedAssets: [
-    { symbol:'TSLA', assetClass:'US Equity',       qty:6,  price:248, value:1488,  gain:-1800, account:'Traditional IRA' },
-    { symbol:'EEM',  assetClass:'Intl Equity',     qty:40, price: 42, value:1680,  gain: -680, account:'Traditional IRA' },
-    { symbol:'HYG',  assetClass:'High Yield Bond', qty:22, price: 74, value:1628,  gain: -510, account:'Traditional IRA' },
-    { symbol:'USO',  assetClass:'Commodity',       qty:25, price: 74, value:1850,  gain: -640, account:'Traditional IRA' },
-    { symbol:'TLT',  assetClass:'Bond',            qty:20, price: 88, value:1760,  gain: -420, account:'Traditional IRA' },
-    { symbol:'LQD',  assetClass:'Corporate Bond',  qty:18, price:107, value:1926,  gain: -230, account:'Traditional IRA' },
-    { symbol:'VNQ',  assetClass:'Real Estate',     qty:14, price: 82, value:1148,  gain: -210, account:'Traditional IRA' },
-    { symbol:'MUB',  assetClass:'Municipal Bond',  qty:16, price:104, value:1664,  gain:  180, account:'Traditional IRA' },
-    { symbol:'XLV',  assetClass:'Healthcare ETF',  qty:16, price:140, value:2240,  gain:  620, account:'Traditional IRA' },
-    { symbol:'GLD',  assetClass:'Commodity',       qty:12, price:225, value:2700,  gain: 1850, account:'Traditional IRA' },
-    { symbol:'VTI',  assetClass:'US Broad Market ETF', qty:5, price:242, value:1210, gain: 780, account:'Traditional IRA' }
+    { symbol:'TSLA', assetClass:'US Equity',           qty: 6, price:248, value:1488, gain:-1800, account:'Traditional IRA' },
+    { symbol:'EEM',  assetClass:'Intl Equity',         qty:40, price: 42, value:1680, gain: -680, account:'Traditional IRA' },
+    { symbol:'USO',  assetClass:'Commodity',           qty:25, price: 74, value:1850, gain: -640, account:'Traditional IRA' },
+    { symbol:'HYG',  assetClass:'High Yield Bond',     qty:22, price: 74, value:1628, gain: -510, account:'Traditional IRA' },
+    { symbol:'TLT',  assetClass:'Bond',                qty:20, price: 88, value:1760, gain: -420, account:'Traditional IRA' },
+    { symbol:'LQD',  assetClass:'Corporate Bond',      qty:18, price:107, value:1926, gain: -230, account:'Traditional IRA' },
+    { symbol:'VNQ',  assetClass:'Real Estate',         qty:14, price: 82, value:1148, gain: -210, account:'Traditional IRA' },
+    { symbol:'MUB',  assetClass:'Municipal Bond',      qty:16, price:104, value:1664, gain:  180, account:'Traditional IRA' },
+    { symbol:'XLV',  assetClass:'Healthcare ETF',      qty:16, price:140, value:2240, gain:  620, account:'Traditional IRA' },
+    { symbol:'VTI',  assetClass:'US Broad Market ETF', qty: 5, price:242, value:1210, gain:  780, account:'Traditional IRA' },
+    { symbol:'GLD',  assetClass:'Commodity',           qty:12, price:225, value:2700, gain: 1850, account:'Traditional IRA' }
   ],
   execution: [
     { symbol:'TSLA', qty:6,  side:'sell', status:'simulated' },
@@ -790,11 +790,8 @@ function renderResults(data) {
   if (el('s4-cash-val'))    el('s4-cash-val').textContent    = fmt(cashVal);
   if (el('s4-fmv-val'))     el('s4-fmv-val').textContent     = fmt(acctBalance);
   if (el('s4-rmd-val'))     el('s4-rmd-val').textContent     = fmt(rmd);
-  const selAccts3   = selectedAccounts.length > 0 ? selectedAccounts : (activeAccount ? [activeAccount] : []);
-  const avgChrPct   = selAccts3.length > 0 ? selAccts3.reduce((s,a) => s + (a.charitablePct||0), 0) / selAccts3.length : 5;
-  const qcdBudgetV  = rmd * (avgChrPct / 100);
-  if (el('s4-qcd-budget')) el('s4-qcd-budget').textContent = fmt(qcdBudgetV);
-  if (el('s4-qcd-pct'))    el('s4-qcd-pct').textContent    = avgChrPct.toFixed(0);
+  // QCD Allocated — show actual amount (updated live by rmdRecalculate)
+  if (el('s4-qcd-budget')) el('s4-qcd-budget').textContent = '—';
   if (el('s4-rmd-status'))  { el('s4-rmd-status').textContent = 'Pending ▶'; el('s4-rmd-status').className = 's4-kpi-val'; }
 
   // ── Panel 1: Optimization Summary ────────────────────────────────
@@ -844,8 +841,12 @@ function renderResults(data) {
   // RMD coverage chart
   renderRMDChart(rmd, totalLiquidated);
 
-  // JSON raw output
-  document.getElementById('executionJson').textContent = JSON.stringify(data, null, 2);
+  // JSON raw output — write to hidden element + localStorage for admin page
+  const jsonStr = JSON.stringify(data, null, 2);
+  const jsonEl = document.getElementById('executionJson');
+  if (jsonEl) jsonEl.textContent = jsonStr;
+  localStorage.setItem('rmd_last_response', jsonStr);
+  localStorage.setItem('rmd_last_response_ts', new Date().toISOString());
 
   // Reinvestment tab
   const ageEl = document.getElementById('age');
@@ -1671,8 +1672,9 @@ function rmdRecalculate() {
   const active   = cashVal + ikVal + qcdVal;
 
   // Panel 1: RMD Optimization Summary
-  if (el('s4-alloc'))  el('s4-alloc').textContent  = fmt(active);
-  if (el('s4-tax'))    el('s4-tax').textContent    = fmt(taxBill);
+  if (el('s4-alloc'))      el('s4-alloc').textContent      = fmt(active);
+  if (el('s4-tax'))        el('s4-tax').textContent        = fmt(taxBill);
+  if (el('s4-qcd-budget')) el('s4-qcd-budget').textContent = qcdVal > 0 ? fmt(qcdVal) : '—';
 
   // Panel 2: Distribution Mix — stacked bar
   if (el('mix-qcd-bar'))  el('mix-qcd-bar').style.width  = qcdPct  + '%';
@@ -2942,6 +2944,10 @@ function renderSelectedTable(assets, executions, strategy, rmd) {
   });
 
   Object.entries(byAccount).forEach(([acct, acctAssets]) => {
+    // Sort by gain ascending so loss-harvest assets come first, then smallest
+    // positive-gain assets get QCD treatment (not large gainers like VTI/GLD)
+    acctAssets.sort((a, b) => (Number(a.gain) || 0) - (Number(b.gain) || 0));
+
     // Section header row
     const secTr = document.createElement('tr');
     secTr.className = 'rmd-sec-row';
@@ -2983,11 +2989,13 @@ function renderSelectedTable(assets, executions, strategy, rmd) {
           smartAct = 'cash';                            // any loss → harvest in cash
         } else if (g >= 7000) {
           smartAct = 'hold';                            // very large gain → defer
-        } else if (qcdAllocated < qcdBudget) {
-          smartAct = 'qcd';                             // non-negative gain + QCD budget
+        } else if (g === 0) {
+          smartAct = 'cash';                            // zero gain (money market etc) → cash, no QCD benefit
+        } else if (g > 0 && qcdAllocated < qcdBudget) {
+          smartAct = 'qcd';                             // positive gain, within budget → QCD
           qcdAllocated += value;
         } else if (ikAllocated < ikBudget) {
-          smartAct = 'ik';                              // non-negative gain + IK budget
+          smartAct = 'ik';                              // remaining gain assets → in-kind
           ikAllocated += value;
         } else {
           smartAct = 'cash';                            // budgets exhausted → cash
@@ -3179,7 +3187,11 @@ async function loadPortfolio() {
   try {
     const res = await fetch(`${API}/agent/portfolio`);
     const data = await res.json();
-    document.getElementById('executionJson').textContent = JSON.stringify(data, null, 2);
+    const jsonStr2 = JSON.stringify(data, null, 2);
+    const jsonEl2 = document.getElementById('executionJson');
+    if (jsonEl2) jsonEl2.textContent = jsonStr2;
+    localStorage.setItem('rmd_last_response', jsonStr2);
+    localStorage.setItem('rmd_last_response_ts', new Date().toISOString());
   } catch (e) {
     console.error('Portfolio load failed', e);
   }

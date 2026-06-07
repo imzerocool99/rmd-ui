@@ -65,10 +65,9 @@
 
       <div style="margin-top:auto;padding-top:20px;border-top:1px solid #21262d;margin-top:24px;display:flex;flex-direction:column;gap:5px">
         <button class="nav-tab-btn" onclick="showTab('value', null)">📈 Business Value</button>
-        <button class="nav-tab-btn" onclick="showTab('demo', null)">🎤 Demo Guide</button>
+        <a href="PRESENTATION.html" target="_blank" class="nav-tab-btn" style="text-decoration:none">🎤 Demo Guide</a>
         <button class="nav-tab-btn" onclick="showTab('faq', null)">❓ FAQ</button>
         <button class="nav-tab-btn" onclick="showTab('about', null)">👥 About Us</button>
-        <button class="nav-tab-btn" id="logsToggleBtn" onclick="toggleLogsTab()">📋 View Agent Logs</button>
         <div style="border-top:1px solid #21262d;margin:6px 0"></div>
         <a href="http://localhost:4500/admin.html" target="_blank" class="nav-tab-btn nav-tab-admin">⚙️ Admin</a>
       </div>
@@ -271,7 +270,7 @@
               <div class="s4-kpi"><div class="s4-kpi-val" style="color:#ffffff" id="s4-fmv-val">—</div><div class="s4-kpi-lbl">12/31 FMV</div></div>
               <div class="s4-kpi"><div class="s4-kpi-val kv-b" id="s4-rmd-val">—</div><div class="s4-kpi-lbl">Current Year RMD</div></div>
               <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-dist-val">$0</div><div class="s4-kpi-lbl">Cur Year Distribution</div></div>
-              <div class="s4-kpi"><div class="s4-kpi-val" id="s4-qcd-budget" style="color:#4ade80">—</div><div class="s4-kpi-lbl">QCD Budget (<span id="s4-qcd-pct">5</span>%)</div></div>
+              <div class="s4-kpi"><div class="s4-kpi-val" id="s4-qcd-budget" style="color:#4ade80">—</div><div class="s4-kpi-lbl">QCD Allocated</div></div>
               <div class="s4-kpi"><div class="s4-kpi-val kv-g" id="s4-rmd-status">Pending ▶</div><div class="s4-kpi-lbl" id="s4-rmd-status-lbl">RMD Status</div></div>
             </div>
           </div>
@@ -394,15 +393,8 @@
           <div id="taxChartWrap"></div>
         </div>
 
-        <!-- FULL RESPONSE (collapsible) -->
-        <div class="panel" style="margin-top:12px">
-          <div class="panel-title collapsible-title" onclick="togglePanel('jsonPanel','jsonChevron')" style="cursor:pointer;user-select:none;">
-            Full Agent Response <span id="jsonChevron" style="margin-left:auto;font-size:12px;color:#8b949e;">▼</span>
-          </div>
-          <div id="jsonPanel" style="display:none">
-            <pre class="json-view" id="executionJson">Run the agent to see the full execution response...</pre>
-          </div>
-        </div>
+        <!-- executionJson hidden — full response moved to Admin → Agent Response tab -->
+        <pre id="executionJson" style="display:none"></pre>
 
         <!-- Hidden elements kept for renderResults compatibility -->
         <span id="rmdValue" style="display:none"></span>
@@ -986,15 +978,15 @@
           <div class="qa-list">
             <div class="qa-item">
               <div class="qa-q">What is the difference between Cash Distribution and In-Kind Transfer?</div>
-              <div class="qa-a">Cash Distribution (Sell): assets are sold inside the IRA and cash proceeds are wired to the client's bank account. In-Kind Transfer: actual shares move unsold from the IRA to a taxable brokerage account at fair market value — the client keeps the investment. Both methods satisfy the IRS RMD requirement per IRS Pub. 590-B. The agent selects the appropriate strategy based on client preference and can handle both within the same session.</div>
+              <div class="qa-a">The system supports four strategies — all satisfy the IRS RMD requirement per IRS Pub. 590-B:<br/><br/><strong>Cash Distribution:</strong> Assets are sold inside the IRA and cash is wired to the client's bank account.<br/><strong>In-Kind Transfer:</strong> Shares move unsold from the IRA to a taxable brokerage account at fair market value — the client keeps the investment.<br/><strong>QCD Donate:</strong> Up to $105,000/yr can be transferred directly to a qualified charity tax-free — the distribution counts toward the RMD and is excluded from taxable income.<br/><strong>Hold:</strong> Asset is excluded from the current RMD run (advisor override).</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">How does the live RMD recalculation work?</div>
-              <div class="qa-a">When the advisor changes any Action Select dropdown (Sell / Transfer / Hold), the app immediately recalculates how much of the RMD is covered by the remaining active assets. Hold excludes that asset's value from coverage. Both Sell and Transfer count toward the RMD. The RMD Coverage chart and plain-language status line update in real time — before the advisor submits — so they can see the impact of every override.</div>
+              <div class="qa-a">When the advisor changes any Action pill (Cash / In-Kind / QCD / Hold), the app immediately recalculates how much of the RMD is covered by the remaining active assets. Hold excludes that asset's value from coverage. Cash, In-Kind, and QCD all count toward the RMD total. The RMD Coverage chart and plain-language status line update in real time — before the advisor submits — so they can see the impact of every override.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Why do the Tax Efficiency numbers change when I change an action?</div>
-              <div class="qa-a">The agent's tax savings come from selling loss positions first. If the advisor overrides a loss-making asset to Hold, that loss is no longer realized — reducing the tax offset. The Tax Efficiency panel recalculates the smart tax bill in real time using only the assets still marked Sell or Transfer, so the advisor immediately sees how much of the $2,220 savings they're giving up.</div>
+              <div class="qa-a">Tax savings come from selling loss positions first. If the advisor overrides a loss-making asset to Hold, that loss is no longer realized — reducing the tax offset. The Tax Efficiency panel recalculates the smart tax bill in real time using only the assets still marked Cash, In-Kind, or QCD, so the advisor immediately sees how much of the $2,220 savings they're giving up.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What are the source citation icons in the AI Explanation?</div>
@@ -1002,15 +994,15 @@
             </div>
             <div class="qa-item">
               <div class="qa-q">Is this using real money / real trades?</div>
-              <div class="qa-a">This solution uses Alpaca Paper Trading — a simulated brokerage environment. No real orders are placed. The upgrade path to a live environment is straightforward: replace the paper trading API credentials with a live brokerage integration.</div>
+              <div class="qa-a">This solution uses the Alpaca Brokerage Platform in paper trading mode — a simulated environment with realistic market data. No real orders are placed and no real money is at risk. The upgrade path to live is straightforward: swap the paper trading credentials for live brokerage credentials.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Where does the AI run — does client data leave the firm?</div>
               <div class="qa-a">The AI (Ollama/Phi-3) runs 100% locally on the machine. No client data is sent to any cloud service. The language model is downloaded once and runs fully offline — meeting the most stringent data residency requirements.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Can advisors always override the agent?</div>
-              <div class="qa-a">Yes — by design. The agent recommends, the advisor decides. Every asset has an Action Select dropdown that the advisor can freely change before submitting. The system is built around human-in-the-loop: the agent does the analysis, the advisor retains full control and accountability. Nothing executes until the advisor clicks Execute.</div>
+              <div class="qa-q">Can advisors always override the AI recommendations?</div>
+              <div class="qa-a">Yes — by design. The AI recommends, the advisor decides. Every asset has an Action pill (Cash / In-Kind / QCD / Hold) that the advisor can freely change before submitting. The system is built around human-in-the-loop: the AI does the analysis, the advisor retains full control and accountability. Nothing executes until the advisor clicks Execute Plan.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">How accurate is the tax savings calculation?</div>
@@ -1037,12 +1029,16 @@
               <div class="qa-a">An RMD is the minimum amount the IRS requires you to withdraw from a Traditional IRA or employer-sponsored retirement plan each year, starting at age 73. The amount is calculated by dividing your prior year-end account balance by a life expectancy factor from the IRS Uniform Lifetime Table. Failure to take the full RMD triggers a 25% excise tax on the shortfall (reduced to 10% if corrected promptly). <a class="faq-link" href="https://www.irs.gov/retirement-plans/retirement-plans-faqs-regarding-required-minimum-distributions" target="_blank">IRS RMD FAQ ↗</a></div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">How does the agent calculate the RMD amount?</div>
-              <div class="qa-a">The agent uses the IRS Uniform Lifetime Table (the same table the IRS publishes in IRS Pub. 590-B). It divides the prior year-end IRA balance by the applicable distribution period factor for the client's age. For example, at age 75 the factor is 24.6 — so a $500,000 IRA requires a $20,325 withdrawal. The calculation is shown on the Dashboard and cited with a link to the IRS source.</div>
+              <div class="qa-q">How is the RMD amount calculated?</div>
+              <div class="qa-a">The system uses the IRS Uniform Lifetime Table (published in IRS Pub. 590-B). It divides the prior year-end IRA balance by the applicable distribution period factor for the client's age. For example, at age 75 the factor is 24.6 — so a $500,000 IRA requires a $20,325 withdrawal. The calculation is shown on the Dashboard and cited with a link to the IRS source.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What is the difference between Cash Distribution and In-Kind Transfer?</div>
               <div class="qa-a"><strong>Cash Distribution (Sell):</strong> Assets are sold inside the IRA and cash proceeds are sent to the client's bank account. The distributed amount is taxed as ordinary income in the year of distribution.<br/><br/><strong>In-Kind Transfer:</strong> The actual shares (unsold) move from the IRA to the client's taxable brokerage account. The fair market value (FMV) on the transfer date counts toward the RMD and is taxed as ordinary income — but the client keeps the investment. The cost basis in the taxable account becomes the FMV on transfer date. This is explicitly permitted by IRS Pub. 590-B. <a class="faq-link" href="https://www.irs.gov/publications/p590b" target="_blank">IRS Pub. 590-B ↗</a></div>
+            </div>
+            <div class="qa-item">
+              <div class="qa-q">What is a Qualified Charitable Distribution (QCD) and how does it help?</div>
+              <div class="qa-a">A QCD is a direct transfer from a Traditional IRA to a qualified charity. Up to $105,000/yr (2024 limit, indexed annually) can be donated this way. The key benefit: the amount transferred is excluded from taxable income entirely — it counts toward the RMD but is never added to the client's gross income. For charitably inclined clients in the 22%+ bracket, a QCD can be significantly more tax-efficient than taking a cash distribution and donating separately. <a class="faq-link" href="https://www.irs.gov/retirement-plans/qualified-charitable-distributions" target="_blank">IRS QCD Rules ↗</a></div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Does an In-Kind Transfer satisfy the full RMD requirement?</div>
@@ -1050,7 +1046,7 @@
             </div>
             <div class="qa-item">
               <div class="qa-q">What happens if the RMD is not fully covered?</div>
-              <div class="qa-a">The RMD Coverage Analysis panel will show a ⚠️ shortfall in red with a plain-language warning. This can happen if the advisor sets too many assets to Hold. The IRS imposes a 25% excise tax on any shortfall (reduced to 10% if corrected within the correction window). The agent is designed to prevent this — but advisors can override, and the live recalculation makes any shortfall immediately visible.</div>
+              <div class="qa-a">The RMD Coverage Analysis panel will show a ⚠️ shortfall in red with a plain-language warning. This can happen if the advisor sets too many assets to Hold. The IRS imposes a 25% excise tax on any shortfall (reduced to 10% if corrected within the correction window). The system is designed to prevent this — but advisors can override, and the live recalculation makes any shortfall immediately visible before submission.</div>
             </div>
           </div>
         </div>
@@ -1064,11 +1060,11 @@
             </div>
             <div class="qa-item">
               <div class="qa-q">What does the 💬 Discuss button do?</div>
-              <div class="qa-a">Each 💬 Discuss button pre-loads that specific asset's context — symbol, analyst rating, gain/loss, agent recommendation, and rationale — into the AI bot. When you click it, the bot is already briefed and can immediately answer questions like "Should I override the agent's recommendation given this analyst outlook?" without you having to copy-paste any data.</div>
+              <div class="qa-a">Each 💬 Discuss button pre-loads that specific asset's context — symbol, analyst rating, gain/loss, AI recommendation, and rationale — into the AI chat assistant. When you click it, the assistant is already briefed and can immediately answer questions like "Should I override this recommendation given the analyst outlook?" without you having to copy-paste any data.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Can the agent handle multiple IRA accounts for the same client?</div>
-              <div class="qa-a">Yes — the demo shows exactly this with Robert & Margaret Chen, who have two accounts: a Traditional IRA (Cash Distribution strategy) and a Rollover IRA (In-Kind Transfer strategy). Each account runs its own independent agent analysis. The Quick Select in the sidebar lets you switch between accounts instantly.</div>
+              <div class="qa-q">Can the system handle multiple IRA accounts for the same client?</div>
+              <div class="qa-a">Yes — the demo shows exactly this with Robert & Margaret Chen, who have two accounts: a Traditional IRA and a Rollover IRA. Each account runs its own independent analysis with the optimal strategy selected per account. The Quick Select in the sidebar lets you switch between accounts instantly.</div>
             </div>
           </div>
         </div>
@@ -1077,16 +1073,16 @@
           <div class="faq-section-title">🤝 Human-in-the-Loop &amp; Advisor Control</div>
           <div class="qa-list">
             <div class="qa-item">
-              <div class="qa-q">Does the agent execute trades automatically without advisor approval?</div>
-              <div class="qa-a">No — by design. The agent analyzes and recommends. The advisor reviews every asset in the Action Select table (Sell / Transfer / Hold), overrides any row as needed, and must explicitly click <strong>Execute Plan</strong> to submit. Nothing executes until the advisor approves. This is the human-in-the-loop architecture.</div>
+              <div class="qa-q">Does the system execute trades automatically without advisor approval?</div>
+              <div class="qa-a">No — by design. The AI analyzes and recommends. The advisor reviews every asset in the Action table (Cash / In-Kind / QCD / Hold), overrides any row as needed, and must explicitly click <strong>Execute Plan</strong> to submit. Nothing executes until the advisor approves. This is the human-in-the-loop architecture.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">What happens when I change an action from Sell to Hold?</div>
-              <div class="qa-a">Two things update in real time before you submit: (1) The <strong>RMD Coverage Analysis</strong> recalculates — if you hold too much the chart shows a shortfall. (2) The <strong>Tax Efficiency</strong> panel recalculates — if you hold a loss position, the tax savings decrease because that loss is no longer offsetting gains. This gives advisors full visibility into the financial impact of their override before committing.</div>
+              <div class="qa-q">What happens when I change an action to Hold?</div>
+              <div class="qa-a">Two things update in real time before you submit: (1) The <strong>RMD Coverage Analysis</strong> recalculates — if you hold too much the chart shows a shortfall. (2) The <strong>Tax Efficiency</strong> panel recalculates — if you hold a loss position, the tax savings decrease because that loss is no longer offsetting gains. This gives advisors full visibility into the financial impact of every override before committing.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Can an advisor partially override — change some assets but accept others?</div>
-              <div class="qa-a">Yes — each asset row is independent. The advisor can change any subset of rows (e.g., change TSLA from Sell to Hold but leave all others as the agent recommended). The live recalculation reflects only the rows that were changed. The Execute button submits all rows in their current state.</div>
+              <div class="qa-a">Yes — each asset row is independent. The advisor can change any subset of rows (e.g., change TSLA from Cash to Hold but leave all others as recommended). The live recalculation reflects only the rows that were changed. Execute Plan submits all rows in their current state.</div>
             </div>
           </div>
         </div>
@@ -1095,8 +1091,8 @@
           <div class="faq-section-title">💰 Tax Efficiency &amp; Source Citations</div>
           <div class="qa-list">
             <div class="qa-item">
-              <div class="qa-q">What is tax-loss harvesting and how does the agent use it?</div>
-              <div class="qa-a">Tax-loss harvesting is the strategy of selling positions with unrealized losses to offset realized gains — reducing the overall tax bill. The agent scores every asset in the portfolio by its gain/loss position and selects loss-making or low-gain assets first. Compared to a naive approach (randomly selecting assets), this can save thousands of dollars per client per year. The Tax Efficiency panel shows the exact comparison side-by-side. <a class="faq-link" href="https://www.investopedia.com/terms/t/taxlossharvesting.asp" target="_blank">Investopedia ↗</a></div>
+              <div class="qa-q">What is tax-loss harvesting and how does the AI use it?</div>
+              <div class="qa-a">Tax-loss harvesting is the strategy of selling positions with unrealized losses to offset realized gains — reducing the overall tax bill. The system scores every asset in the portfolio by its gain/loss position and selects loss-making or low-gain assets first. Assets with large unrealized gains are routed to In-Kind Transfer or QCD instead, avoiding a taxable event entirely. Compared to a naive approach (selling highest-gain assets first), this saved Robert $2,220 in this demo. The Tax Efficiency panel shows the exact comparison side-by-side. <a class="faq-link" href="https://www.investopedia.com/terms/t/taxlossharvesting.asp" target="_blank">Investopedia ↗</a></div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What are the source citation icons in the AI Explanation?</div>
@@ -1105,7 +1101,7 @@
                 This gives compliance teams a direct audit trail from AI decision to regulatory source.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">What tax rate does the agent use?</div>
+              <div class="qa-q">What tax rate does the system use?</div>
               <div class="qa-a">The POC uses a 24% marginal federal rate as a baseline. In production, the actual client tax bracket, applicable state tax, and carryforward losses would be integrated from the firm's tax engine for precise per-client calculations.</div>
             </div>
           </div>
@@ -1120,15 +1116,15 @@
             </div>
             <div class="qa-item">
               <div class="qa-q">Is this using real money or real brokerage accounts?</div>
-              <div class="qa-a">This solution uses Alpaca Paper Trading — a simulated brokerage environment with realistic market data. No real orders are placed and no real money is at risk. Moving to a live environment simply requires replacing the paper trading API credentials with live brokerage integration.</div>
+              <div class="qa-a">This solution uses the Alpaca Brokerage Platform in paper trading mode — a simulated environment with realistic market data. No real orders are placed and no real money is at risk. Moving to a live environment simply requires replacing the paper trading credentials with live brokerage credentials.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Is there a full audit trail of agent decisions?</div>
-              <div class="qa-a">Yes — every agent run logs the client, account, RMD amount, assets selected, rationale, and execution actions with timestamps. The Logs tab (accessible from the sidebar) shows the complete execution history. The AI Explanation panel preserves the full reasoning for each decision, with regulatory source citations, for compliance review.</div>
+              <div class="qa-q">Is there a full audit trail of AI decisions?</div>
+              <div class="qa-a">Yes — every run logs the client, account, RMD amount, assets selected, rationale, and execution actions with timestamps. The Logs tab (accessible from the sidebar) shows the complete execution history. The AI Explanation panel preserves the full reasoning for each decision, with regulatory source citations, for compliance review.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Can this scale to thousands of clients?</div>
-              <div class="qa-a">Yes — the agent is stateless per request. Multiple accounts can be processed in parallel. The scheduler can automatically trigger runs for all eligible accounts on a defined schedule (daily, monthly, annually). No additional staff is needed as the client base grows.</div>
+              <div class="qa-a">Yes — the system is stateless per request. Multiple accounts can be processed in parallel. The scheduler can automatically trigger runs for all eligible accounts on a defined schedule (daily, monthly, annually). No additional staff is needed as the client base grows.</div>
             </div>
           </div>
         </div>
@@ -1137,20 +1133,20 @@
           <div class="faq-section-title">🔄 Strategy &amp; Edge Cases</div>
           <div class="qa-list">
             <div class="qa-item">
-              <div class="qa-q">Can the advisor mix Cash and In-Kind in the same RMD run?</div>
-              <div class="qa-a">Yes — within the same run, the advisor can override individual assets. For example, if the agent defaults all rows to In-Kind Transfer, the advisor can change Asset A to Sell (Cash Distribution) and leave Asset B as Transfer. Both count toward the RMD. The RMD Coverage panel reflects the combined total immediately.</div>
+              <div class="qa-q">Can the advisor mix strategies in the same RMD run?</div>
+              <div class="qa-a">Yes — within the same run, the advisor can override individual assets independently. For example, the AI might recommend Cash for loss positions, In-Kind for moderate gainers, and QCD for a charitable client. The advisor can change any individual row — switch one asset from Cash to Hold, another from In-Kind to QCD. All active rows count toward the RMD. The RMD Coverage panel reflects the combined total immediately.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What if the client's portfolio doesn't have enough assets to cover the RMD?</div>
-              <div class="qa-a">The RMD Coverage Analysis panel shows the shortfall in red with the exact gap amount and a ⚠️ plain-language warning. In production the agent would escalate to the advisor and potentially suggest additional assets or partial liquidations. The agent covers this detection; automated escalation workflow is a planned enhancement.</div>
+              <div class="qa-a">The RMD Coverage Analysis panel shows the shortfall in red with the exact gap amount and a ⚠️ plain-language warning. In production the system would escalate to the advisor and potentially suggest additional assets or partial liquidations. Shortfall detection is live; automated escalation workflow is a planned enhancement.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">What if the client's tax bracket is different from 24%?</div>
               <div class="qa-a">This solution uses 24% as a demonstration baseline. The tax savings calculation is proportional — at a 32% bracket the tax savings from the same $2,220 gain offset would be even larger (~$2,960 saved). In production the exact marginal rate per client, including state tax and alternative minimum tax considerations, would be pulled from the firm's tax engine.</div>
             </div>
             <div class="qa-item">
-              <div class="qa-q">Does the agent consider wash sale rules when harvesting losses?</div>
-              <div class="qa-a">Wash sale awareness is a production enhancement. The agent demonstrates the tax-loss harvesting concept and quantifies the savings. In production, the agent would cross-check the 30-day wash sale window (IRS Section 1091) to ensure that recently purchased substantially identical securities do not disqualify the harvested loss.</div>
+              <div class="qa-q">Does the system consider wash sale rules when harvesting losses?</div>
+              <div class="qa-a">Wash sale awareness is a production enhancement. The AI demonstrates the tax-loss harvesting concept and quantifies the savings. In production, the system would cross-check the 30-day wash sale window (IRS Section 1091) to ensure that recently purchased substantially identical securities do not disqualify the harvested loss.</div>
             </div>
           </div>
         </div>
@@ -1159,12 +1155,12 @@
           <div class="faq-section-title">📈 Reinvestment &amp; Products</div>
           <div class="qa-list">
             <div class="qa-item">
-              <div class="qa-q">Why does the reinvestment tab show Same Bank options?</div>
-              <div class="qa-a">The agent is designed to keep assets within the firm's ecosystem wherever possible. The ⭐ Same Bank option on each product card represents the firm's own offering for that product type — no transfer is required, the relationship is maintained, and the firm retains the AUM. Two alternative institutions are shown for comparison and client choice transparency.</div>
+              <div class="qa-q">How does the Reinvestment tab keep AUM within the firm?</div>
+              <div class="qa-a">The system is designed to keep distributed cash within the firm's ecosystem wherever possible. Each reinvestment product card represents a firm-managed offering — High-Yield Savings, CDs, Treasury Bills, Municipal Bonds, Dividend ETFs, Fixed Annuities, and Money Market funds. The advisor selects products, sees projected annual income update live, then clicks Deploy Funds to initiate the digital authorization workflow. No external transfer is required, the client relationship is maintained, and the firm retains the AUM.</div>
             </div>
             <div class="qa-item">
               <div class="qa-q">Why are Municipal Bonds highlighted for RMD clients?</div>
-              <div class="qa-a">Municipal Bond interest income is exempt from federal income tax (and often state tax). RMD distributions are taxed as ordinary income — so a client who just took a large taxable RMD distribution is in a higher-than-normal tax situation that year. Investing some of the proceeds in tax-exempt muni bonds directly offsets that income tax impact. The agent specifically surfaces this for clients in the 22%+ bracket.</div>
+              <div class="qa-a">Municipal Bond interest income is exempt from federal income tax (and often state tax). RMD distributions are taxed as ordinary income — so a client who just took a large taxable RMD distribution is in a higher-than-normal tax situation that year. Investing some of the proceeds in tax-exempt muni bonds directly offsets that income tax impact. The system specifically surfaces this for clients in the 22%+ bracket.</div>
             </div>
           </div>
         </div>
@@ -1183,7 +1179,7 @@
           <div class="panel-title">🎯 Purpose &amp; Vision</div>
           <p style="font-size:13px;color:#c9d1d9;line-height:1.8;margin:0">
             This solution demonstrates how <strong>Agentic AI</strong> can transform Required Minimum Distribution processing — one of the most compliance-critical, tax-sensitive, and operationally burdensome workflows in retail wealth management.<br/><br/>
-            The agent does not replace the advisor. It amplifies them — handling the analytical heavy lifting (RMD calculation, tax optimization, asset selection, reinvestment planning) while the advisor retains full control and accountability over every decision.<br/><br/>
+            The AI does not replace the advisor. It amplifies them — handling the analytical heavy lifting (RMD calculation, tax optimization, asset selection, reinvestment planning) while the advisor retains full control and accountability over every decision.<br/><br/>
             The same agentic framework is designed to extend to Inherited IRAs, Roth conversions, retirement income planning, and beyond.
           </p>
         </div>
@@ -1596,18 +1592,6 @@
 
       </div>
 
-      <!-- LOGS TAB -->
-      <div id="tab-logs" class="tab-content">
-        <div class="panel">
-          <div class="panel-title">
-            Agent Execution Logs
-            <button class="btn-xs" onclick="loadLogs()">↻ Refresh</button>
-          </div>
-          <div class="log-container" id="logContainer">
-            <div class="log-empty">Click Refresh or run the agent to see logs.</div>
-          </div>
-        </div>
-      </div>
 
     </main>
   </div>
@@ -1775,6 +1759,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260607p"></script>
+  <script src="app.js?v=20260607s"></script>
 </body>
 </html>
