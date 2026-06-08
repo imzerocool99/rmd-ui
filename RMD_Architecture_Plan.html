@@ -108,7 +108,7 @@
   <li>Analyzes portfolio across 10 asset classes — scores each asset for tax efficiency and performance.</li>
   <li>Selects assets with losses/underperformance first to minimize tax impact.</li>
   <li>Shows exact tax savings vs naive (random) asset selection — side-by-side comparison.</li>
-  <li>Executes trades via Alpaca paper trading API (simulated for POC).</li>
+  <li>Executes trades via Alpaca paper trading platform (simulated for POC).</li>
   <li>Suggests 7 reinvestment products for the distributed cash (HYSA, CD, T-Bills, Muni Bonds, Dividend ETF, Fixed Annuity, Money Market).</li>
   <li>Context-aware AI chat bot answers client questions based on whichever tab they are viewing.</li>
   <li>Full audit trail and agent execution logs for compliance.</li>
@@ -142,7 +142,7 @@
                       │
 ┌─────────────────────▼────────────────────────────────────────────────┐
 │                     INTEGRATION LAYER                                  │
-│  Alpaca Paper Trading API  |  IRS Life Expectancy Tables              │
+│  Alpaca Paper Trading Platform  |  IRS Life Expectancy Tables              │
 │  Ollama / Phi-3 (port 11434, local)  |  Market price data             │
 └──────────────────────────────────────────────────────────────────────┘</div>
 </div>
@@ -232,7 +232,7 @@ Example: $500,000 balance, age 75 → RMD = <strong>$20,325.20</strong></div>
   <tr><td>Build Tool</td><td>Apache Maven 3.9.6</td><td>Compile, package, dependency management</td><td><span class="badge free">FREE</span></td></tr>
   <tr><td>AI Runtime</td><td>Ollama (local, port 11434)</td><td>Hosts LLM on your PC — no API key needed</td><td><span class="badge free">FREE</span></td></tr>
   <tr><td>AI Model</td><td>Phi-3 (Microsoft, 3.8B params)</td><td>Chat assistant only (not agent decisions)</td><td><span class="badge free">FREE</span></td></tr>
-  <tr><td>Trading API</td><td>Alpaca Paper Trading</td><td>Simulated trade execution (POC mode)</td><td><span class="badge free">FREE</span></td></tr>
+  <tr><td>Trading Platform</td><td>Alpaca Paper Trading</td><td>Simulated trade execution (POC mode)</td><td><span class="badge free">FREE</span></td></tr>
   <tr><td>Frontend</td><td>HTML5 / CSS3 / Vanilla JS</td><td>Dashboard UI — no build step required</td><td><span class="badge free">FREE</span></td></tr>
   <tr><td>Charts</td><td>Chart.js 4.5</td><td>Doughnut, bar, horizontal bar charts</td><td><span class="badge free">FREE</span></td></tr>
   <tr><td>Static Server</td><td>http-server (npx)</td><td>Serves frontend on port 4500</td><td><span class="badge free">FREE</span></td></tr>

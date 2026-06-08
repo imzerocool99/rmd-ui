@@ -390,6 +390,14 @@ header {
   border: 1px solid #21262d; padding: 1px 6px; border-radius: 3px;
 }
 
+/* Increase readability for Featured Products section only */
+#productCards2 .product-card2-desc {
+  font-size: 12px;
+}
+#productCards2 .product-tag {
+  font-size: 11px;
+}
+
 /* ── DISTRIBUTION METHOD LEGEND ── */
 .method-legend {
   display: flex; align-items: flex-start; gap: 0;
@@ -1193,16 +1201,17 @@ tr.cls-row-hidden { display: none; }
   margin-bottom: 20px;
   text-align: center;
 }
-.bv-hero-title { font-size: 20px; font-weight: 700; color: #7EC8F5; margin-bottom: 8px; }
-.bv-hero-sub { font-size: 13px; color: #8b949e; }
+.bv-hero-title { font-size: 22px; font-weight: 700; color: #7EC8F5; margin-bottom: 8px; }
+.bv-hero-sub { font-size: 15px; color: #c9d1d9; }
 .bv-pill {
-  font-size: 11px; font-weight: 600; color: #c9d1d9;
+  font-size: 12px; font-weight: 700; color: #c9d1d9;
   background: #1a2a3a; border: 1px solid #4AAEE0;
-  border-radius: 20px; padding: 4px 12px;
+  border-radius: 20px; padding: 6px 14px;
 }
 
 .bv-list { list-style: none; padding: 0; margin: 0; }
-.bv-list li { font-size: 13px; padding: 7px 0; border-bottom: 1px solid #21262d; color: #c9d1d9; }
+.bv-list li { font-size: 15px; padding: 8px 0; border-bottom: 1px solid #21262d; color: #c9d1d9; }
+.bv-list li:last-child { border: none; }
 .bv-list li:last-child { border: none; }
 .bv-list.bad li::before  { content: '✗ '; color: #f85149; font-weight: 700; }
 .bv-list.good li::before { content: '✓ '; color: #3fb950; font-weight: 700; }
@@ -1217,14 +1226,14 @@ tr.cls-row-hidden { display: none; }
   background: #161b22;
   border: 1px solid #21262d;
   border-radius: 10px;
-  padding: 18px;
+  padding: 20px;
   transition: border-color 0.2s, transform 0.2s;
 }
 .bv-card:hover { border-color: #7EC8F5; transform: translateY(-2px); }
-.bv-icon { font-size: 28px; margin-bottom: 10px; }
-.bv-title { font-size: 13px; font-weight: 700; color: #c9d1d9; margin-bottom: 8px; }
-.bv-desc { font-size: 12px; color: #8b949e; line-height: 1.6; margin-bottom: 10px; }
-.bv-value { font-size: 11px; color: #3fb950; font-weight: 600; border-top: 1px solid #21262d; padding-top: 8px; }
+.bv-icon { font-size: 30px; margin-bottom: 12px; }
+.bv-title { font-size: 16px; font-weight: 700; color: #c9d1d9; margin-bottom: 8px; }
+.bv-desc { font-size: 15px; color: #c0c7cc; line-height: 1.7; margin-bottom: 12px; }
+.bv-value { font-size: 13px; color: #3fb950; font-weight: 700; border-top: 1px solid #21262d; padding-top: 10px; }
 
 /* AGENT LOOP */
 .agent-loop { display: flex; flex-direction: column; gap: 12px; }
